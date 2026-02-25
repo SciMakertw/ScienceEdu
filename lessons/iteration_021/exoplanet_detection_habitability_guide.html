@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：系外行星探測與宜居性評估</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08101b;
+      --panel: #17283d;
+      --panel2: #1f3751;
+      --text: #edf4ff;
+      --muted: #c8d8ea;
+      --line: #4a6f93;
+      --accent: #87d6ff;
+      --accent2: #a8ffd5;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 84% 8%, #2c5b8d 0%, #1a3652 44%, #08101b 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6f95b6; color: #d7ecff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #cde2f4; max-width: 760px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(17,32,49,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d7e7fa; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e8f2ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3f6685; color: #ccffe8; }
+
+    .planner { border: 1px solid #6189ab; border-radius: 16px; background: linear-gradient(150deg, #204363, #1a3550); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #dff2ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #6f98b9; border-radius: 10px; background: rgba(10,26,39,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cee2f3; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #87d6ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7ca3c2; border-radius: 10px; background: rgba(8,18,27,.74); padding: .66rem .75rem; font-size: .9rem; color: #dfecf8; }
+    .plan-out b { color: #d2ffea; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #afe9ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #dfebf9; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #6f95b5; border-radius: 12px; background: #2b5775; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #5f84a2; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #d7e7f4; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1d3f55; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #799dbb; border-radius: 10px; background: rgba(40,67,86,.56); padding: .68rem .78rem; color: #e7f1fa; font-size: .92rem; }
+    .debrief strong { color: #d1ffea; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Exoplanet Detection & Habitability</span>
+        <h1>系外行星探測與宜居性評估：<br>從「找到行星」走到「判讀生命條件」</h1>
+        <p>近二十年，系外行星研究從少量發現快速進入資料爆發期。真正困難已不只是「有沒有行星」，而是如何判讀它的軌道、成分、輻射環境與大氣特徵，並在高度不確定中做出合理的宜居性判斷。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為什麼要找系外行星</a>
+      <a href="#s2">2. 探測方法：凌日與徑向速度</a>
+      <a href="#s3">3. 望遠鏡任務與資料鏈</a>
+      <a href="#s4">4. 大氣光譜與生物訊號判讀</a>
+      <a href="#s5">5. 宜居性評估的陷阱</a>
+      <a href="#s6">6. 下一代任務與研究路線</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="宜居性判讀評估器">
+        <h2>宜居性判讀評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="starStability">母恆星穩定度（高 = 輻射環境較穩）</label>
+            <input id="starStability" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="atmosphereEvidence">大氣證據可信度（高 = 光譜訊號清楚）</label>
+            <input id="atmosphereEvidence" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="waterClues">液態水線索強度（高 = 軌道條件佳）</label>
+            <input id="waterClues" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先提高光譜品質與交叉驗證，再討論生物訊號</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為什麼要找系外行星</h3>
+        <p class="lead">找系外行星不是單純「星空獵奇」，而是理解地球在宇宙中是否常見的核心路徑。</p>
+        <p>當我們問「宇宙是否還有生命」，真正要回答的是一串更具工程感的問題：行星形成機率有多高、穩定軌道能維持多久、恆星活動是否會摧毀大氣、以及化學環境是否允許複雜分子存在。系外行星研究把這些問題從哲學辯論轉成可量測科學。</p>
+        <p>這也是為什麼行星研究與天文儀器、資料科學、太空任務規劃緊密連動。你看到的一顆「新行星」，背後其實是大量統計與誤差控制工作。真正有價值的不是單點發現，而是能不能建立可靠族群模型，判斷哪些行星型態在宇宙中最常出現。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜What Is an Exoplanet?</h4>
+            <p>頻道：NASA｜用途：建立系外行星研究的核心問題與基本概念。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="0ZOhJe_7GrE" title="What Is an Exoplanet" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先把「發現一顆行星」與「理解一個行星系統」區分開來，後者才是研究深度所在。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 探測方法：凌日與徑向速度</h3>
+        <p class="lead">多數系外行星不是直接看到，而是透過「間接訊號」反推出來。</p>
+        <p>凌日法會觀測恆星亮度微幅下降，推估行星大小與公轉週期；徑向速度法則看恆星光譜的都卜勒位移，推估行星質量下限。兩種方法都很強，但單獨使用都會有盲區。凌日法偏向找到軌道面剛好對準地球的系統；徑向速度法對恆星活動干擾很敏感。</p>
+        <p>因此，現代研究的標準做法是多方法交叉確認。當同一顆行星同時有凌日與徑向速度資料，你才能同時估到半徑與質量，進一步推算平均密度，判斷它比較像岩石行星還是氣體行星。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Exoplanets: Crash Course Astronomy #27</h4>
+            <p>頻道：CrashCourse｜用途：快速掌握主流探測方法的原理與限制。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="7ATtD8x7vV0" title="Crash Course Exoplanets" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點不是背方法名稱，而是理解每種方法會偏好找到哪些類型行星。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 望遠鏡任務與資料鏈</h3>
+        <p class="lead">系外行星研究是一條完整資料鏈：巡天發現、追蹤確認、光譜解析、模型校正。</p>
+        <p>像 Kepler 與 TESS 偏向大量巡天，快速找到候選目標；CHEOPS 這類任務則把焦點放在已知目標的精密量測。這種分工有點像醫療檢查：先做大規模篩檢，再用高精度工具做深入診斷。若沒有前後銜接，候選訊號很難轉成可信結論。</p>
+        <p>研究團隊真正花時間的，常常不是「找到訊號」，而是處理系統誤差：儀器漂移、恆星本身亮度變化、資料缺口補值等。這些看似技術細節，實際上直接決定論文結論是否可重現。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Meet Cheops, the Characterising Exoplanet Satellite</h4>
+            <p>頻道：European Space Agency, ESA｜用途：理解精密系外行星量測任務在資料鏈中的角色。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="M-bJ2YcPDUg" title="ESA CHEOPS mission" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把 CHEOPS 看成「精密追蹤儀」，它補上的是候選行星到物理參數之間的關鍵一段。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 大氣光譜與生物訊號判讀</h3>
+        <p class="lead">宜居性討論一旦進到大氣層，問題會從「有沒有行星」升級成「如何避免過度解讀」。</p>
+        <p>望遠鏡觀測到的大氣訊號通常非常微弱，而且容易與儀器噪聲、資料處理流程耦合。即使看到水蒸氣、甲烷、二氧化碳等分子線，也不代表可以直接宣布生命跡象。因為同樣分子組合，可能由非生物地質過程產生。</p>
+        <p>成熟做法是多波段、多儀器、跨模型比較，並把不確定度公開。真正負責任的科學論述，往往不是說「已證實有生命」，而是明確列出「目前最有可能的物理解釋，以及還缺哪些關鍵觀測」。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜New Worlds: Analyzing the Atmospheres of Exoplanets with JWST</h4>
+            <p>頻道：SVAstronomyLectures｜用途：深入理解 JWST 在系外行星大氣研究的分析方法。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="PnPoIhxud4Y" title="Analyzing exoplanet atmospheres with JWST" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>記住：看到光譜峰值只是起點，真正工作在於排除替代解釋與估算不確定度。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 宜居性評估的陷阱</h3>
+        <p class="lead">「位在宜居帶」不等於「適合生命」，這是最常見也最昂貴的誤解。</p>
+        <p>宜居帶只是溫度條件的一個粗估，沒有把大氣厚度、磁場保護、行星潮汐鎖定、恆星閃焰頻率等因素完整納入。很多看起來位在理想距離的行星，實際環境可能極端到不利複雜化學維持。</p>
+        <p>所以研究者現在更重視「可居住性指標組合」而非單一參數。你可以把它想成醫療風險評估：不是看一項數值就下結論，而是多維度整合後給出風險區間。這種方法雖然保守，但更符合真實科學流程，也更能避免媒體敘事把暫時訊號包裝成最終答案。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Exoplanets and the Search for Habitable Worlds</h4>
+            <p>頻道：UT Physics｜用途：建立宜居性判讀時的理論框架與審慎標準。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="J_6DiGAC_tc" title="Exoplanets and habitable worlds lecture" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支最值得帶走的是「如何在不確定中做科學判讀」的思考框架。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 下一代任務與研究路線</h3>
+        <p class="lead">未來十年的重點不只是在「多找一些行星」，而是建立可比較、可重現、可累積的宜居性證據系統。</p>
+        <p>下一代觀測任務會把解析度、靈敏度與資料連續性再推高，讓我們更有機會追蹤行星大氣隨時間變化，而不是只看單次觀測切片。這對判斷大氣是否穩定、是否存在季節性化學變化非常關鍵。</p>
+        <p>研究策略也會更平台化：巡天任務提供候選名單，精密任務做深入量測，地面望遠鏡補長期追蹤，最後由模型團隊做統計整合。真正能改變認知的，不會是一支「驚人新聞」，而是多年累積後在不同資料源之間出現一致訊號。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜How Do We Learn About a Planet's Atmosphere?</h4>
+            <p>頻道：James Webb Space Telescope (JWST)｜用途：理解未來大氣探測與判讀的技術路線。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="W1bel0ODIDE" title="How we learn about exoplanet atmosphere" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把焦點放在「證據鏈」：資料品質、交叉驗證與長期監測缺一不可。</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const starStability = document.getElementById('starStability');
+    const atmosphereEvidence = document.getElementById('atmosphereEvidence');
+    const waterClues = document.getElementById('waterClues');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const s = Number(starStability.value);
+      const a = Number(atmosphereEvidence.value);
+      const w = Number(waterClues.value);
+      const options = [
+        { name: '先提高光譜品質與交叉驗證，再討論生物訊號', score: (6 - a) * 1.2 + w * 0.8 + s * 0.7 },
+        { name: '優先追蹤母星活動週期，降低環境誤判風險', score: (6 - s) * 1.2 + a * 0.8 + w * 0.6 },
+        { name: '鎖定高潛力目標做長期監測與多儀器聯測', score: a * 1.1 + w * 1.0 + s * 0.8 },
+        { name: '先擴充候選樣本，再做統計層級宜居性分析', score: s * 0.8 + a * 0.7 + w * 0.7 + 0.8 }
+      ].sort((x, y) => y.score - x.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [starStability, atmosphereEvidence, waterClues].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
