@@ -1,0 +1,320 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：工業數位孿生與預測維護</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #081017;
+      --panel: #14232f;
+      --panel2: #1b3040;
+      --text: #eaf4fb;
+      --muted: #b8ccda;
+      --line: #3d5d72;
+      --accent: #71d8ff;
+      --accent2: #8dffc1;
+      --warn: #ffd89d;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 88% 8%, #285f7e 0%, #133246 40%, #081017 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #5f8398; color: #c8e8fb; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #c7dae6; max-width: 760px; font-size: 1rem; }
+    .hero-note { border: 1px solid #4d7185; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(24,51,65,.82), rgba(18,36,47,.9)); color: #dcebf4; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,36,47,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #c5dcec; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #dfeffd; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #2d5568; color: #a9ffd8; }
+
+    .planner { border: 1px solid #4f7388; border-radius: 16px; background: linear-gradient(150deg, #173447, #132a38); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #d2ecf9; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #587c91; border-radius: 10px; background: rgba(12,28,37,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #c8dfe9; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #71d8ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #5c7f92; border-radius: 10px; background: rgba(10,21,29,.74); padding: .66rem .75rem; font-size: .9rem; color: #d4e4ec; }
+    .plan-out b { color: #b8ffe0; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #a4f0ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d9e9f3; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #557a8e; border-radius: 12px; background: #1e4a5f; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #496b7e; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f1fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #c9dfeb; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #112d3a; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #648094; border-radius: 10px; background: rgba(34,52,63,.56); padding: .68rem .78rem; color: #e0edf4; font-size: .92rem; }
+    .debrief strong { color: #c6ffe9; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #c8ffef; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #c8ffef; }
+    .open-youtube:hover { color: #effff9; border-bottom-color: #effff9; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #b4c7d3; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Industrial Digital Twin</span>
+        <h1>工業數位孿生與預測維護：<br>從「看設備」走向「預判故障」</h1>
+        <p>數位孿生的真正價值，不是做一個漂亮 3D 模型，而是把設備狀態、維護歷史與運行風險變成可決策資訊。這份指南會帶你從概念、協同架構到實務部署，完整看懂預測維護怎麼落地。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「維護策略排程器」，調整停機成本、資料品質、備品時程後，即時得到建議維護優先順序。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_017/digital_twin_predictive_maintenance_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 什麼是工業數位孿生</a>
+      <a href="#s2">2. 預測維護的資料鏈</a>
+      <a href="#s3">3. 孿生模型與工廠流程耦合</a>
+      <a href="#s4">4. 故障預警到維修派工</a>
+      <a href="#s5">5. 跨部門導入與治理</a>
+      <a href="#s6">6. 企業部署路線圖</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="維護策略排程器">
+        <h2>維護策略排程器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="downtimeCost">停機成本壓力（高 = 停機代價大）</label>
+            <input id="downtimeCost" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="dataQuality">感測資料品質（高 = 訊號更穩定）</label>
+            <input id="dataQuality" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="spareLead">備品交期壓力（高 = 補料慢）</label>
+            <input id="spareLead" type="range" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>高風險設備預警 + 備品前置</b>，再擴展到全廠設備分層維護。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 什麼是工業數位孿生</h3>
+        <p class="lead">數位孿生是「實體設備 + 即時資料 + 模型推演」的持續同步系統。</p>
+        <p>很多人把數位孿生等同於可視化儀表板，但真正的孿生系統必須能對設備行為做預測，而不是只回看歷史。它連結設計參數、現場感測與運維紀錄，讓工程師在故障發生前就看到風險走勢。</p>
+        <p>因此，孿生價值不在單次展示，而在長期決策品質提升：更少停機、更準派工、更低維修總成本。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜What is a Digital Twin?</h4>
+            <p>頻道：IBM Technology｜用途：建立數位孿生核心定義與應用框架。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="2hnoGo27uf8" title="What is a Digital Twin" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先抓住一句話：孿生系統的任務是「把未知變可預測」，而不是只做展示。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 預測維護的資料鏈</h3>
+        <p class="lead">預測維護成功與否，取決於資料鏈完整度，而不只模型精度。</p>
+        <p>感測器資料進來後，需要經過清洗、特徵化、異常檢測與風險評分，最後才轉成可行動的維護建議。若資料品質不穩，模型再先進也容易產生誤報與漏報。</p>
+        <p>真正可用的系統一定把資料工程、設備知識與維修流程綁在一起，避免「模型很準但現場沒法執行」的落差。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Predictive Maintenance Explained</h4>
+            <p>頻道：RealPars｜用途：快速理解預測維護在工業場景的完整流程。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="2_o1SDy6__U" title="Predictive Maintenance Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這支影片當作資料鏈地圖，逐步對照你現場有哪些資料缺口。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 孿生模型與工廠流程耦合</h3>
+        <p class="lead">只有模型沒有流程，數位孿生很快會變成孤島系統。</p>
+        <p>在先進工廠裡，孿生模型需和 MES、PLM、設備監控與排程系統協作，才能把預測結果轉成排程或生產策略。這也是數位孿生導入最常卡住的地方：技術可行，但跨系統整合成本高。</p>
+        <p>因此導入順序很關鍵。通常從高價值產線或關鍵設備做示範，再擴展到跨廠域協同，成功率更高。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Why digital twins will be the backbone of industry in the future</h4>
+            <p>頻道：Siemens Knowledge Hub｜用途：理解孿生如何成為工業流程核心。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="ObGhB9CCHP8" title="Digital twins backbone of industry" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點不是工具品牌，而是你能否把設計、生產、維護三段資料串起來。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 故障預警到維修派工</h3>
+        <p class="lead">預測維護的終點不是告警，而是準確且可執行的維修行動。</p>
+        <p>多數專案失敗在最後一哩：系統能發警報，卻沒有接到工單、備品、排程流程。有效做法是把風險分數直接映射到維修優先級與維修窗口，讓現場團隊能立即行動。</p>
+        <p>這讓維護策略從反應式變成主動式，停機時間與誤修成本都能下降。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Catch Equipment Failures Early - SmartSignal Predictive Maintenance</h4>
+            <p>頻道：GE Vernova｜用途：觀察故障預警如何轉成可運作維護流程。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="JHKNZWcfvms" title="SmartSignal Predictive Maintenance" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看完後請問自己：警報是否真的能驅動派工？這是導入成敗關鍵。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 跨部門導入與治理</h3>
+        <p class="lead">數位孿生不是 IT 專案，而是營運專案，必須由設備、製造、維護共同擁有。</p>
+        <p>若 KPI 只放在單一部門，系統很容易偏成局部最佳化。成熟導入通常會設共同指標：停機率、良率、維修週期、備品成本，並建立明確資料責任分工。</p>
+        <p>這也是為什麼導入期要先做治理框架：資料標準、異常分類、模型更新節奏都要定義清楚。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜What is a digital twin?</h4>
+            <p>頻道：MIT Open Learning｜用途：從教育與系統視角建立跨部門共同語言。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="p-q6I_CdWVk" title="MIT What is a digital twin" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支片適合做內部共識建立，先讓各部門對「孿生」有一致定義。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 企業部署路線圖</h3>
+        <p class="lead">最務實的部署不是一次到位，而是「高價值場景先行，逐步擴面」。</p>
+        <p>建議先選一條關鍵產線，建立從資料接入到派工閉環，再擴展到多設備、多廠區。這樣能快速證明 ROI，也能降低組織阻力。當你能穩定縮短停機並提高維修命中率，孿生就從概念變成營運能力。</p>
+        <p>最後要做的是標準化：把成功做法轉成模板，讓新產線能快速複製。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜Predictive Maintenance at the BMW iFACTORY</h4>
+            <p>頻道：BMW Group｜用途：觀察大型製造業如何把預測維護納入生產營運。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="H9uaBg1dsNQ" title="Predictive Maintenance at BMW iFACTORY" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把焦點放在「可複製流程」：技術導入成效，最後要能被標準化擴散。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 017｜主題：工業數位孿生與預測維護｜單頁教學頁 + YouTube 嵌入 + 維護策略排程器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const downtimeCost = document.getElementById('downtimeCost');
+    const dataQuality = document.getElementById('dataQuality');
+    const spareLead = document.getElementById('spareLead');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const d = Number(downtimeCost.value);
+      const q = Number(dataQuality.value);
+      const s = Number(spareLead.value);
+      const options = [
+        { name: '高風險設備預警 + 備品前置', score: d * 1.2 + s * 1.0 + q * 0.7 },
+        { name: '先提升資料品質，再擴模型覆蓋率', score: (6 - q) * 1.15 + d * 0.8 + s * 0.6 },
+        { name: '分層維護排程（關鍵設備優先）', score: d * 1.1 + q * 0.7 + s * 0.8 },
+        { name: '建立跨部門維護 KPI 與派工閉環', score: d * 0.9 + q * 0.9 + s * 0.6 + 1 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [downtimeCost, dataQuality, spareLead].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
