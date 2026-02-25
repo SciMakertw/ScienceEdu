@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：合成生物學與生物製造</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08110f;
+      --panel: #142a24;
+      --panel2: #18352d;
+      --text: #e9f6f1;
+      --muted: #bfd8cf;
+      --line: #3f6759;
+      --accent: #79f2c8;
+      --accent2: #8ce6ff;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 85% 8%, #1f6d56 0%, #163f34 42%, #08110f 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6aa38d; color: #cbf7e8; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #cae4da; max-width: 760px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(17,40,34,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #c9e8dd; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #dff8ef; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #2f5f50; color: #b9ffe5; }
+
+    .planner { border: 1px solid #548a75; border-radius: 16px; background: linear-gradient(150deg, #1a4136, #16362d); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #d2f4e7; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #5f947f; border-radius: 10px; background: rgba(11,28,23,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #c7e8db; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #79f2c8; }
+    .plan-out { margin-top: .6rem; border: 1px solid #649c86; border-radius: 10px; background: rgba(10,22,19,.74); padding: .66rem .75rem; font-size: .9rem; color: #d9ece4; }
+    .plan-out b { color: #c6ffeb; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #aefadf; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #dbeee6; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #5d8f7d; border-radius: 12px; background: #215646; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #4d7a6b; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f0fffa; }
+    .video-meta p { margin: .28rem 0 0; color: #cee7dc; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #14382d; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #6a9687; border-radius: 10px; background: rgba(32,62,53,.56); padding: .68rem .78rem; color: #e4f4ed; font-size: .92rem; }
+    .debrief strong { color: #cdffe8; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d5fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d5fff0; }
+    .open-youtube:hover { color: #f3fffb; border-bottom-color: #f3fffb; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #b4cec3; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Synthetic Biology & Biomanufacturing</span>
+        <h1>合成生物學與生物製造：<br>把「生命設計」推進到產業規模</h1>
+        <p>合成生物學不只是在實驗室改造 DNA，而是把工程流程帶進生命系統，從設計、建構、測試到放大製造。這份指南帶你從核心原理一路走到精準發酵與治理挑戰。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 合成生物學的工程化邏輯</a>
+      <a href="#s2">2. 設計生物系統：從基因到功能</a>
+      <a href="#s3">3. DBTL 循環與自動化實驗</a>
+      <a href="#s4">4. 代謝工程與生物製造放大</a>
+      <a href="#s5">5. 精準發酵與食農應用</a>
+      <a href="#s6">6. 安全、法規與產業路線</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="DBTL 導入策略模擬器">
+        <h2>DBTL 導入策略模擬器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="automation">自動化成熟度（高 = 實驗迭代快）</label>
+            <input id="automation" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="regulation">法規複雜度（高 = 上市門檻高）</label>
+            <input id="regulation" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="scaleRisk">放大量產風險（高 = 製程波動大）</label>
+            <input id="scaleRisk" type="range" min="1" max="5" value="4">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先做小規模驗證 + 建立標準化測試流程</b>，再進入量產放大。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 合成生物學的工程化邏輯</h3>
+        <p class="lead">合成生物學的核心不是「改造生命」四個字，而是把生命系統變成可設計、可驗證、可重複的工程流程。</p>
+        <p>傳統生物研究常重在理解機制；合成生物學則往前一步，要求把機制轉成可執行設計。你需要先定義功能目標，例如產生某種蛋白、改變代謝路徑，然後再反推需要哪些基因元件與控制策略。</p>
+        <p>這種思維改變了研發節奏。團隊不再靠單次突破，而是靠迭代速度與資料品質持續逼近最優解。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Synthetic Biology: Principles and Applications</h4>
+            <p>頻道：iBiology Techniques｜用途：建立合成生物學的整體框架與關鍵語彙。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="ku9_0NIhRPc" title="Synthetic Biology Principles and Applications" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先把「生物學問題」翻譯成「工程需求」，你才能真的進入合成生物學語境。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 設計生物系統：從基因到功能</h3>
+        <p class="lead">設計階段要處理的不只是 DNA 序列，而是生物系統在不同環境下的行為穩定性。</p>
+        <p>同一段基因在不同宿主、不同培養條件，輸出可能完全不同。這也是為什麼合成生物學逐步從單元件設計，走向系統層級設計，關注訊號串接、代謝負擔與宿主適配。</p>
+        <p>當設計能力提升，團隊就能更快從概念跨到可測試原型，減少盲目試錯成本。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Programming Living Bacteria</h4>
+            <p>頻道：iBiology Techniques｜用途：理解如何用工程方法設計與控制細菌行為。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="lNttxYdGHs4" title="Programming Living Bacteria" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點是「可控性」：能不能讓系統在真實環境下仍維持預期輸出。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. DBTL 循環與自動化實驗</h3>
+        <p class="lead">Design-Build-Test-Learn（DBTL）是合成生物學最關鍵的加速器。</p>
+        <p>如果沒有標準化的 DBTL 流程，研發會被人力與時間瓶頸卡住。現代生物工坊（biofoundry）透過自動化液體處理、實驗排程與資料系統，把原本慢速、分散的流程變成可並行、可追蹤的迭代工廠。</p>
+        <p>這使得研發競爭力逐漸從「誰先發現」，轉向「誰能最快迭代且最少失敗」。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Metabolic Engineering and Synthetic Biology of Yeast</h4>
+            <p>頻道：iBiology Techniques｜用途：看懂 DBTL 在酵母工程中的落地方式。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="mL6NwbmEum4" title="Metabolic Engineering and Synthetic Biology of Yeast" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這段內容最值得抄下來的是：如何把每輪實驗失敗轉成下一輪設計資產。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 代謝工程與生物製造放大</h3>
+        <p class="lead">從實驗室成功到量產成功，中間最大的斷層在「放大」而不是「概念」。</p>
+        <p>在 1 公升反應器有效，不代表在 10,000 公升仍能穩定。氧傳、剪切力、溫度梯度與污染風險都會放大原本小問題。代謝工程必須與製程工程一起設計，才能降低從研發到產線的落差。</p>
+        <p>因此，量產前期就要引入製程思維，而不是等到最後才補救。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜What is a Foundry for Biology?</h4>
+            <p>頻道：Ginkgo Bioworks｜用途：理解生物工坊如何支撐高通量研發與量產轉換。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="BJiICr5FnnM" title="What is a Foundry for Biology" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請聚焦在平台化能力：標準流程、資料回饋、與跨專案複用。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 精準發酵與食農應用</h3>
+        <p class="lead">精準發酵是合成生物學走向民生應用最快的一條路線之一。</p>
+        <p>它的價值在於：透過微生物生產特定蛋白、脂質或功能分子，提供替代原料與新型食品解法。這不只牽涉技術可行，還牽涉成本結構、供應鏈穩定與消費者認知。</p>
+        <p>當研發團隊討論商業化時，必須同時評估製程效率、法規與市場溝通，不然技術優勢很難轉成規模化成果。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜What is Precision Fermentation?</h4>
+            <p>頻道：TurtleTree｜用途：快速掌握精準發酵在食農生技的商業化定位。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="pBmBhL5rrTo" title="What is Precision Fermentation" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>注意影片怎麼連結「技術路徑」與「產品策略」，這是落地關鍵。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 安全、法規與產業路線</h3>
+        <p class="lead">合成生物學進入大眾市場後，治理能力就是競爭力的一部分。</p>
+        <p>研發速度越快，越要同步建立風險評估、品質控管與透明溝通機制。尤其在食品與醫療相關應用，安全證據、標示制度與跨國法規協調會直接決定進入門檻。</p>
+        <p>長期來看，誰能把「創新速度」與「可信治理」同時做強，誰就更可能成為下一波生物製造平台的核心玩家。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜The safety of food products from precision fermentation</h4>
+            <p>頻道：FAO｜用途：建立精準發酵產品的安全與治理視角。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="wxXOknHeH3Y" title="Safety of food products from precision fermentation" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>技術可行只是起點，最終能否擴散，取決於安全證據與社會信任。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 018｜主題：合成生物學與生物製造｜單頁教學頁 + YouTube 嵌入 + DBTL 導入策略模擬器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const automation = document.getElementById('automation');
+    const regulation = document.getElementById('regulation');
+    const scaleRisk = document.getElementById('scaleRisk');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const a = Number(automation.value);
+      const r = Number(regulation.value);
+      const s = Number(scaleRisk.value);
+      const options = [
+        { name: '先做小規模驗證 + 建立標準化測試流程', score: (6 - a) * 1.0 + s * 1.1 + r * 0.9 },
+        { name: '強化自動化 DBTL，優先拉高迭代速度', score: a * 1.3 + (6 - r) * 0.7 + (6 - s) * 0.6 },
+        { name: '優先處理法規與品質文件，再推進商業化', score: r * 1.25 + s * 0.7 + (6 - a) * 0.5 },
+        { name: '建立跨部門量產小組，並行處理放大與驗證', score: s * 1.05 + r * 0.85 + a * 0.75 }
+      ].sort((x, y) => y.score - x.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [automation, regulation, scaleRisk].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

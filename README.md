@@ -4,7 +4,7 @@
 
 ## 已上架內容
 - 首頁總攬：`index.html`
-- 課程頁面：`lessons/iteration_001` 到 `lessons/iteration_017`
+- 課程頁面：`lessons/iteration_001` 到 `lessons/iteration_018`
 
 ## GitHub Pages
 建議以 `main` 分支根目錄作為 Pages Source。
