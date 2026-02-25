@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：氣候工程</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1d22;
+      --panel: #13272d;
+      --panel2: #16333b;
+      --text: #e5f2ef;
+      --muted: #a9c2bc;
+      --line: #29505b;
+      --accent: #6ce3bd;
+      --accent2: #8fd6ff;
+      --warn: #ffd283;
+      --max: 1140px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 15% 5%, #21404b 0%, #12252b 40%, #0b171b 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Outfit", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.35fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #4d7e70; color: #bdf5dd; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; margin-bottom: .75rem; text-transform: uppercase; }
+    h1 { margin: 0; font-family: "Outfit", sans-serif; font-size: clamp(2rem, 4.2vw, 3.25rem); line-height: 1.15; letter-spacing: -.01em; }
+    .hero p { margin: .95rem 0 0; color: #bed3cd; font-size: 1rem; max-width: 720px; }
+    .hero-note { border: 1px solid #47685e; background: linear-gradient(140deg, rgba(23,52,47,.8), rgba(23,38,51,.85)); border-radius: 13px; padding: .82rem .9rem; color: #d4f3eb; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6c5e38; background: #302a1a; color: #ffe2a6; border-radius: 10px; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 255px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,37,43,.85); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #b6d4cd; font-size: .86rem; letter-spacing: .08em; text-transform: uppercase; }
+    .toc a { display: block; text-decoration: none; color: #d8ece7; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #1f4551; color: #9ef5d6; }
+
+    .scenario { border: 1px solid #2f5b57; border-radius: 16px; background: linear-gradient(150deg, #143236, #152d36); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.24); }
+    .scenario h2 { margin: 0 0 .6rem; font-size: 1.03rem; color: #c4f3e5; letter-spacing: .03em; }
+    .scenario-switch { display: flex; gap: .45rem; flex-wrap: wrap; margin-bottom: .65rem; }
+    .scenario-switch button { border: 1px solid #4c7972; background: #17353a; color: #cae6e0; border-radius: 999px; padding: .3rem .72rem; cursor: pointer; font-size: .85rem; }
+    .scenario-switch button.active { border-color: #6ce3bd; color: #eafff8; background: #205045; }
+    .scenario-panel { border: 1px solid #3d6864; border-radius: 11px; background: rgba(13,31,35,.66); padding: .72rem .82rem; color: #c7dfdb; min-height: 84px; font-size: .92rem; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-family: "Outfit", sans-serif; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #9ff1d4; border-left: 3px solid #6ce3bd; padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d4e7e2; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #3b6770; border-radius: 12px; background: #132f3c; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #33555d; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #ecfbff; }
+    .video-meta p { margin: .28rem 0 0; color: #bfd5d6; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #0c1f27; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .debrief { margin-top: .74rem; border: 1px solid #4a5e3d; border-radius: 10px; background: rgba(41,56,35,.52); padding: .68rem .78rem; color: #d3efc6; font-size: .92rem; }
+    .debrief strong { color: #ceff9e; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #b4ffd2; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #b4ffd2; }
+    .open-youtube:hover { color: #e0ffed; border-bottom-color: #e0ffed; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #a8c0ba; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Climate Engineering</span>
+        <h1>氣候工程：
+          當減排速度追不上升溫，
+          我們該不該「動手調天氣」？</h1>
+        <p>這份指南從最具爭議的問題出發：碳移除與太陽輻射管理到底是必要保險，還是危險賭注？你會看到科學機制、政策風險，以及為什麼這不是「技術對抗自然」那麼簡單。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「政策情境切換器」，可快速切換「減排優先 / 混合策略 / 高風險干預」三種路線。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_005/climate_engineering_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為何氣候工程被提上桌</a>
+      <a href="#s2">2. 碳移除：把 CO2 拉回地底</a>
+      <a href="#s3">3. 太陽輻射管理：快但爭議大</a>
+      <a href="#s4">4. 風險、治理與道德風險</a>
+      <a href="#s5">5. 2030 後的實際決策框架</a>
+    </aside>
+
+    <main>
+      <section class="scenario" aria-label="政策情境切換器">
+        <h2>政策情境切換器</h2>
+        <div class="scenario-switch">
+          <button type="button" class="active" data-key="mitigation">減排優先</button>
+          <button type="button" data-key="mixed">混合策略</button>
+          <button type="button" data-key="intervention">高風險干預</button>
+        </div>
+        <div class="scenario-panel" id="scenarioPanel">主軸是快速減排與能源轉型，碳移除只補難減部門；優點是治理成本相對可控，缺點是對政治協調與投資速度要求極高。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為何氣候工程被提上桌</h3>
+        <p class="lead">幾年前它還像科幻，現在它進入政策會議，原因只有一個：時間壓力。</p>
+        <p>當全球升溫風險與極端氣候衝擊變得更具體，部分研究者開始主張：即使深度減排是主軸，也需要評估「額外工具」。氣候工程不是單一技術，而是一整組干預方案，從移除大氣二氧化碳到反射部分太陽輻射，差異很大。</p>
+        <p>討論它並不等於支持它。真正重要的是把問題說清楚：哪些方法是長期修復，哪些只是短期降溫；哪些風險可量化，哪些風險會跨國擴散。沒有這層辨識，公共討論很容易在「全盤否定」與「盲目樂觀」之間擺盪。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Geoengineering: A Horrible Idea We Might Have to Do</h4>
+            <p>頻道：Kurzgesagt – In a Nutshell｜用途：建立氣候工程「不得不談」的背景張力。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="dSu5sXmsur4" title="Geoengineering A Horrible Idea We Might Have to Do" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先抓一句話：這不是「要不要拯救地球」的二選一，而是「在風險變大時，哪些選項值得先研究」。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 碳移除：把 CO2 拉回地底</h3>
+        <p class="lead">碳移除（CDR）像是補救工具：對已在大氣中的 CO2 做逆操作。</p>
+        <p>與直接減排不同，碳移除是在排放發生後，再把二氧化碳從空氣中抓出來並長期封存。這類方法理論上可處理難以完全去碳化的部門，但成本、能耗、土地與監測問題都很現實。若規模化設計不當，甚至可能與糧食、水資源競爭。</p>
+        <p>關鍵不在「能不能捕捉」，而在「能否持續、可驗證、可負擔」。政策上還要避免一個常見陷阱：把未來的碳移除承諾，拿來延後今天該做的減排。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Carbon dioxide can save us...?</h4>
+            <p>頻道：PBS Terra｜用途：理解碳捕捉與碳移除的機會與限制。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="KORn-9SR0LA" title="Carbon dioxide can save us" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看這支時請把「技術可行」和「系統可行」分開記。前者是工程題，後者是政策與經濟題。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 太陽輻射管理：快，但爭議更大</h3>
+        <p class="lead">如果碳移除像慢速修復，太陽輻射管理（SRM）更像緊急剎車。</p>
+        <p>SRM 的核心想法是減少到達地表的淨太陽能量，短期內可能帶來降溫效果。它吸引人的地方是速度；它最危險的地方也是速度，因為氣候系統並非單一旋鈕。降溫可能伴隨區域降雨變化、季風擾動與治理衝突，而且無法處理海洋酸化等 CO2 根本問題。</p>
+        <p>這使得 SRM 討論總帶著倫理困境：若不用，風險可能升高；若使用，副作用與國際治理成本也很高。真正難題不是物理可不可行，而是誰有權決定、誰承擔後果。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Should we reflect sunlight to cool the planet?</h4>
+            <p>頻道：Vox｜用途：快速理解 SRM 的原理、優勢與爭議。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="EKPFZPyQurA" title="Should we reflect sunlight to cool the planet" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請留意影片對「快效」的描述。任何快效技術都應附帶更嚴格的退出機制與國際監督設計。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 風險、治理與道德風險</h3>
+        <p class="lead">氣候工程最大的風險，常常不在實驗室，而在治理結構裡。</p>
+        <p>所謂道德風險（moral hazard）是指：當社會相信未來有技術補救，今天就可能放慢減排。這不是抽象假設，而是政策訊號會真實影響投資與行為。如果沒有清楚框架，氣候工程可能從「補充手段」滑向「拖延理由」。</p>
+        <p>此外，氣候系統跨國相連，單一國家的部署可能對他國降雨與糧食造成外溢影響。這意味著治理必須至少具備三層：透明資料、國際協議、可追責機制。沒有治理，技術越強，風險越難收束。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜David Keith: A surprising idea for "solving" climate change</h4>
+            <p>頻道：TED｜用途：從研究者視角看 SRM 的科學與政策兩難。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="XkEys3PeseA" title="David Keith A surprising idea for solving climate change" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片的價值在於把「科學可行」與「政治可行」放在同一張桌上。請把這兩條線分別記錄。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 2030 後的實際決策框架</h3>
+        <p class="lead">最可行的框架通常不是押單一方案，而是建立分層決策：減排主軸、移除補位、高風險方案嚴格門檻。</p>
+        <p>如果把氣候工程納入政策工具箱，務實做法應包含四點：第一，減排路線不被替代；第二，碳移除必須有監測與永久性驗證；第三，SRM 僅限研究或極高門檻應急；第四，所有進展都要有國際透明審查。這樣才可能兼顧風險管理與行動速度。</p>
+        <p>對公眾而言，關鍵能力不是表態支持或反對，而是能辨識不同方案的時程、風險與治理需求。因為未來決策的核心問題不是「要不要技術」，而是「什麼條件下、由誰負責、如何退出」。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Can carbon capture save us?</h4>
+            <p>頻道：DW Planet A｜用途：回到碳捕捉與碳移除的可行性檢查。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="uuayrvIFi0E" title="Can carbon capture save us" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>最後用一句話總結：氣候工程只能是「風險管理工具」，不能是「減排替代品」。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 005｜主題：氣候工程（碳移除與地球工程）｜單頁教學頁 + YouTube 嵌入 + 政策情境切換器</footer>
+
+  <script>
+    const scenarioText = {
+      mitigation: '主軸是快速減排與能源轉型，碳移除只補難減部門；優點是治理成本相對可控，缺點是對政治協調與投資速度要求極高。',
+      mixed: '減排持續推進，同時有限部署碳移除並加大監測；優點是有彈性，缺點是政策設計複雜，容易被錯誤訊號扭曲。',
+      intervention: '在暖化衝擊失控時考慮高風險干預（如 SRM）；優點是可能快速降溫，缺點是跨國風險與治理衝突急遽上升。'
+    };
+
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+    const panel = document.getElementById('scenarioPanel');
+    const scenarioBtns = Array.from(document.querySelectorAll('.scenario-switch button'));
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    scenarioBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-key');
+        scenarioBtns.forEach((b) => b.classList.toggle('active', b === btn));
+        panel.textContent = scenarioText[key] || '';
+      });
+    });
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

@@ -1,0 +1,618 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：記憶與學習的神經科學</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f0e8;
+      --paper: #fffaf3;
+      --ink: #2b2421;
+      --muted: #6a5c56;
+      --line: #d8c8bb;
+      --accent: #c45f46;
+      --accent-soft: #f7d7ca;
+      --teal: #2f7d7a;
+      --teal-soft: #d7f0ee;
+      --shadow: 0 12px 28px rgba(43, 36, 33, 0.12);
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at 12% 8%, #fff7ed 0%, #f5ece0 32%, #efe3d8 100%),
+        linear-gradient(180deg, rgba(196,95,70,0.06), rgba(47,125,122,0.03));
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", sans-serif;
+      line-height: 1.82;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.6);
+      z-index: 40;
+      backdrop-filter: blur(4px);
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--teal));
+      transition: width 0.08s linear;
+    }
+
+    .hero {
+      padding: 5rem 1.1rem 2rem;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(145deg, #f9ecdf, #efe8df);
+    }
+
+    .hero-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .label {
+      display: inline-block;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid #c99c8c;
+      color: #935745;
+      border-radius: 999px;
+      padding: 0.22rem 0.68rem;
+      margin-bottom: 0.78rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: clamp(2rem, 4.1vw, 3.3rem);
+      line-height: 1.14;
+    }
+
+    .hero p {
+      margin: 0.9rem 0 0;
+      color: #5b4f49;
+      max-width: 720px;
+      font-size: 1rem;
+    }
+
+    .hero-card {
+      border: 1px solid #d4b9aa;
+      background: #fff5ea;
+      border-radius: 14px;
+      padding: 0.82rem 0.92rem;
+      color: #6f4838;
+      font-size: 0.92rem;
+      box-shadow: 0 8px 20px rgba(96, 62, 42, 0.08);
+    }
+
+    .runtime-note {
+      max-width: var(--max);
+      margin: 0.9rem auto 0;
+      padding: 0 1.1rem;
+      display: none;
+    }
+
+    .runtime-note.show { display: block; }
+
+    .runtime-note p {
+      margin: 0;
+      border: 1px solid #c3a576;
+      background: #fff4de;
+      color: #6d552b;
+      border-radius: 10px;
+      padding: 0.75rem 0.85rem;
+      font-size: 0.9rem;
+    }
+
+    .layout {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1rem 1.1rem 2.2rem;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 1rem;
+    }
+
+    .toc {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 251, 244, 0.85);
+      padding: 0.78rem;
+      box-shadow: 0 10px 22px rgba(56, 42, 35, 0.08);
+      backdrop-filter: blur(6px);
+    }
+
+    .toc h2 {
+      margin: 0 0 0.5rem;
+      font-size: 0.86rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6a5a54;
+    }
+
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: #4a3e39;
+      border-radius: 8px;
+      padding: 0.4rem 0.46rem;
+      font-size: 0.9rem;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--accent-soft);
+      color: #6f3020;
+    }
+
+    .quiz {
+      border: 1px solid #cbb5a7;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #fff8ef, #f8eee4);
+      padding: 0.95rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .quiz h2 {
+      margin: 0 0 0.6rem;
+      font-family: "Fraunces", serif;
+      font-size: 1.08rem;
+      color: #5a3328;
+    }
+
+    .q-item {
+      border: 1px solid #dbc8bb;
+      border-radius: 12px;
+      background: #fffaf5;
+      padding: 0.7rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .q-item:last-child { margin-bottom: 0; }
+
+    .q-title {
+      margin: 0 0 0.45rem;
+      color: #3f312b;
+      font-size: 0.93rem;
+      font-weight: 700;
+    }
+
+    .q-ops {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .q-ops button {
+      border: 1px solid #caaea0;
+      background: #fff;
+      border-radius: 999px;
+      padding: 0.28rem 0.68rem;
+      cursor: pointer;
+      font-size: 0.84rem;
+      color: #543e35;
+    }
+
+    .q-ops button.correct {
+      border-color: #2f7d7a;
+      background: #dbf0ee;
+      color: #1d5c5a;
+    }
+
+    .q-ops button.wrong {
+      border-color: #c45f46;
+      background: #f9ddd3;
+      color: #7c3223;
+    }
+
+    .q-feedback {
+      margin-top: 0.42rem;
+      font-size: 0.84rem;
+      color: #6a5a52;
+      min-height: 1.25rem;
+    }
+
+    .section {
+      border: 1px solid #d8c9be;
+      border-radius: 16px;
+      background: var(--paper);
+      padding: 1.16rem 1rem;
+      margin-bottom: 0.95rem;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section h3 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.22rem, 2.15vw, 1.72rem);
+      line-height: 1.26;
+      color: #362925;
+    }
+
+    .lead {
+      margin: 0.56rem 0 0.72rem;
+      border-left: 3px solid var(--teal);
+      padding-left: 0.56rem;
+      color: #2c6866;
+      font-size: 0.95rem;
+    }
+
+    .section p {
+      margin: 0.66rem 0;
+      color: #403531;
+      font-size: 0.98rem;
+    }
+
+    .video-card {
+      margin-top: 0.95rem;
+      border: 1px solid #c7d8d6;
+      border-radius: 12px;
+      background: #f5fbfa;
+      overflow: hidden;
+    }
+
+    .video-meta {
+      padding: 0.7rem 0.88rem;
+      border-bottom: 1px solid #c5dad7;
+    }
+
+    .video-meta h4 {
+      margin: 0;
+      font-size: 1rem;
+      color: #29514f;
+    }
+
+    .video-meta p {
+      margin: 0.28rem 0 0;
+      color: #4b6765;
+      font-size: 0.9rem;
+    }
+
+    .frame {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: #e2efed;
+    }
+
+    .frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .debrief {
+      margin-top: 0.75rem;
+      border: 1px solid #d5c5b7;
+      border-radius: 10px;
+      background: #fff2e6;
+      padding: 0.68rem 0.8rem;
+      color: #68493b;
+      font-size: 0.92rem;
+    }
+
+    .debrief strong { color: #7b3c2b; }
+
+    .open-youtube {
+      display: inline-block;
+      margin: 0.68rem 0.9rem 0.9rem;
+      font-size: 0.9rem;
+      color: #2b6e6b;
+      text-decoration: none;
+      border-bottom: 1px dashed #2b6e6b;
+    }
+
+    .open-youtube:hover {
+      color: #1f5a57;
+      border-bottom-color: #1f5a57;
+    }
+
+    footer {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 1.1rem 2rem;
+      text-align: center;
+      color: #7c6e66;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+    }
+
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: 0.96rem 0.84rem; }
+      .section p { font-size: 0.95rem; }
+      .q-ops button { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="label">Learning Guide • Neuroscience</span>
+        <h1>記憶與學習的神經科學：
+          我們如何記住，
+          又為什麼會忘記？</h1>
+        <p>這份指南從日常經驗出發，帶你走進海馬迴、突觸可塑性與遺忘機制。你會知道「記憶力不好」不只是意志問題，而是大腦在效率、穩定與更新之間做出的取捨。</p>
+      </div>
+      <div class="hero-card"><strong style="color:#8f422f">本輪升級：</strong>加入 3 題「知識小測」，可即時回饋對核心概念的掌握度。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若以 <code>file://</code> 開啟頁面，YouTube 可能顯示錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_004/neuroscience_memory_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 記憶不是硬碟，而是重建</a>
+      <a href="#s2">2. 海馬迴在做什麼</a>
+      <a href="#s3">3. 可塑性與學習速度</a>
+      <a href="#s4">4. 為什麼遺忘是必要機制</a>
+      <a href="#s5">5. 把神經科學變成學習策略</a>
+    </aside>
+
+    <main>
+      <section class="quiz" aria-label="知識小測">
+        <h2>知識小測（即時回饋）</h2>
+        <article class="q-item" data-answer="b">
+          <p class="q-title">Q1：海馬迴受損最典型的影響是？</p>
+          <div class="q-ops">
+            <button type="button" data-op="a">視力急降</button>
+            <button type="button" data-op="b">新記憶形成困難</button>
+            <button type="button" data-op="c">聽力急降</button>
+          </div>
+          <p class="q-feedback"></p>
+        </article>
+
+        <article class="q-item" data-answer="c">
+          <p class="q-title">Q2：長期增強（LTP）主要描述什麼？</p>
+          <div class="q-ops">
+            <button type="button" data-op="a">神經元數量直接增加</button>
+            <button type="button" data-op="b">腦脊髓液流速提升</button>
+            <button type="button" data-op="c">突觸連結效率提升</button>
+          </div>
+          <p class="q-feedback"></p>
+        </article>
+
+        <article class="q-item" data-answer="a">
+          <p class="q-title">Q3：遺忘在大腦系統中可能扮演什麼角色？</p>
+          <div class="q-ops">
+            <button type="button" data-op="a">降低雜訊、保留關鍵資訊</button>
+            <button type="button" data-op="b">單純是神經系統故障</button>
+            <button type="button" data-op="c">只和睡眠無關</button>
+          </div>
+          <p class="q-feedback"></p>
+        </article>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 記憶不是硬碟，而是重建</h3>
+        <p class="lead">我們常以為記憶是「存檔再讀取」，但神經科學更像告訴我們：每次想起，都在重新編輯。</p>
+        <p>你回想昨天晚餐時，腦中不是單一資料庫被打開，而是多個系統協作重建。情境線索、情緒狀態、語言標記都會參與。這也解釋了為什麼同一事件，隔幾天回憶版本會有微妙差異。記憶不是純粹複製，它本質上是「可塑的重組」。</p>
+        <p>這種可塑性很珍貴，因為它讓我們能把新經驗整合進舊知識網絡；但代價是失真風險。學習上最重要的一件事，因此不是盲目重複，而是建立多重提取線索，讓重建更穩定。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜How memories form and how we lose them</h4>
+            <p>頻道：TED-Ed｜用途：建立記憶形成與遺忘的全貌。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="yOgAbKJGrTA" title="How memories form and how we lose them" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請先記一個核心句：記憶不是越多越好，而是越可提取越好。這個觀念會貫穿後面章節。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 海馬迴在做什麼</h3>
+        <p class="lead">海馬迴像是一位夜間值班的檔案管理員，把白天經驗暫存、編碼、分流。</p>
+        <p>著名臨床案例顯示，海馬迴受損時，人仍可能保留舊記憶與語言能力，但難以形成新的陳述性記憶。這個現象提醒我們：記憶不是單點，而是跨區域網路；海馬迴的角色更像路由節點，把零散經驗轉成可長期存取的結構。</p>
+        <p>學習時若只靠短時間硬塞，大腦未必來得及完成這個轉換流程。睡眠、重複提取、情境連結，才是幫海馬迴「交接班」成功的關鍵。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜What happens when you remove the hippocampus?</h4>
+            <p>頻道：TED-Ed｜用途：透過病例理解海馬迴對記憶的核心功能。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="KkaXNvzE4pk" title="What happens when you remove the hippocampus" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看完後請自問：如果「理解了」但隔天想不起來，可能是哪個流程沒完成？答案通常不在智力，而在鞏固機制。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 可塑性與學習速度</h3>
+        <p class="lead">學習本質是「連結被改寫」。速度差異，很多時候是可塑性調節差異。</p>
+        <p>長期增強（LTP）描述的是突觸傳遞效率在特定活動模式下被提升。當一條神經路徑反覆被激活，訊號傳遞門檻可能下降，回路更容易再次啟動。這讓技能與知識逐步從「費力」變「自動」。</p>
+        <p>但可塑性並非無限增加。大腦同時需要穩定與彈性：太穩會學不動，太鬆會亂連結。所以高品質學習通常是「間隔、回想、應用」三件事交替，讓可塑性有方向地發生。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜How We Make Memories: Crash Course Psychology #13</h4>
+            <p>頻道：CrashCourse｜用途：建立記憶編碼、儲存、提取的心理學與神經學框架。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="bSycdIx-C48" title="How We Make Memories Crash Course Psychology 13" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支很適合搭配你的學習習慣反思：你目前做的是「重讀」還是「提取」？兩者對可塑性的效果差很多。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 為什麼遺忘是必要機制</h3>
+        <p class="lead">遺忘不是系統失敗，而是資訊管理策略。</p>
+        <p>如果大腦把每一個細節都永久保留，決策會被雜訊淹沒。遺忘能讓系統釋放資源、壓縮資訊、突顯高價值模式。你會發現許多有效學習法其實都在「對抗不必要遺忘」：間隔重複、主動回想、睡眠整合，都是在人為介入記憶保留機制。</p>
+        <p>換句話說，學習不只是輸入內容，而是設計「與遺忘賽跑」的節奏。懂這件事後，你會更在意學習時程，而非單次讀書時數。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Remembering and Forgetting: Crash Course Psychology #14</h4>
+            <p>頻道：CrashCourse｜用途：理解遺忘曲線、提取失敗與記憶扭曲。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="HVWbrNls-Kw" title="Remembering and Forgetting Crash Course Psychology 14" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請注意影片中「忘記」的分類。當你知道自己忘的是哪一種，就能對症設計學習策略。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 把神經科學變成學習策略</h3>
+        <p class="lead">最有用的神經科學，不是讓你背名詞，而是改變你今天怎麼學。</p>
+        <p>若把前面內容收斂成可執行做法，可以是這樣：第一，學完當天就做一次主動回想；第二，在 1 天、3 天、7 天做間隔複習；第三，每次複習都加一點情境變化，迫使大腦在不同線索下提取。這套流程等於在海馬迴與皮質之間反覆加固路徑。</p>
+        <p>再進一步，理解突觸可塑性後，你會知道「短時間狂刷」為何效率低。真正有效的是分散且可提取的練習。神經科學給我們的不是捷徑，而是一套更符合大腦運作的節奏設計。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Long term potentiation and synaptic plasticity</h4>
+            <p>頻道：Khan Academy (khanacademymedicine)｜用途：用神經層次理解學習如何被寫進腦迴路。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="uVQXZudZd5s" title="Long term potentiation and synaptic plasticity" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這支當作總結。若你能把 LTP 觀念轉成可執行讀書流程，你已經把科普知識變成個人能力。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 004｜主題：神經科學（記憶與學習機制）｜敘事式教學頁 + YouTube 嵌入 + 知識小測</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+    const quizItems = Array.from(document.querySelectorAll('.q-item'));
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+
+    sections.forEach((sec) => sectionObserver.observe(sec));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        links.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+
+    sections.forEach((sec) => navObserver.observe(sec));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    quizItems.forEach((item) => {
+      const answer = item.getAttribute('data-answer');
+      const feedback = item.querySelector('.q-feedback');
+      const buttons = Array.from(item.querySelectorAll('button[data-op]'));
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const selected = btn.getAttribute('data-op');
+          buttons.forEach((b) => b.classList.remove('correct', 'wrong'));
+          if (selected === answer) {
+            btn.classList.add('correct');
+            feedback.textContent = '答對。你抓到這一節的核心。';
+          } else {
+            btn.classList.add('wrong');
+            const right = buttons.find((b) => b.getAttribute('data-op') === answer);
+            if (right) right.classList.add('correct');
+            feedback.textContent = '這題的正確答案已標示，建議回頭看該段影片解說。';
+          }
+        });
+      });
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

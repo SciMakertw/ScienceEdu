@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：低軌衛星通訊（LEO）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b14;
+      --panel: #11192b;
+      --panel2: #1a2640;
+      --text: #e8efff;
+      --muted: #b5c7e7;
+      --line: #4a5f8c;
+      --accent: #7cb5ff;
+      --accent2: #8fffd2;
+      --warn: #ffd9a1;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      background: radial-gradient(circle at 82% 0%, #293e77 0%, #172447 38%, #080b14 100%);
+    }
+    body { margin: 0; font-family: "Noto Sans TC", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #667eae; color: #d4e4ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Orbitron", "Noto Sans TC", sans-serif; font-size: clamp(1.85rem, 4.2vw, 3rem); line-height: 1.12; letter-spacing: .02em; }
+    .hero p { margin: .9rem 0 0; color: #c7d7f4; max-width: 760px; font-size: 1rem; }
+    .hero-note { border: 1px solid #5b739f; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(24,35,61,.85), rgba(14,21,42,.92)); color: #dde8ff; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,29,55,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #c9d8f5; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e4eeff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #2f4a7b; color: #b8ffe2; }
+
+    .planner { border: 1px solid #5d74a5; border-radius: 16px; background: linear-gradient(150deg, #1b2a4f, #172343); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #d7e5ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #6b82b0; border-radius: 10px; background: rgba(13,21,39,.72); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cedcf6; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #7cb5ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #667da8; border-radius: 10px; background: rgba(10,18,34,.74); padding: .66rem .75rem; font-size: .9rem; color: #d7e3fb; }
+    .plan-out b { color: #bcffe4; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #aed9ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #dbe7fb; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #5d78a8; border-radius: 12px; background: #243f6a; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #54709a; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f3f8ff; }
+    .video-meta p { margin: .28rem 0 0; color: #cad9ef; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #132344; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #647a99; border-radius: 10px; background: rgba(35,50,67,.56); padding: .68rem .78rem; color: #dfe9f6; font-size: .92rem; }
+    .debrief strong { color: #cbffe7; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #c5fbff; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #c5fbff; }
+    .open-youtube:hover { color: #efffff; border-bottom-color: #efffff; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #b7c6e1; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • LEO Satellite Communications</span>
+        <h1>低軌衛星通訊：
+          從「看得見星星」到
+          「全球可用網路」</h1>
+        <p>低軌衛星（LEO）網路不是把幾顆衛星送上天這麼簡單。它是一個動態系統工程：軌道設計、星間鏈路、地面閘道、終端天線與排程控制要同步工作。這份指南會帶你從原理走到部署現實。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「星座設計模擬器」，調整衛星密度、地面閘道與終端需求後，即時產生部署優先策略。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_015/leo_satcom_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為什麼 LEO 改變通訊</a>
+      <a href="#s2">2. LEO 網路的工程難題</a>
+      <a href="#s3">3. 星座與路由架構</a>
+      <a href="#s4">4. 地面系統與營運模式</a>
+      <a href="#s5">5. 未來競局與部署策略</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="星座設計模擬器">
+        <h2>星座設計模擬器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="satDensity">衛星密度（高 = 覆蓋更細）</label>
+            <input id="satDensity" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="gatewayDensity">地面閘道密度（高 = 回傳路徑更穩）</label>
+            <input id="gatewayDensity" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="trafficPressure">終端流量壓力（高 = 用戶需求更大）</label>
+            <input id="trafficPressure" type="range" min="1" max="5" value="4">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先補地面閘道與回傳容量</b>，再擴衛星密度，最後優化尖峰分流策略。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為什麼 LEO 改變通訊</h3>
+        <p class="lead">LEO 的核心優勢是更低延遲與更高覆蓋彈性，但前提是要承受更複雜的系統調度。</p>
+        <p>傳統 GEO 衛星距離地面遠、覆蓋廣，適合廣播型業務；LEO 衛星貼近地球，訊號路徑短，理論延遲更低，特別適合互動性網路服務。問題是衛星在快速移動，用戶端必須持續切換連線，網路控制層的複雜度明顯上升。</p>
+        <p>因此 LEO 的突破不只是「飛得低」，而是把太空段、地面段、與網路協定協同成一個可持續營運的整體。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜What’s the difference between GEO/LEO satellites?</h4>
+            <p>頻道：EUMETSAT｜用途：快速建立軌道差異與通訊影響的基礎框架。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="sN3QNrax8Io" title="Difference between GEO and LEO satellites" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先把延遲、覆蓋、切換頻率三件事連在一起看，後面所有架構選擇都在這三角裡取捨。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. LEO 網路的工程難題</h3>
+        <p class="lead">LEO 真正困難處在「動態」：衛星在移動、波束在切換、流量在波動。</p>
+        <p>從通訊工程角度看，LEO 網路必須同時處理多衛星可見性變化、都卜勒效應、頻譜共享與跨星切換。這讓傳統固定節點思維不夠用，系統必須更像一個持續重組的分散式網路。</p>
+        <p>所以你看到的是衛星互聯，工程師看到的是排程與控制問題：哪顆衛星服務哪批終端、什麼時候切換、怎麼維持 QoS。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜LEO Satellite Networks: Brief Introduction to Communications Challenges</h4>
+            <p>頻道：Iain Explains Signals, Systems, and Digital Comms｜用途：理解 LEO 通訊在理論與實作上的主要瓶頸。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="1tw4SmS4Pc4" title="LEO communications challenges" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這段重點在於「控制層負擔」；LEO 成功與否往往決定在看不見的調度軟體層。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 星座與路由架構</h3>
+        <p class="lead">星座規模擴大後，重點不只是衛星數量，而是如何把鏈路編成可用網路。</p>
+        <p>LEO 星座通常依軌道面分布，搭配星間鏈路（ISL）形成太空骨幹。好的架構能降低地面回傳依賴、改善偏遠區可用性，也能在地面節點受限時維持服務。反過來說，若路由策略不佳，再多衛星也可能形成局部壅塞。</p>
+        <p>因此「網路拓撲 + 路由控制」是 LEO 商業可行性的核心變數之一。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜How does Starlink Satellite Internet Work?</h4>
+            <p>頻道：Branch Education｜用途：從系統工程角度看 LEO 星座、終端與網路路由如何協同。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="qs2QcycggWU" title="How Starlink Satellite Internet Works" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請留意「星間鏈路 vs 地面閘道」的分工，這是判斷網路韌性的關鍵。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 地面系統與營運模式</h3>
+        <p class="lead">再先進的太空段，最後都要回到地面段：閘道站、回傳鏈路、與地面網路互通。</p>
+        <p>LEO 業務能否規模化，往往由地面基礎設施決定。閘道站密度、法規許可、頻譜協調與區域回傳能力，直接影響可提供的服務品質。這也是為什麼不同營運商即使使用類似軌道策略，實際體驗仍可能差很多。</p>
+        <p>商業上，LEO 常與電信商或政府專網整合，而不一定完全取代地面網路。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜How OneWeb's Connectivity Works</h4>
+            <p>頻道：Eutelsat OneWeb｜用途：理解 LEO 網路在企業/政府連接場景下的地面整合邏輯。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="REzA_SYInvc" title="How OneWeb Connectivity Works" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支片能幫你看到「營運現實」：LEO 不是純太空題，而是跨產業整合題。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 未來競局與部署策略</h3>
+        <p class="lead">LEO 競爭不是單點技術決勝，而是發射節奏、製造能力、地面部署與法規協調的綜合戰。</p>
+        <p>從產業角度看，LEO 網路要長期成立，必須同時控制三條曲線：單位容量成本、服務可用率、終端可及性。只要其中一條失控，商業模式就會受壓。這也是為什麼各家業者都在強化垂直整合與規模化製造能力。</p>
+        <p>未來幾年，最值得觀察的不是「誰先發射最多」，而是誰能在全球多場景下維持穩定服務品質與可持續成本。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Why SpaceX is Making Starlink</h4>
+            <p>頻道：Real Engineering｜用途：從商業與系統工程視角理解 LEO 星座的長期部署邏輯。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="giQ8xEWjnBs" title="Why SpaceX is Making Starlink" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>總結一句：LEO 最終比的不是概念，而是把高複雜度系統長期穩定運作的能力。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 015｜主題：低軌衛星通訊（LEO）｜單頁教學頁 + YouTube 嵌入 + 星座設計模擬器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const satDensity = document.getElementById('satDensity');
+    const gatewayDensity = document.getElementById('gatewayDensity');
+    const trafficPressure = document.getElementById('trafficPressure');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const s = Number(satDensity.value);
+      const g = Number(gatewayDensity.value);
+      const t = Number(trafficPressure.value);
+
+      const options = [
+        { name: '先補地面閘道與回傳容量', score: g * 1.2 + t * 1.0 + s * 0.6 },
+        { name: '擴衛星密度並提升跨星路由能力', score: s * 1.25 + t * 0.9 + g * 0.7 },
+        { name: '優先做流量分層與尖峰時段分流', score: t * 1.2 + g * 0.8 + s * 0.7 },
+        { name: '先強化地面網路整合再擴星座', score: g * 1.1 + (6 - s) * 0.7 + 2 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [satDensity, gatewayDensity, trafficPressure].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

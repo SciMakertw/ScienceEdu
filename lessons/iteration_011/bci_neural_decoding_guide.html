@@ -1,0 +1,337 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：腦機介面與神經訊號解碼</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090e12;
+      --panel: #111d24;
+      --panel2: #172730;
+      --text: #e8f2f7;
+      --muted: #afc2ce;
+      --line: #375261;
+      --accent: #6ee4ff;
+      --accent2: #98ffb2;
+      --warn: #ffd69c;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at 84% 6%, #245c6f 0%, #112c35 35%, #090e12 100%);
+    }
+    body { margin: 0; font-family: "Noto Sans TC", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #4e7788; color: #c2ebff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Space Grotesk", "Noto Sans TC", sans-serif; font-size: clamp(2rem, 4.3vw, 3.18rem); line-height: 1.12; letter-spacing: .01em; }
+    .hero p { margin: .9rem 0 0; color: #c2d6e0; max-width: 760px; font-size: 1rem; }
+    .hero-note { border: 1px solid #4c6e7c; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(22,50,60,.82), rgba(19,39,47,.88)); color: #d6e8f0; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(16,34,41,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #bed6df; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #ddeff7; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #285364; color: #a6ffd8; }
+
+    .planner { border: 1px solid #446675; border-radius: 16px; background: linear-gradient(150deg, #18333f, #142b35); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #d2edf7; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #4f7381; border-radius: 10px; background: rgba(12,27,33,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #c5dce5; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #6ee4ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #507281; border-radius: 10px; background: rgba(10,22,28,.74); padding: .66rem .75rem; font-size: .9rem; color: #d0e2ea; }
+    .plan-out b { color: #a8ffd6; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.23rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #9feeff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d8e9f1; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #476a79; border-radius: 12px; background: #174153; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #3e5f6d; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #eefcff; }
+    .video-meta p { margin: .28rem 0 0; color: #c5dce7; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #0d2530; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #5a7280; border-radius: 10px; background: rgba(31,46,53,.58); padding: .68rem .78rem; color: #dce8ee; font-size: .92rem; }
+    .debrief strong { color: #c4ffe7; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #c1fbff; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #c1fbff; }
+    .open-youtube:hover { color: #edffff; border-bottom-color: #edffff; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #afc3cb; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Brain-Computer Interface</span>
+        <h1>腦機介面：
+          當神經訊號變成
+          可讀、可控、可回饋的語言</h1>
+        <p>腦機介面（BCI）不是科幻捷徑，而是一套把神經活動轉成控制指令的工程系統。它牽涉感測器、訊號處理、機器學習、臨床流程與倫理治理。你將在這份指南裡看到，為什麼「能讀到訊號」和「能穩定幫助病人」之間，差了整個系統工程。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「BCI 路線選型模擬器」，以訊號品質、侵入容忍度、即時性需求三軸即時推薦技術方向。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_011/bci_neural_decoding_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. BCI 到底在解什麼問題</a>
+      <a href="#s2">2. 非侵入式路線與 EEG</a>
+      <a href="#s3">3. 植入式 BCI 與語音重建</a>
+      <a href="#s4">4. 裝置工程與臨床風險</a>
+      <a href="#s5">5. 未來十年的臨床與治理</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="BCI 路線選型模擬器">
+        <h2>BCI 路線選型模擬器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="signalNeed">訊號解析度需求（高 = 需要更細）</label>
+            <input id="signalNeed" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="invasiveTolerance">侵入性容忍度（高 = 可接受手術）</label>
+            <input id="invasiveTolerance" type="range" min="1" max="5" value="2">
+          </div>
+          <div class="planner-item">
+            <label for="latencyNeed">即時控制需求（高 = 延遲要低）</label>
+            <input id="latencyNeed" type="range" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>高密度非侵入式 EEG + 個人化解碼</b>，若需更高精度再評估半侵入或植入式方案。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. BCI 到底在解什麼問題</h3>
+        <p class="lead">BCI 的核心任務不是讀心術，而是建立「意圖」到「動作」的可靠通道。</p>
+        <p>在臨床場景裡，BCI 最直接的價值是替中風、脊髓損傷、ALS 等患者建立替代控制路徑。病人的肌肉無法有效輸出，不代表大腦沒有意圖。BCI 要做的，就是把殘存神經訊號轉成可操作指令，例如游標移動、字詞輸出、語音合成，甚至是機械臂控制。</p>
+        <p>真正困難的地方在穩定性。神經訊號會飄、噪音會變、患者狀態會波動。這讓 BCI 不是一次訓練就永遠可用，而是需要持續校正與個人化更新的動態系統。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Brain-Computer Interface Explained (DW Shift)</h4>
+            <p>頻道：DW Shift｜用途：快速理解 BCI 的任務邊界、機會與限制。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="6QcY7v9Kio4" title="Brain-Computer Interface Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先抓一句話：BCI 的成功標準是「病人能否長期使用」，不是展示片段裡的驚艷瞬間。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 非侵入式路線與 EEG</h3>
+        <p class="lead">非侵入式 BCI 的優勢是風險較低，但要用演算法補回訊號解析度不足。</p>
+        <p>EEG 路線最容易進入臨床與研究，因為它不需要開顱。問題是訊號穿過頭骨後會衰減，空間解析度受限，容易被肌電、眨眼、環境噪音污染。這迫使系統設計者必須在感測、濾波、特徵抽取與模型更新上投入大量工程。</p>
+        <p>近年進展在於把高密度電極、個人化模型與在線校正結合，讓非侵入式方案能在特定任務上達到更實用的準確度。這條路線不一定最炫，但通常最可擴散。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜EEG-Based, Non-Invasive BCI Advancement</h4>
+            <p>頻道：Carnegie Mellon University Engineering｜用途：理解非侵入式 BCI 的技術突破路徑。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="bwriLGRuDZI" title="EEG-Based Non-Invasive BCI Advancement" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片重點在方法論：不是單押硬體或單押模型，而是整體管線協同優化。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 植入式 BCI 與語音重建</h3>
+        <p class="lead">當目標是高頻寬輸出，植入式 BCI 可能提供更高解析度，但也帶來更高醫療門檻。</p>
+        <p>植入式 BCI 能更接近神經源頭，抓到更細緻、更穩定的訊號，特別適合高即時性或高維度控制任務。近年最引人注目的突破，是把大腦語音相關活動解碼成可理解語句，讓失語患者重新建立溝通能力。</p>
+        <p>但這條路線的挑戰同樣巨大：手術風險、長期生物相容性、電極漂移、系統維護、臨床可近性，每一項都會影響「能不能落地」。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜How a Brain Implant and AI Gave a Woman with Paralysis Her Voice Back</h4>
+            <p>頻道：UC San Francisco (UCSF)｜用途：觀察植入式 BCI 在語音重建上的臨床價值。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="iTZ2N-HJbwA" title="Brain Implant and AI Gave Voice Back" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請注意「病人生活功能」的改善，而不是只看模型指標。臨床價值是 BCI 真正的終點。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 裝置工程與臨床風險</h3>
+        <p class="lead">BCI 不是單純 AI 題，而是醫材工程題：可靠性、可維護性、風險管理都要達標。</p>
+        <p>外界常把焦點放在「腦機介面有多酷」，但工程團隊每天在處理的，是訊號衰減、封裝壽命、熱管理、功耗與通訊穩定。只要其中一項失衡，系統就可能從可用變不可用。</p>
+        <p>在醫療應用中，法規與倫理也不是附加條件，而是設計輸入。資料治理、知情同意、可撤回性與失效安全機制，都必須在產品早期被納入。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜The Science Behind Elon Musk’s Neuralink Brain Chip</h4>
+            <p>頻道：WIRED｜用途：拆解高關注度 BCI 裝置背後的工程與風險點。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="Gv_XB6Hf6gM" title="Science Behind Neuralink Brain Chip" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這支片當成工程審查練習：每個炫目功能都對應一組新的失效模式。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 未來十年的臨床與治理</h3>
+        <p class="lead">下一個關鍵問題不是「BCI 能不能做」，而是「誰能安全、可負擔、可持續地使用」。</p>
+        <p>未來十年的主戰場會是三件事：臨床證據累積、跨中心可重現性、以及支付與照護體系能否接住新技術。若只有少數示範案例，BCI 仍停在科技新聞；若能形成標準化流程，才會成為常規醫療選項。</p>
+        <p>同時，隱私與人格邊界議題會越來越重要。當神經資料可被長期收集與分析，社會必須先定義可接受邊界，再談大規模部署。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜AI-Powered Intracortical Brain-Computer Interfaces</h4>
+            <p>頻道：Rice Ken Kennedy Institute｜用途：理解高階研究如何推進臨床可用性與未來路線。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="7hUmDk-BvCo" title="AI Powered Intracortical BCI" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>最終判準是「可擴散性」：能不能從頂尖實驗室，走到多數患者能接觸的照護場景。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 011｜主題：腦機介面（神經訊號解碼與臨床應用）｜單頁教學頁 + YouTube 嵌入 + BCI 路線選型模擬器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const signalNeed = document.getElementById('signalNeed');
+    const invasiveTolerance = document.getElementById('invasiveTolerance');
+    const latencyNeed = document.getElementById('latencyNeed');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const s = Number(signalNeed.value);
+      const i = Number(invasiveTolerance.value);
+      const l = Number(latencyNeed.value);
+
+      const options = [
+        {
+          name: '高密度非侵入式 EEG + 個人化解碼',
+          score: (6 - i) * 1.1 + s * 0.8 + l * 0.7
+        },
+        {
+          name: '半侵入式（如 ECoG）+ 任務導向解碼',
+          score: s * 1.0 + i * 0.95 + l * 0.85
+        },
+        {
+          name: '植入式 intracortical + 高頻寬控制',
+          score: s * 1.2 + i * 1.25 + l * 1.0
+        },
+        {
+          name: '先走復健輔助 BCI，再逐步升級',
+          score: (6 - i) * 0.95 + l * 0.75 + 2
+        }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [signalNeed, invasiveTolerance, latencyNeed].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

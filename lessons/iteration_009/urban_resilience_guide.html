@@ -1,0 +1,320 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：城市防災與韌性系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1317;
+      --panel: #142129;
+      --panel2: #1a2d37;
+      --text: #e6f1f8;
+      --muted: #a8becf;
+      --line: #355061;
+      --accent: #5fd2ff;
+      --accent2: #75f3c0;
+      --warn: #ffd58a;
+      --max: 1140px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 80% 7%, #224b63 0%, #102630 40%, #080f13 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.34fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #4f768a; color: #c1e8ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.2vw, 3.2rem); line-height: 1.14; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #bed3df; max-width: 720px; font-size: 1rem; }
+    .hero-note { border: 1px solid #4a6878; border-radius: 13px; padding: .82rem .9rem; background: linear-gradient(140deg, rgba(22,49,63,.82), rgba(22,38,52,.86)); color: #d6e8f2; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 255px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,35,43,.86); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #b8ceda; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #daedf8; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #245063; color: #9ef7d6; }
+
+    .planner { border: 1px solid #3f6372; border-radius: 16px; background: linear-gradient(150deg, #17333f, #162a33); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #c9edf9; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #466b78; border-radius: 10px; background: rgba(13,29,36,.68); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #bfd8e2; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #5fd2ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #4c6874; border-radius: 10px; background: rgba(11,24,31,.72); padding: .66rem .75rem; font-size: .9rem; color: #cedee7; }
+    .plan-out b { color: #9ff5d4; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #a7f2ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d5e8f1; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #446777; border-radius: 12px; background: #153545; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #3c5c6b; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #effbff; }
+    .video-meta p { margin: .28rem 0 0; color: #c1d7e3; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #0d2330; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #5a6b5f; border-radius: 10px; background: rgba(37,47,43,.56); padding: .68rem .78rem; color: #dbe6e1; font-size: .92rem; }
+    .debrief strong { color: #bcffe8; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #bbf8ff; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #bbf8ff; }
+    .open-youtube:hover { color: #e5feff; border-bottom-color: #e5feff; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #a9bec8; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Urban Resilience</span>
+        <h1>城市防災：
+          從「災後救援」走向「災前韌性」，
+          一座城市要改什麼？</h1>
+        <p>面對複合災害時代，城市不能只靠臨時應變。真正的防災是把基礎設施、治理流程、社區行為和早期預警串成系統。這份指南會帶你從原理走到可執行策略。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「韌性投資優先排序器」，調整風險權重後即時得到投資優先順序。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_009/urban_resilience_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 何謂城市韌性</a>
+      <a href="#s2">2. 水患與排水系統轉型</a>
+      <a href="#s3">3. 地震與建築韌性</a>
+      <a href="#s4">4. 治理框架與投資邏輯</a>
+      <a href="#s5">5. 社區到城市的實作路線</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="韌性投資優先排序器">
+        <h2>韌性投資優先排序器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="floodRisk">淹水風險權重</label>
+            <input id="floodRisk" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="quakeRisk">地震風險權重</label>
+            <input id="quakeRisk" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="heatRisk">熱浪風險權重</label>
+            <input id="heatRisk" type="range" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>城市排水與滯洪升級</b>，其次是建築耐震補強，再來是降溫綠基盤。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 何謂城市韌性</h3>
+        <p class="lead">韌性不是「災後撐住」，而是「災前就把系統做成可恢復」。</p>
+        <p>傳統防災思維常聚焦在災害發生後的應急與重建，但極端氣候與複合災害時代，光靠災後反應已不夠。城市韌性的核心是把風險前置：在平時就重設基礎設施、治理流程、資訊流與社區能力，讓衝擊來時不會全面失效。</p>
+        <p>因此韌性是一個系統概念。電網、交通、供水、醫療、數據與決策要能互相備援。單一部門強化不等於整體安全，跨部門協同才是關鍵。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜What is a Resilient City? Arup explores how this is achieved</h4>
+            <p>頻道：Arup｜用途：建立城市韌性的系統框架。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="dMXdmQ_G1BM" title="What is a Resilient City" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先抓「系統」兩個字。城市韌性重點不是單項技術，而是跨系統的故障隔離與恢復能力。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 水患與排水系統轉型</h3>
+        <p class="lead">短延時強降雨越來越常見，城市排水設計必須從「排得快」走向「留得住、分得開」。</p>
+        <p>傳統硬體導向排水系統在極端降雨下容易超載。新一代策略更強調藍綠基礎設施、滯洪空間、可滲透地表與分散式調蓄。這些做法本質是把洪峰「削平」而不是只拚管線口徑。</p>
+        <p>更重要的是把土地使用規劃與水管理綁在一起。若上游不透水面持續增加，下游再多工程也會被壓垮。防災從來不是單一工務題，而是城市治理題。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Why isn’t the Netherlands underwater?</h4>
+            <p>頻道：TED-Ed｜用途：理解防洪工程與國土治理如何協同。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="25LW_PG2ZuI" title="Why isn’t the Netherlands underwater" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片的價值在於「長期治理」。關鍵不是一次大工程，而是制度化持續維護。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 地震與建築韌性</h3>
+        <p class="lead">地震本身未必致命，脆弱建物與失效系統才是災損放大器。</p>
+        <p>城市地震風險管理重點不只在新建築耐震規範，更在既有建築補強、關鍵設施冗餘與生命線維持。當醫院、通訊、交通節點能在主震後維持最低服務，整體社會恢復速度會大幅不同。</p>
+        <p>也因此，防災投資不是「花很多錢避免小概率事件」，而是用可預見成本換取避免系統性崩潰的能力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Why do buildings fall in earthquakes?</h4>
+            <p>頻道：TED-Ed｜用途：從結構角度理解地震災損為何發生。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="H4VQul_SmCg" title="Why do buildings fall in earthquakes" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看完後請記住一件事：防災不是追求「零損害」，而是保住生命與關鍵功能不中斷。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 治理框架與投資邏輯</h3>
+        <p class="lead">有技術不代表會落地，沒有治理框架再好的方案也會碎片化。</p>
+        <p>城市防災常卡在三個斷點：部門資料不互通、預算周期短於風險周期、績效評估偏重短期可見成果。要突破這些限制，通常需要明確框架與共同指標。國際上常用的 Sendai Framework 就是把減災從口號變成可追蹤行動的一種方法。</p>
+        <p>投資韌性不是「多花一筆錢」，而是把未來災損內生到今天決策。當決策者能量化中斷成本，就更容易支持前置投資。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜What is the Sendai Framework for Disaster Risk Reduction?</h4>
+            <p>頻道：United Nations Office for Disaster Risk Reduction (UNDRR)｜用途：理解國際減災治理框架。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="M9m6mb-blYM" title="What is the Sendai Framework for Disaster Risk Reduction" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片是政策骨架。你可以把它當作城市韌性 KPI 的來源清單。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 社區到城市的實作路線</h3>
+        <p class="lead">韌性不是政府單向輸出，而是社區、企業、公共部門共同維運的能力。</p>
+        <p>真正有效的城市防災通常同時具備三件事：平時演練與教育、關鍵節點備援設計、資料驅動的迭代改進。這三件事缺一不可。只有工程沒有社區參與，執行會斷；只有宣導沒有系統改造，衝擊仍會放大。</p>
+        <p>最務實的下一步，往往不是追求完美藍圖，而是先做可擴充的示範區，讓韌性能力從點到面擴散。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜What Works to Make Cities More Resilient?</h4>
+            <p>頻道：IEG WorldBankGroup｜用途：從評估視角看哪些城市韌性投資真正有效。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="1OC0CA-Sobg" title="What Works to Make Cities More Resilient" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>最後把焦點放在「可複製性」：一座城市做得好，是否能被其他城市低摩擦移植？</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 009｜主題：城市防災（複合災害與韌性系統）｜單頁教學頁 + YouTube 嵌入 + 韌性投資優先排序器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const floodRisk = document.getElementById('floodRisk');
+    const quakeRisk = document.getElementById('quakeRisk');
+    const heatRisk = document.getElementById('heatRisk');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const f = Number(floodRisk.value);
+      const q = Number(quakeRisk.value);
+      const h = Number(heatRisk.value);
+      const entries = [
+        { name: '城市排水與滯洪升級', score: f * 1.2 },
+        { name: '建築耐震補強', score: q * 1.2 },
+        { name: '熱浪降溫綠基盤', score: h * 1.1 },
+        { name: '跨部門預警與應變平台', score: (f + q + h) / 3 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${entries[0].name}</b>，其次是 ${entries[1].name}，再來是 ${entries[2].name}。`;
+    };
+
+    [floodRisk, quakeRisk, heatRisk].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：碳捕捉與封存（CCS）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c120f;
+      --panel: #17221c;
+      --panel2: #203128;
+      --text: #eaf5ee;
+      --muted: #b3c8ba;
+      --line: #45614f;
+      --accent: #6de7be;
+      --accent2: #b8ff87;
+      --warn: #ffd79a;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      background: radial-gradient(circle at 12% 0%, #2e6048 0%, #1a3428 38%, #0c120f 100%);
+    }
+    body { margin: 0; font-family: "Noto Sans TC", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #5e8b74; color: #cdf8df; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Sora", "Noto Sans TC", sans-serif; font-size: clamp(2rem, 4.3vw, 3.18rem); line-height: 1.12; letter-spacing: .01em; }
+    .hero p { margin: .9rem 0 0; color: #c9ded0; max-width: 760px; font-size: 1rem; }
+    .hero-note { border: 1px solid #557965; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(26,48,38,.82), rgba(19,36,28,.88)); color: #ddf1e4; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(19,39,30,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #c7e1d1; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e3f4e9; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #355941; color: #b4ffd6; }
+
+    .planner { border: 1px solid #557863; border-radius: 16px; background: linear-gradient(150deg, #1c3b2d, #172f24); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #ddf4e6; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #628a73; border-radius: 10px; background: rgba(14,29,22,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cbe3d3; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #6de7be; }
+    .plan-out { margin-top: .6rem; border: 1px solid #5f836c; border-radius: 10px; background: rgba(10,22,16,.74); padding: .66rem .75rem; font-size: .9rem; color: #d7ebe0; }
+    .plan-out b { color: #beffd8; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #adffd5; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #dceddf; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #5f8470; border-radius: 12px; background: #24513c; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #4f705f; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f0fff5; }
+    .video-meta p { margin: .28rem 0 0; color: #c9e5d6; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #132b20; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #678674; border-radius: 10px; background: rgba(34,52,42,.58); padding: .68rem .78rem; color: #e0eee4; font-size: .92rem; }
+    .debrief strong { color: #cbffe3; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #c8ffe3; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #c8ffe3; }
+    .open-youtube:hover { color: #eefff6; border-bottom-color: #eefff6; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #b6cabd; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Carbon Capture & Storage</span>
+        <h1>碳捕捉與封存（CCS）：
+          從排放端攔截 CO₂，
+          到地下數千公尺長期封存</h1>
+        <p>CCS 不是單一設備，而是一條完整鏈條：捕捉、壓縮、運輸、注入、監測。它同時是工程題、成本題與治理題。這份指南會帶你看懂 CCS 怎麼運作、為何有爭議、以及哪些條件下才可能成為可擴散方案。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「CCS 方案選型儀表板」，調整排放濃度、儲層距離與政策支持後，即時給出優先策略。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_012/ccs_learning_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. CCS 在減碳路徑中的角色</a>
+      <a href="#s2">2. 捕捉技術與能耗代價</a>
+      <a href="#s3">3. 運輸與地質封存</a>
+      <a href="#s4">4. 直接空氣捕捉（DAC）與新路線</a>
+      <a href="#s5">5. 真正落地的條件</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="CCS 方案選型儀表板">
+        <h2>CCS 方案選型儀表板</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="co2Concentration">排放端 CO₂ 濃度（高 = 較易捕捉）</label>
+            <input id="co2Concentration" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="storageDistance">儲層距離（高 = 運輸更遠）</label>
+            <input id="storageDistance" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="policySupport">政策支持度（高 = 補貼/法規更完整）</label>
+            <input id="policySupport" type="range" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先做點源捕捉 + 就近封存示範</b>，再擴大到區域管網與跨廠整合。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. CCS 在減碳路徑中的角色</h3>
+        <p class="lead">CCS 最常被問的不是「做不做得到」，而是「值不值得做」。</p>
+        <p>在鋼鐵、水泥、化工等高排放產業裡，有些製程排放短期難以完全電氣化，CCS 因而成為補位工具。它的價值不在取代所有減碳手段，而在處理那些最難降的尾端排放。若把 CCS 當萬靈丹，會失焦；若完全排除，也可能少一塊可行拼圖。</p>
+        <p>因此判斷 CCS 的關鍵是場景：哪一類排放源、哪一段時程、哪種成本結構下，CCS 才真正合理。這是系統決策，而不是單點技術崇拜。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Carbon Capture Technology Explained</h4>
+            <p>頻道：Freethink｜用途：建立 CCS 技術路徑與產業應用全景。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="XxjNhLZCae0" title="Carbon Capture Technology Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先把 CCS 當成「困難部門的補位方案」，不要把它誤讀成單一全面解方。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 捕捉技術與能耗代價</h3>
+        <p class="lead">捕捉 CO₂ 的技術可行性通常不是最大障礙，真正壓力來自能耗、成本與維運穩定性。</p>
+        <p>目前常見路線包括燃燒後捕捉、燃燒前捕捉與富氧燃燒，核心差異在排氣濃度、改造難度與熱整合方式。對工廠經營者而言，關鍵不是理論效率，而是改造後能否持續穩定運轉，且不把生產成本推到失去競爭力。</p>
+        <p>所以在實務上，CCS 設計必須與主製程耦合，並且重新安排能源系統，否則捕捉設備本身可能變成新的高耗能負擔。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜How Carbon Storage Works | CCS & CCUS Explained</h4>
+            <p>頻道：SLB｜用途：理解工業場景下捕捉與儲存流程的工程鏈條。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="I5eFPBD04FY" title="How Carbon Storage Works" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看這支影片時，重點放在「整鏈條協同」而不是單一捕捉裝置效率。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 運輸與地質封存</h3>
+        <p class="lead">把 CO₂ 捕下來只是起點，真正的長期減碳效果取決於封存端是否安全、可監測、可追溯。</p>
+        <p>地質封存通常選擇深層鹽水層或枯竭油氣藏，注入後需要長期監測壓力、流向與封存完整性。這意味著 CCS 不是一次性工程，而是數十年治理承諾。任何監測與責任機制不完整，都會削弱社會信任。</p>
+        <p>此外，管線與儲層位置決定成本上限。若排放源與儲層距離過遠，運輸成本與許可程序會快速增加，因此區域集群化規劃非常關鍵。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Carbon capture and storage research at the British Geological Survey</h4>
+            <p>頻道：British Geological Survey｜用途：理解封存地質條件與長期監測邏輯。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="7j3OTLmaE-g" title="Carbon capture and storage research" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這段最重要的訊息是「封存即治理」，不能只用工程完工視角看待 CCS。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 直接空氣捕捉（DAC）與新路線</h3>
+        <p class="lead">DAC 的優勢是可處理分散排放，但代價是能耗更高、成本更敏感。</p>
+        <p>和點源捕捉相比，直接從空氣抓取 CO₂ 面對的是極低濃度挑戰，因此每噸去除的能源與設備需求通常更高。這讓 DAC 更像是中長期補充工具，而非短期大規模替代。若沒有低碳能源與穩定政策支持，商業可行性會快速惡化。</p>
+        <p>但 DAC 的潛力在於地點彈性與負排放能力，對難以避免的殘餘排放可能具有策略價值。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜How does direct air capture remove CO₂?</h4>
+            <p>頻道：Climeworks｜用途：掌握 DAC 的流程、限制與可擴展條件。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="1rAR7PSLUHY" title="How direct air capture remove CO2" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>DAC 值不值得，要一起看能源來源、去除成本與封存可靠性三件事。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 真正落地的條件</h3>
+        <p class="lead">CCS 的成敗，最後不是技術 Demo，而是規模化部署能力。</p>
+        <p>若要走向大規模部署，需要同時具備四個條件：可預期的政策框架、可融資的商業模式、區域共享基礎設施，以及可公開驗證的監測制度。缺一不可。只要其中一塊缺失，專案就容易停在示範層級。</p>
+        <p>這也是為什麼 CCS 常伴隨爭議。支持者強調其必要性，批評者擔心其被用來延後轉型。真正務實的作法是把 CCS 放到透明、可審核的減碳組合裡，讓每噸減排都可檢驗。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Rethinking carbon capture and sequestration</h4>
+            <p>頻道：MIT Energy Initiative｜用途：從研究與政策視角檢視 CCS 的現實條件。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="q61e2r8g4dc" title="Rethinking carbon capture and sequestration" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>總結一句：CCS 能否成為氣候解方，取決於它是否被放在可問責的系統裡，而不是口號裡。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 012｜主題：碳捕捉與封存（CCS）｜單頁教學頁 + YouTube 嵌入 + CCS 方案選型儀表板</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const co2Concentration = document.getElementById('co2Concentration');
+    const storageDistance = document.getElementById('storageDistance');
+    const policySupport = document.getElementById('policySupport');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const c = Number(co2Concentration.value);
+      const d = Number(storageDistance.value);
+      const p = Number(policySupport.value);
+
+      const options = [
+        { name: '點源捕捉 + 就近封存示範', score: c * 1.2 + (6 - d) * 1.0 + p * 0.8 },
+        { name: '區域共享管網 + 多廠整合封存', score: c * 0.9 + (6 - d) * 1.1 + p * 1.1 },
+        { name: '先做 DAC 示範，聚焦負排放場景', score: (6 - c) * 0.8 + d * 0.6 + p * 1.2 },
+        { name: '延後大投資，先強化監測與法規基礎', score: (6 - p) * 1.1 + d * 0.8 + 2 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [co2Concentration, storageDistance, policySupport].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：CRISPR 基因編輯</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f3eb;
+      --paper: #fffdf7;
+      --ink: #1f2c2b;
+      --muted: #5f6f6d;
+      --line: #d7cdb9;
+      --accent: #0f766e;
+      --accent-soft: #d7f0ec;
+      --warm: #c07a2d;
+      --hero-a: #f3e7d3;
+      --hero-b: #d6ece7;
+      --shadow: 0 18px 40px rgba(31, 44, 43, 0.12);
+      --max: 760px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: radial-gradient(circle at 15% 10%, #fff8ef 0%, var(--bg) 45%, #e7efe9 100%);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", sans-serif;
+      line-height: 1.85;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(3px);
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--warm), var(--accent));
+      transition: width 0.1s linear;
+    }
+
+    .runtime-note {
+      display: none;
+      max-width: 1160px;
+      margin: 1rem auto 0;
+      padding: 0 1.2rem;
+    }
+
+    .runtime-note.show {
+      display: block;
+    }
+
+    .runtime-note p {
+      margin: 0;
+      padding: 0.9rem 1rem;
+      border-radius: 12px;
+      border: 1px solid #ecd5b2;
+      background: #fff2df;
+      color: #6c4918;
+      font-size: 0.92rem;
+    }
+
+    .runtime-note code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.88rem;
+    }
+
+    .hero {
+      padding: 5.5rem 1.25rem 3rem;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(130deg, var(--hero-a), var(--hero-b));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.35);
+      top: -130px;
+      right: -90px;
+      filter: blur(2px);
+    }
+
+    .hero-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      color: #4d5e5b;
+      margin-bottom: 0.7rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Noto Serif TC", serif;
+      font-size: clamp(2rem, 4.6vw, 3.4rem);
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin-top: 1rem;
+      max-width: 760px;
+      color: #2f4340;
+      font-size: 1.06rem;
+    }
+
+    .layout {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 2.2rem;
+      padding: 2rem 1.2rem 4rem;
+    }
+
+    .toc {
+      position: sticky;
+      top: 1.5rem;
+      align-self: start;
+      border: 1px solid var(--line);
+      background: rgba(255, 253, 247, 0.9);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 8px 20px rgba(31, 44, 43, 0.08);
+    }
+
+    .toc h2 {
+      margin: 0 0 0.6rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: #36504c;
+      padding: 0.38rem 0.48rem;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      margin-bottom: 0.2rem;
+      transition: background 0.2s;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: var(--accent-soft);
+      color: #0e5852;
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+      padding: 1.7rem 1.4rem;
+      background: var(--paper);
+      border: 1px solid #e8decb;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section h2 {
+      margin: 0 0 0.85rem;
+      font-family: "Noto Serif TC", serif;
+      font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+      line-height: 1.3;
+      color: #1f3532;
+    }
+
+    .lead {
+      color: #516764;
+      font-size: 0.97rem;
+      margin-bottom: 0.9rem;
+      border-left: 3px solid var(--warm);
+      padding-left: 0.7rem;
+    }
+
+    p {
+      margin: 0.85rem 0;
+      font-size: 1.02rem;
+    }
+
+    .video-card {
+      margin-top: 1.3rem;
+      border: 1px solid #d6e1de;
+      background: #f4fbf9;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .video-meta {
+      padding: 0.85rem 1rem 0.35rem;
+    }
+
+    .video-meta h3 {
+      margin: 0;
+      font-size: 1.02rem;
+      color: #163734;
+    }
+
+    .video-meta p {
+      margin: 0.34rem 0 0;
+      color: #4a6461;
+      font-size: 0.92rem;
+    }
+
+    .iframe-wrap {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: #dae9e7;
+    }
+
+    .iframe-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .debrief {
+      margin-top: 0.9rem;
+      background: #fff5e8;
+      border: 1px solid #f0d5b1;
+      padding: 0.95rem 1rem;
+      border-radius: 12px;
+      color: #654b2c;
+      font-size: 0.95rem;
+    }
+
+    .debrief strong {
+      font-weight: 700;
+      color: #6f4513;
+    }
+
+    .open-youtube {
+      display: inline-block;
+      margin: 0.85rem 1rem 1rem;
+      color: #0f5f59;
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px dashed #0f5f59;
+    }
+
+    .open-youtube:hover {
+      color: #0a4742;
+      border-bottom-color: #0a4742;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 1rem 1rem 2.6rem;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .toc {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        padding-top: 4.5rem;
+      }
+
+      .section {
+        padding: 1.2rem 1rem;
+      }
+
+      p {
+        font-size: 0.98rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+  <div class="runtime-note" id="runtimeNote">
+    <p>偵測到你可能是直接用 <code>file://</code> 開啟檔案。YouTube 嵌入播放器可能出現錯誤 153。請改用本機伺服器開啟：<code>python -m http.server 5500</code>，再前往 <code>http://localhost:5500/outputs/iteration_001/crispr_learning_guide.html</code>。</p>
+  </div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Learning Guide • Molecular Biology</div>
+      <h1>CRISPR 基因編輯：
+        把生命的句子，
+        從「閱讀」帶到「改寫」</h1>
+      <p class="subtitle">這份指南用 5 段敘事式教學，帶你從 CRISPR 的誕生背景、分子機制、醫療應用、倫理衝擊到未來想像。每段都搭配一支精選 YouTube 影片與「老師解讀」，讓你在閱讀與觀看之間，真正長出理解。</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="章節導覽">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 從細菌防禦到基因剪刀</a>
+      <a href="#s2">2. Cas9 怎麼找到目標</a>
+      <a href="#s3">3. 改寫生命後的機會</a>
+      <a href="#s4">4. 我們敢改，該怎麼改</a>
+      <a href="#s5">5. 走向下一代生物工程</a>
+    </nav>
+
+    <main>
+      <section class="section" id="s1">
+        <h2>1. 從細菌防禦到基因剪刀</h2>
+        <p class="lead">先別急著把 CRISPR 想成高冷實驗室技術。它最早其實是一種「細菌求生策略」。</p>
+        <p>想像一個沒有防彈衣、沒有醫院、連「昨天」都可能活不到的世界。那是單細胞生物長期面對病毒入侵的日常。每一次噬菌體攻擊，都像陌生人闖入家門；能活下來的細菌，靠的不是運氣，而是記憶。它們會把病毒的一小段 DNA 留下來，像在牆上貼通緝照。下一次同樣病毒再來，細菌就能迅速辨認、鎖定，並啟動切割機制。這套古老防禦系統，就是 CRISPR 的起點。</p>
+        <p>科學家在 20 世紀末觀察到這些規律重複序列時，還不知道它會改變醫學與農業。直到後來，研究者發現 Cas 蛋白可在 RNA 引導下定位並切開特定 DNA，局勢才徹底翻轉。這代表我們不只理解生命密碼，還能「在特定位置改字」。從過去只能旁觀突變，到今天可以有目的地修復、刪除或插入基因，生物學的角色從紀錄者變成編輯者。</p>
+        <p>如果基因是一本厚重的百科，CRISPR 不是把整本書重寫，而是把手指放在某一行，說：就是這裡。那個精準的指向能力，正是它讓世界震動的原因。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h3>影片 1｜How CRISPR lets you edit DNA - Andrea M. Henle</h3>
+            <p>頻道：TED-Ed｜功能：建立全貌，理解「基因編輯」到底在做什麼。</p>
+          </div>
+          <div class="iframe-wrap">
+            <iframe data-video-id="6tw_JVz_IEc" title="How CRISPR lets you edit DNA" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="debrief"><strong>老師解讀：</strong>看這支影片時，先抓住一件事：CRISPR 最關鍵的不是「切」，而是「找到哪裡切」。理解定位邏輯後，後面談醫療或倫理就不會只停在口號，而能回到技術本質。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h2>2. Cas9 怎麼找到目標：分子層級的精準與誤差</h2>
+        <p class="lead">真正的難題不在於剪刀是否鋒利，而是它會不會剪錯地方。</p>
+        <p>在 CRISPR-Cas9 系統中，gRNA（導引 RNA）像導航地址，Cas9 蛋白像執行工具。兩者合作後，先在整段基因體中搜尋符合條件的位置，再比對鹼基序列，最後於特定位點切開雙股 DNA。這個流程聽起來直覺，但在細胞內其實充滿雜訊：序列相似區段太多、染色質結構不同、細胞週期狀態不一，都會影響命中率。於是工程重點就變成兩件事：提升 on-target（命中目標），壓低 off-target（誤切位置）。</p>
+        <p>你可以把它想成夜間救援任務。地址看似正確，但巷弄錯綜複雜，任何一個門牌誤判都可能造成代價。科研團隊因此發展高保真 Cas 變體、改良 gRNA 設計與多重驗證流程，讓編輯行為更可控。從研究角度，這是效率問題；從臨床角度，這是安全底線。尤其當治療目標是人體時，任何低比例錯誤都可能在時間尺度上放大。</p>
+        <p>理解這裡，你會發現 CRISPR 並不是「按一下就成功」的黑箱技術，而是一套在概率、風險與驗證間反覆調參的工程系統。它既強大，也要求紀律。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h3>影片 2｜CRISPR Immunity Explained: How Cas9 Protects Bacteria from Viruses</h3>
+            <p>頻道：Innovative Genomics Institute – IGI｜功能：拆解 Cas9 如何辨識與作用。</p>
+          </div>
+          <div class="iframe-wrap">
+            <iframe data-video-id="Aqw4DihmoQY" title="CRISPR Immunity Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="debrief"><strong>老師解讀：</strong>請特別注意「辨識」與「切割」是兩個步驟。前者決定精準度，後者才是執行。很多初學者只記住 Cas9 能剪 DNA，卻忽略導引與檢核機制，這正是理解偏差的來源。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h2>3. 改寫生命後的機會：從罕病治療到農業轉型</h2>
+        <p class="lead">一旦可以改寫基因，問題就不再只是「能不能」，而是「先救誰、怎麼救」。</p>
+        <p>CRISPR 的最直觀價值出現在遺傳疾病治療。某些疾病由明確基因突變導致，理論上只要修正關鍵片段，就有機會從根本改變病程。近年臨床進展讓這件事不再只是科幻：針對血液相關疾病的基因編輯療法已走入真實醫療系統。這是歷史性的轉折，因為人類第一次看見「修改病因本身」而非長期壓制症狀的路徑。</p>
+        <p>但應用範圍遠不只醫療。在農業中，CRISPR 可用於提升抗病、耐旱、產量與營養特性，並縮短育種週期。與傳統選育相比，它讓改良更具方向性；與早期基改技術相比，它降低了部分流程的複雜度。這些改變背後的共同問題是：如何在效率與風險間保持透明？如果技術帶來生產力紅利，誰會優先受益？如果成本下降，監管是否也要同步升級？</p>
+        <p>每一次成功案例都在擴張社會期待，但科學前進最怕的不是困難，而是過度樂觀。真正成熟的技術文化，必須同時容納希望與懷疑。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h3>影片 3｜5 Ways CRISPR Is About to Change Everything</h3>
+            <p>頻道：SciShow｜功能：快速看到 CRISPR 在醫療與社會層面的多重影響。</p>
+          </div>
+          <div class="iframe-wrap">
+            <iframe data-video-id="_L-t7Esup6s" title="5 Ways CRISPR Is About to Change Everything" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="debrief"><strong>老師解讀：</strong>這支影片適合用來整理「應用版圖」。看完後，建議你把案例分成兩類：短期可落地與長期高不確定。這會幫你建立對技術成熟度的判斷，而不是把所有前景放在同一時間軸。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h2>4. 我們敢改，該怎麼改：倫理、治理與公共信任</h2>
+        <p class="lead">科技的邊界，永遠不只由實驗室決定，也由社會願意承擔的風險決定。</p>
+        <p>當基因編輯進入人體與生殖領域，爭議立刻升級。治療與增強如何劃線？體細胞編輯與胚系編輯應否分開管理？是否會擴大既有不平等，讓「可被優化」變成新的社會壓力？這些問題沒有單一答案，卻必須先於大規模應用被討論。因為生物科技不同於一般軟體，錯誤不一定能快速回滾，影響可能橫跨世代。</p>
+        <p>監管的挑戰在於速度差。科學進展很快，政策形成常常較慢；如果規範過鬆，可能造成不可逆後果；過嚴，則可能抑制真正有益的療法落地。最可行的做法通常不是「一次到位的大規則」，而是動態治理：要求資料透明、風險揭露、跨國對話、持續追蹤，再根據證據迭代政策。</p>
+        <p>信任不是宣傳來的，而是程序累積來的。當公眾能看見科學家如何定義風險、如何回應異議、如何承認不確定，技術才有機會在社會中長期站穩。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h3>影片 4｜CRISPR: Gene editing and beyond</h3>
+            <p>頻道：nature video｜功能：連結技術進展與更大的研究、治理與未來議題。</p>
+          </div>
+          <div class="iframe-wrap">
+            <iframe data-video-id="4YKFw2KZA5o" title="CRISPR: Gene editing and beyond" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="debrief"><strong>老師解讀：</strong>看這段時，請留意講者如何處理「可行性」與「正當性」的差異。技術可行，不代表立即正當；這條分界線，是科學素養中最常被忽略的一環。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h2>5. 走向下一代生物工程：從剪刀到編輯器生態系</h2>
+        <p class="lead">CRISPR 不是終點，而是平台的起點。真正的革命，往往在第二代工具出現時才被看見。</p>
+        <p>今天我們談 CRISPR，常以 Cas9 為代表；但研究現場早已走向多樣化工具鏈。鹼基編輯（base editing）與 prime editing 等新方法，試圖在不造成雙股斷裂的前提下，達成更細緻的修正，降低副作用風險。這代表問題意識已經變了：不只是「能不能改」，而是「能不能更穩、更準、更可預測地改」。</p>
+        <p>未來十年的競爭，可能不是某一項單點突破，而是整個生態系的成熟度。包括更好的遞送系統、更可靠的體內監測、更透明的臨床資料，以及跨領域人才的協作。生物學、資料科學、材料工程與法規治理將被迫同桌工作。誰能把這張桌子搭好，誰就能把 CRISPR 從亮眼技術，變成可持續的公共基礎設施。</p>
+        <p>回頭看，CRISPR 的故事其實很樸素：人類先向細菌學習，再把學到的規則變成工具。下一步，我們要學的不是更大膽，而是更成熟。因為真正難的從來不是改寫一段 DNA，而是改寫之後，還能把世界維持在值得信任的狀態。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h3>影片 5｜Jennifer Doudna: CRISPR Basics</h3>
+            <p>頻道：Innovative Genomics Institute – IGI｜功能：從先驅研究者視角梳理 CRISPR 的核心與未來。</p>
+          </div>
+          <div class="iframe-wrap">
+            <iframe data-video-id="47pkFey3CZ0" title="Jennifer Doudna: CRISPR Basics" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="debrief"><strong>老師解讀：</strong>把這支當作總結影片。你可以用三個問題驗收自己：我是否能說明 CRISPR 的定位機制？我是否理解主要應用與限制？我是否能說出一個倫理難題並提出可討論的治理方向？</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    迭代 001｜科普教育教學製作｜主題：CRISPR 基因編輯
+  </footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const iframes = Array.from(document.querySelectorAll('.iframe-wrap iframe'));
+
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    sections.forEach((sec) => sectionObserver.observe(sec));
+
+    const tocObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          tocLinks.forEach((a) => {
+            a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+          });
+        }
+      });
+    }, { rootMargin: '-35% 0px -50% 0px', threshold: 0 });
+
+    sections.forEach((sec) => tocObserver.observe(sec));
+
+    // YouTube embeds can fail with Error 153 when opened directly via file://
+    if (window.location.protocol === 'file:') {
+      runtimeNote.classList.add('show');
+    }
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若播放器錯誤，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  </script>
+</body>
+</html>

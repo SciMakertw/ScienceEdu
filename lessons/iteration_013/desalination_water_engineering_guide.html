@@ -1,0 +1,320 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：海水淡化與水資源工程</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #081118;
+      --panel: #0f1f2c;
+      --panel2: #162a3b;
+      --text: #e8f3ff;
+      --muted: #b0c6d9;
+      --line: #3e5f7a;
+      --accent: #6fd6ff;
+      --accent2: #88ffd2;
+      --warn: #ffd89b;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 15% 0%, #20527c 0%, #11273a 36%, #081118 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #5680a3; color: #c6e8ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Outfit", "Noto Sans TC", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: .01em; }
+    .hero p { margin: .9rem 0 0; color: #c4d8ea; max-width: 760px; font-size: 1rem; }
+    .hero-note { border: 1px solid #4f7088; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(21,44,61,.82), rgba(14,31,45,.9)); color: #d8eaf6; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(14,31,46,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #bfd6e9; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e0effd; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #27557a; color: #a7ffd9; }
+
+    .planner { border: 1px solid #4b6d87; border-radius: 16px; background: linear-gradient(150deg, #16324b, #12283d); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #d0e9ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #577a94; border-radius: 10px; background: rgba(10,24,36,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #c3d9ea; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #6fd6ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #58798f; border-radius: 10px; background: rgba(9,21,33,.74); padding: .66rem .75rem; font-size: .9rem; color: #d0e2ef; }
+    .plan-out b { color: #a7ffdc; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #9cefff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d8e8f6; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #50738f; border-radius: 12px; background: #1a3f5d; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #466681; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f0f9ff; }
+    .video-meta p { margin: .28rem 0 0; color: #c6dced; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #0c2234; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #5e7a8c; border-radius: 10px; background: rgba(30,47,60,.56); padding: .68rem .78rem; color: #dce9f2; font-size: .92rem; }
+    .debrief strong { color: #c0ffe8; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #bdfbff; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #bdfbff; }
+    .open-youtube:hover { color: #ecffff; border-bottom-color: #ecffff; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #afc3d4; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Desalination Engineering</span>
+        <h1>海水淡化與水資源工程：
+          把海洋變成水庫，
+          代價是什麼？</h1>
+        <p>海水淡化常被視為缺水地區的解方，但它背後是一連串工程權衡：能耗、鹵水排放、管網投資、供水韌性。這份指南用工程視角拆解淡化技術，讓你看懂什麼情境該做、什麼情境不該硬上。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「供水組合模擬器」，調整乾旱壓力、能源成本與再生水能力後，即時推薦供水策略。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_013/desalination_water_engineering_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 淡化在供水系統的位置</a>
+      <a href="#s2">2. 逆滲透核心流程</a>
+      <a href="#s3">3. 廠站運維與能源成本</a>
+      <a href="#s4">4. 膜技術與新路線</a>
+      <a href="#s5">5. 城市水資源韌性策略</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="供水組合模擬器">
+        <h2>供水組合模擬器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="droughtPressure">乾旱壓力（高 = 傳統水源更不穩）</label>
+            <input id="droughtPressure" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="energyCost">能源成本壓力（高 = 電價敏感）</label>
+            <input id="energyCost" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="reuseCapacity">再生水能力（高 = 可替代比例高）</label>
+            <input id="reuseCapacity" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>淡化基載 + 再生水擴容並行</b>，同時優化尖峰用電排程。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 淡化在供水系統的位置</h3>
+        <p class="lead">淡化不是萬靈丹，它是城市供水組合中的一張保險牌。</p>
+        <p>當降雨不穩、地表水與地下水難以支撐需求時，淡化提供一種「不靠天吃飯」的來源。這種可預測性對沿海大城市非常重要，特別是在長旱與高溫頻率上升的背景下。不過，穩定性的代價通常是更高的能源需求與更重的資本支出。</p>
+        <p>所以工程決策重點不是「要不要淡化」，而是「淡化在供水組合裡佔多少」。過高會讓系統承擔能源風險，過低則無法對沖乾旱風險。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Why Is Desalination So Difficult?</h4>
+            <p>頻道：Practical Engineering｜用途：快速理解淡化的工程難點與成本結構。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="mxqOPdEUNTs" title="Why Is Desalination So Difficult" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先抓住「熱力學下限」與「實際工程損耗」的差距，這是淡化成本核心來源。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 逆滲透核心流程</h3>
+        <p class="lead">逆滲透不是單一步驟，而是前處理、加壓、膜分離、後處理的整條鏈。</p>
+        <p>海水進入膜系統前，必須先經過前處理以降低懸浮物與污染負荷，否則膜會快速衰退。進入高壓段後，系統利用壓力克服滲透壓，把淡水與濃鹽水分開。最後還需要再礦化與消毒，才能成為穩定供應的飲用水。</p>
+        <p>這意味著淡化廠性能不只看膜本身，還取決於整體流程協調與運維能力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜What is Desalination and why do we use it?</h4>
+            <p>頻道：SydneyWaterTV｜用途：從公共供水角度理解逆滲透淡化流程。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="B13tffiuLLM" title="What is Desalination and why do we use it" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>注意影片裡前處理與後處理段落，這些往往比「膜本體」更影響長期穩定。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 廠站運維與能源成本</h3>
+        <p class="lead">淡化廠最大的經濟風險通常不是蓋廠，而是長期運轉期的電力與維護。</p>
+        <p>由於高壓泵浦是主要能耗來源，電價波動會直接影響每噸水成本。實務上會搭配能量回收裝置、彈性運轉策略、與離峰排程來降低成本。當系統被納入區域電網與供水聯調時，調度能力就變成競爭力。</p>
+        <p>此外，停機維護與膜更換周期若估算不足，原本的財務模型很容易失真。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜What happens at a Seawater Desalination Plant</h4>
+            <p>頻道：Water Corporation｜用途：觀察實際廠站運轉流程與水廠管理節奏。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="mEXzzlDCkoo" title="What happens at a Seawater Desalination Plant" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把重點放在「穩定供水」四個字，淡化廠的價值來自可預測，而非單次效率峰值。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 膜技術與新路線</h3>
+        <p class="lead">下一波突破常不在單點發明，而在把新膜材料與既有系統整合得更穩。</p>
+        <p>除了傳統逆滲透，電滲析、先進膜材料與低壓流程也在快速發展。這些技術的目標是降低能耗、提高耐污能力、延長壽命。但工程實務中，技術好壞最終仍回到可維護性與全生命週期成本。</p>
+        <p>因此研發與部署之間常有落差。能跨過這段落差的方案，往往不是最炫技術，而是最容易併入既有水務系統的方案。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Electrodialysis Explained</h4>
+            <p>頻道：MIT Mechanical Engineering｜用途：理解非 RO 路線在脫鹽工程中的潛在角色。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="wYkkLUckmg4" title="Electrodialysis Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把電滲析看成技術組合的一員，而不是 RO 的完全替代品，判斷會更務實。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 城市水資源韌性策略</h3>
+        <p class="lead">真正可持續的水務策略，永遠是「多水源組合」而非單一路線押注。</p>
+        <p>城市水務韌性通常來自四條線並行：節水管理、再生水回用、跨區調水、與淡化備援。淡化能提升抗旱能力，但若沒有需求管理與管網治理，系統總成本仍可能失控。策略設計必須同時看氣候風險與財務可承擔性。</p>
+        <p>這也是政策層面最困難的地方：技術可行不等於社會可行。費率、補貼、與長期維護責任都需要透明機制。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜How Singapore solved its looming water crisis</h4>
+            <p>頻道：DW Planet A｜用途：從城市治理與基礎設施角度理解供水韌性組合。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="GgKi2x9od_0" title="How Singapore solved its looming water crisis" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>總結一句：技術是必要條件，但制度與治理才是把水安全做大的充分條件。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 013｜主題：海水淡化與水資源工程｜單頁教學頁 + YouTube 嵌入 + 供水組合模擬器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const droughtPressure = document.getElementById('droughtPressure');
+    const energyCost = document.getElementById('energyCost');
+    const reuseCapacity = document.getElementById('reuseCapacity');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const d = Number(droughtPressure.value);
+      const e = Number(energyCost.value);
+      const r = Number(reuseCapacity.value);
+      const options = [
+        { name: '淡化基載 + 再生水擴容並行', score: d * 1.2 + r * 1.05 - e * 0.6 + 2 },
+        { name: '先強化再生水與節水，淡化作戰略備援', score: r * 1.3 + (6 - d) * 0.9 + e * 0.3 },
+        { name: '淡化主力供水 + 離峰運轉降電價衝擊', score: d * 1.15 + (6 - e) * 1.0 + r * 0.5 },
+        { name: '延後擴建，優先管網減漏與需求管理', score: (6 - d) * 1.1 + e * 0.9 + (6 - r) * 0.4 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [droughtPressure, energyCost, reuseCapacity].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

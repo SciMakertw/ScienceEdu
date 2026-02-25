@@ -1,0 +1,562 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：核融合能源</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070d1a;
+      --panel: #0f1a30;
+      --panel-2: #122444;
+      --ink: #e8f0ff;
+      --muted: #a0b4d9;
+      --line: #1e335c;
+      --accent: #49d6ff;
+      --accent-2: #68ffb2;
+      --warn: #ffcc66;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: radial-gradient(circle at 82% 8%, #1d3566 0%, #0b1530 35%, var(--bg) 100%);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "Manrope", sans-serif;
+      line-height: 1.8;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.1s linear;
+    }
+
+    .hero {
+      padding: 5.2rem 1.2rem 2rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .tag {
+      display: inline-block;
+      color: #9ddaf0;
+      border: 1px solid #2a5e85;
+      border-radius: 999px;
+      padding: 0.24rem 0.7rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.8rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Manrope", sans-serif;
+      font-size: clamp(2rem, 4.1vw, 3.35rem);
+      line-height: 1.16;
+      letter-spacing: -0.01em;
+    }
+
+    .hero p {
+      margin: 1rem 0 0;
+      color: #bfd0ef;
+      max-width: 700px;
+      font-size: 1.02rem;
+    }
+
+    .signal {
+      border: 1px solid #2b457a;
+      background: linear-gradient(140deg, rgba(30, 55, 102, 0.75), rgba(10, 24, 51, 0.9));
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      font-size: 0.92rem;
+      color: #d8e4ff;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .signal strong { color: var(--warn); }
+
+    .runtime-note {
+      max-width: var(--max);
+      margin: 1rem auto 0;
+      padding: 0 1.2rem;
+      display: none;
+    }
+
+    .runtime-note.show { display: block; }
+
+    .runtime-note p {
+      margin: 0;
+      border: 1px solid #5f4d29;
+      background: #2a210f;
+      color: #f7dd9b;
+      border-radius: 12px;
+      padding: 0.8rem 0.9rem;
+      font-size: 0.9rem;
+    }
+
+    .layout {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1.2rem;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.2rem;
+    }
+
+    .rail {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      border: 1px solid var(--line);
+      background: rgba(14, 26, 49, 0.87);
+      border-radius: 14px;
+      padding: 0.8rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .rail h2 {
+      margin: 0 0 0.5rem;
+      font-size: 0.88rem;
+      color: #95acd8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .rail a {
+      display: block;
+      color: #d3e2ff;
+      text-decoration: none;
+      border-radius: 8px;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .rail a:hover,
+    .rail a.active {
+      background: #1b315a;
+      color: #8fe8ff;
+    }
+
+    .summary {
+      border: 1px solid #2a4170;
+      background: linear-gradient(120deg, #122446, #101e3b);
+      border-radius: 16px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+    }
+
+    .summary h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.02rem;
+      color: #9ce6ff;
+      letter-spacing: 0.04em;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+    }
+
+    .summary-item {
+      border: 1px solid #2a3f6d;
+      background: rgba(9, 22, 46, 0.75);
+      border-radius: 12px;
+      padding: 0.7rem;
+      min-height: 102px;
+    }
+
+    .summary-item b {
+      display: block;
+      color: #79f0ff;
+      margin-bottom: 0.3rem;
+      font-size: 0.9rem;
+    }
+
+    .summary-item p {
+      margin: 0;
+      color: #b9cbee;
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      background: linear-gradient(160deg, rgba(15, 26, 48, 0.95), rgba(12, 22, 43, 0.96));
+      border-radius: 16px;
+      padding: 1.3rem 1.1rem;
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section h3 {
+      margin: 0;
+      font-family: "Manrope", sans-serif;
+      font-size: clamp(1.22rem, 2.1vw, 1.72rem);
+      line-height: 1.28;
+      color: #eef4ff;
+    }
+
+    .lead {
+      margin: 0.6rem 0 0.7rem;
+      color: #89e5f7;
+      font-size: 0.95rem;
+      border-left: 3px solid #47d7ff;
+      padding-left: 0.55rem;
+    }
+
+    .section p {
+      margin: 0.7rem 0;
+      color: #d5e2fb;
+      font-size: 0.98rem;
+    }
+
+    .video-card {
+      margin-top: 1rem;
+      border: 1px solid #335286;
+      background: #10264a;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .video-meta {
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid #2b4470;
+    }
+
+    .video-meta h4 {
+      margin: 0;
+      color: #e6f6ff;
+      font-size: 1rem;
+    }
+
+    .video-meta p {
+      margin: 0.3rem 0 0;
+      color: #b6c9ea;
+      font-size: 0.9rem;
+    }
+
+    .frame-wrap {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: #0b1a31;
+    }
+
+    .frame-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .debrief {
+      margin-top: 0.8rem;
+      border: 1px solid #2c5a76;
+      background: rgba(15, 52, 70, 0.44);
+      border-radius: 10px;
+      padding: 0.72rem 0.82rem;
+      color: #bcefff;
+      font-size: 0.92rem;
+    }
+
+    .debrief strong { color: #8ef1ff; }
+
+    .open-youtube {
+      display: inline-block;
+      margin: 0.7rem 0.9rem 0.95rem;
+      color: #93e8ff;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border-bottom: 1px dashed #93e8ff;
+    }
+
+    .open-youtube:hover {
+      color: #c6f8ff;
+      border-bottom-color: #c6f8ff;
+    }
+
+    footer {
+      max-width: var(--max);
+      margin: 0 auto;
+      color: #8ea8d4;
+      font-size: 0.88rem;
+      padding: 0 1.2rem 2.2rem;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .rail {
+        position: static;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.2rem; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .section { padding: 1rem 0.9rem; }
+      .section p { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="tag">Learning Guide • Energy Future</span>
+        <h1>核融合能源：
+          人類能不能把「太陽」
+          變成一座發電廠？</h1>
+        <p>這份指南不只講原理，也講現實。你會看到核融合為何令人著迷、為何困難到幾十年都未商轉，以及今天的工程路線到底走到哪裡。</p>
+      </div>
+      <div class="signal"><strong>本輪升級：</strong>加入「重點速覽」卡片，先給你全局地圖，再進入章節深讀。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若你是用 <code>file://</code> 開啟頁面，YouTube 可能回報錯誤 153。請改用本機伺服器：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_002/fusion_learning_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="rail">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為何世界押注核融合</a>
+      <a href="#s2">2. 聚變反應到底怎麼發生</a>
+      <a href="#s3">3. Tokamak 與工程難題</a>
+      <a href="#s4">4. 為什麼「突破」還沒變商業</a>
+      <a href="#s5">5. 2030 後的可能路徑</a>
+    </aside>
+
+    <main>
+      <section class="summary" aria-label="重點速覽">
+        <h2>重點速覽</h2>
+        <div class="summary-grid">
+          <article class="summary-item"><b>核心目標</b><p>讓輸出能量長期大於維持反應所需能量，且可穩定運轉。</p></article>
+          <article class="summary-item"><b>最大挑戰</b><p>要在超高溫電漿中同時達到溫度、密度、拘束時間三條件。</p></article>
+          <article class="summary-item"><b>主流路線</b><p>磁約束（Tokamak、Stellarator）與部分公司走慣性/脈衝路線。</p></article>
+          <article class="summary-item"><b>近期進展</b><p>點火與高增益實驗進展明顯，但多數仍在研究或示範階段。</p></article>
+          <article class="summary-item"><b>你該關注</b><p>不是單次新聞，而是可重複、可擴充、可維運的工程能力。</p></article>
+          <article class="summary-item"><b>這份指南結論</b><p>核融合不是神話，也不是明天就商轉；它是長程工程競賽。</p></article>
+        </div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為何世界押注核融合</h3>
+        <p class="lead">核融合被稱作「終極能源」不是因為浪漫，而是它同時碰到三個關鍵：高能量密度、低碳排、燃料潛力。</p>
+        <p>在能源轉型裡，社會一直在做痛苦的平衡：要足夠穩定、足夠乾淨、又不能太昂貴。太陽能與風電解決了大規模清潔發電的一大塊，但儲能、電網調度與季節性波動仍是系統級難題。核融合吸引人的地方在於，它理論上可提供高密度、長時間且低碳的基載能源，像是把「天氣依賴」改成「反應爐控制」。</p>
+        <p>不過核融合不是「加強版核分裂」。它的核心是讓輕元素在極端條件下結合並釋放能量。那代表安全風險形態、燃料循環、設備壽命與成本結構都不相同。也因此，核融合能不能成功，不只是科學題，而是下一代工業系統題。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Nuclear Fusion, explained for beginners</h4>
+            <p>頻道：Cleo Abram｜用途：快速建立「為什麼值得做」的全局視角。</p>
+          </div>
+          <div class="frame-wrap">
+            <iframe data-video-id="piPbnKdve9M" title="Nuclear Fusion, explained for beginners" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先把這支當成地圖，而不是答案。看完後請用一句話回答：核融合解的是哪種能源痛點？答得出來，後面工程細節就不會迷路。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 聚變反應到底怎麼發生</h3>
+        <p class="lead">你可以把核融合想成「讓兩個都帶正電的粒子，硬是跨過彼此排斥」。</p>
+        <p>在常溫下，原子核彼此排斥，幾乎不會自然融合。要讓它們靠近到能被強核力接手，必須給非常高的動能，也就是極高溫。這就把反應物推進「電漿」狀態。問題來了：溫度越高，粒子越難被束縛，反應容器同時得承受巨大熱負荷與材料疲勞。</p>
+        <p>因此核融合不是「點火」而已，而是持續維持那個苛刻窗口。科學上常用勞森準則理解這件事：溫度、密度、拘束時間要一起達標。只要其中一項掉下去，淨能量就會掉回去。這也是為何新聞常出現「突破」，但離電網商轉仍有距離。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜How close are we to powering the world with nuclear fusion?</h4>
+            <p>頻道：TED-Ed｜用途：掌握核融合的科學門檻與路線差異。</p>
+          </div>
+          <div class="frame-wrap">
+            <iframe data-video-id="dGr8VaITKbA" title="How close are we to powering the world with nuclear fusion" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看這支時盯住一個問題：為什麼「高溫」本身不是最難，真正難的是「高溫下的穩定」？這會直接連到第三章的工程挑戰。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. Tokamak 與工程難題：做出一顆地球上的小太陽</h3>
+        <p class="lead">Tokamak 的本質，是用磁場把高溫電漿「懸浮」起來，不讓它碰到容器壁。</p>
+        <p>磁約束是目前最主流的核融合工程路線。想像你在空中握住一團極不穩定、溫度高到常規材料無法承受的流體，還要長時間保持形狀與密度。這不只考驗超導磁體，也考驗控制系統、診斷系統、真空技術與材料工程。任何小擾動都可能造成電漿失穩，讓整次脈衝效率大幅下降。</p>
+        <p>因此，核融合工程進展其實很像航空工業早期：單一零件不夠，整體系統協同才是關鍵。你看到的每一次紀錄刷新，背後都是大量控制與容錯技術的累積。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Fusion Power Explained – Future or Failure</h4>
+            <p>頻道：Kurzgesagt – In a Nutshell｜用途：把技術原理與工程難點連成完整敘事。</p>
+          </div>
+          <div class="frame-wrap">
+            <iframe data-video-id="mZsaaturR6E" title="Fusion Power Explained – Future or Failure" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請注意影片裡每個「看似簡單」步驟，都其實對應一個產業級子系統。核融合難，不是難在一個公式，而是難在把所有公式同時變成可運轉設備。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 為什麼「突破」還沒變商業</h3>
+        <p class="lead">新聞會報導里程碑，但電力市場只接受可預測、可維修、可融資的機組。</p>
+        <p>近年你會常看到核融合大突破：能量增益提高、脈衝更長、控制更穩。這些都重要，但商業化還需要另外三層驗證。第一，能否長期重複達成，而不是一次性紀錄。第二，設備壽命與維修週期能否支撐電廠商業模型。第三，整體度電成本是否能在電力市場競爭。</p>
+        <p>這也是為什麼越來越多討論從「是否可行」轉向「哪條路線更快跨過工程門檻」。技術競賽逐漸從科學論文轉向供應鏈、製造與運維能力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜The Problem with Nuclear Fusion</h4>
+            <p>頻道：Real Engineering｜用途：理解核融合距離商業化的關鍵阻礙。</p>
+          </div>
+          <div class="frame-wrap">
+            <iframe data-video-id="BzK0ydOF0oU" title="The Problem with Nuclear Fusion" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請把這支當作風險清單。看完後你應該能清楚說出：核融合目前卡住的是科學、工程、還是商業模型？答案通常是三者交織。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 2030 後的可能路徑：大科學計畫 vs. 快速商業路線</h3>
+        <p class="lead">接下來十年，核融合會同時走兩條線：國際大型計畫與民間快節奏公司。</p>
+        <p>以 ITER 為代表的大型計畫，目標是建立可驗證、可複現的工程與科學基準；這是「把底層能力做紮實」的路線。另一邊，像 Helion 這類公司試圖用不同架構快速逼近商轉，強調速度與成本。兩者不是誰替代誰，而是各自對不同風險下注。</p>
+        <p>對一般讀者來說，最務實的觀察方法是看三件事：一，是否有持續可重複的性能指標；二，是否公開關鍵測試資料；三，是否有清楚的工程里程碑而非口號。能同時做到這三點，才有資格談「能源新時代」。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜A New Way to Achieve Nuclear Fusion: Helion</h4>
+            <p>頻道：Real Engineering｜用途：了解新創路線如何挑戰傳統核融合工程節奏。</p>
+          </div>
+          <div class="frame-wrap">
+            <iframe data-video-id="_bDXXWQxK38" title="A New Way to Achieve Nuclear Fusion: Helion" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>最後用一句話收斂：核融合的競賽不是「誰先上新聞」，而是「誰先把工程、成本、可靠度一起做出來」。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 002｜主題：核融合能源｜形式：敘事式科普教學頁 + YouTube 嵌入</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const links = Array.from(document.querySelectorAll('.rail a'));
+    const iframes = Array.from(document.querySelectorAll('.frame-wrap iframe'));
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const percent = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${percent}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    }, { threshold: 0.14 });
+
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        links.forEach((a) => {
+          a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+        });
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+
+    sections.forEach((section) => navObserver.observe(section));
+
+    if (window.location.protocol === 'file:') {
+      runtimeNote.classList.add('show');
+    }
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

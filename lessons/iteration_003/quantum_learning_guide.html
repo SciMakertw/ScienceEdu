@@ -1,0 +1,567 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：量子運算</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f12;
+      --panel: #12191f;
+      --panel-soft: #171f27;
+      --text: #ebf3ff;
+      --muted: #9eb0c4;
+      --line: #273849;
+      --accent: #9eff4a;
+      --accent-2: #55f5d5;
+      --warn: #ffd77c;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at 78% 10%, #223544 0%, #0e151b 32%, #090d10 100%),
+        linear-gradient(90deg, transparent 0, transparent 95%, rgba(158, 255, 74, 0.08) 95%);
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Noto Sans TC", "Space Grotesk", sans-serif;
+      line-height: 1.82;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.07);
+      z-index: 40;
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.08s linear;
+    }
+
+    .hero {
+      padding: 5rem 1.2rem 2rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 1.1rem;
+      align-items: end;
+    }
+
+    .kicker {
+      display: inline-block;
+      padding: 0.25rem 0.72rem;
+      border-radius: 999px;
+      border: 1px solid #3e6640;
+      color: #c8ff92;
+      font-size: 0.8rem;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.8rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: -0.02em;
+      line-height: 1.14;
+      font-size: clamp(2rem, 4.35vw, 3.3rem);
+    }
+
+    .hero p {
+      margin: 0.95rem 0 0;
+      color: #bbcee0;
+      max-width: 720px;
+      font-size: 1rem;
+    }
+
+    .hero-note {
+      border: 1px solid #445d2f;
+      border-radius: 14px;
+      background: linear-gradient(130deg, rgba(34, 53, 16, 0.7), rgba(18, 34, 31, 0.72));
+      padding: 0.85rem 0.95rem;
+      font-size: 0.92rem;
+      color: #dcf8c2;
+    }
+
+    .runtime-note {
+      max-width: var(--max);
+      margin: 0.9rem auto 0;
+      padding: 0 1.2rem;
+      display: none;
+    }
+
+    .runtime-note.show { display: block; }
+
+    .runtime-note p {
+      margin: 0;
+      border: 1px solid #634d1c;
+      background: #2e220d;
+      color: #ffd98d;
+      border-radius: 11px;
+      padding: 0.78rem 0.9rem;
+      font-size: 0.9rem;
+    }
+
+    .layout {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1.1rem 1.2rem 2.2rem;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.1rem;
+    }
+
+    .toc {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(18, 25, 31, 0.88);
+      backdrop-filter: blur(8px);
+      padding: 0.8rem;
+    }
+
+    .toc h2 {
+      margin: 0 0 0.5rem;
+      color: #bdd1e5;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: #dce8f8;
+      border-radius: 8px;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .toc a:hover,
+    .toc a.active {
+      background: #233446;
+      color: #bfff89;
+    }
+
+    .concept-box {
+      border: 1px solid #2f4533;
+      border-radius: 16px;
+      background: linear-gradient(150deg, #13211a, #141e25);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
+    }
+
+    .concept-box h2 {
+      margin: 0 0 0.6rem;
+      font-size: 1rem;
+      color: #d9ffb3;
+      letter-spacing: 0.03em;
+    }
+
+    .switches {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.7rem;
+    }
+
+    .switches button {
+      background: #16222b;
+      border: 1px solid #355249;
+      color: #d0e2f5;
+      border-radius: 999px;
+      padding: 0.34rem 0.8rem;
+      cursor: pointer;
+      font-size: 0.86rem;
+    }
+
+    .switches button.active {
+      background: #2e4a2f;
+      border-color: #9eff4a;
+      color: #e8ffd2;
+    }
+
+    .switch-panel {
+      border: 1px solid #294545;
+      border-radius: 12px;
+      background: rgba(12, 22, 29, 0.7);
+      padding: 0.75rem 0.85rem;
+      color: #c3d7eb;
+      font-size: 0.92rem;
+      min-height: 86px;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: linear-gradient(160deg, var(--panel), var(--panel-soft));
+      padding: 1.2rem 1.05rem;
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.62s ease, transform 0.62s ease;
+    }
+
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section h3 {
+      margin: 0;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(1.22rem, 2.2vw, 1.76rem);
+      line-height: 1.26;
+      letter-spacing: -0.01em;
+    }
+
+    .lead {
+      margin: 0.55rem 0 0.75rem;
+      color: #bdfd84;
+      border-left: 3px solid #8fe93d;
+      padding-left: 0.56rem;
+      font-size: 0.95rem;
+    }
+
+    .section p {
+      margin: 0.68rem 0;
+      color: #d6e6f8;
+      font-size: 0.98rem;
+    }
+
+    .video-card {
+      margin-top: 0.95rem;
+      border: 1px solid #31506d;
+      border-radius: 12px;
+      background: #122739;
+      overflow: hidden;
+    }
+
+    .video-meta {
+      padding: 0.72rem 0.9rem;
+      border-bottom: 1px solid #28445d;
+    }
+
+    .video-meta h4 {
+      margin: 0;
+      font-size: 1rem;
+      color: #e8f6ff;
+    }
+
+    .video-meta p {
+      margin: 0.3rem 0 0;
+      color: #b2c9e2;
+      font-size: 0.9rem;
+    }
+
+    .frame {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: #0b1825;
+    }
+
+    .frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .debrief {
+      margin-top: 0.8rem;
+      border: 1px solid #365043;
+      border-radius: 10px;
+      background: rgba(26, 43, 29, 0.46);
+      padding: 0.7rem 0.82rem;
+      color: #d1f2ca;
+      font-size: 0.92rem;
+    }
+
+    .debrief strong { color: #bdff79; }
+
+    .open-youtube {
+      display: inline-block;
+      margin: 0.7rem 0.9rem 0.92rem;
+      font-size: 0.9rem;
+      color: #b9f58d;
+      text-decoration: none;
+      border-bottom: 1px dashed #b9f58d;
+    }
+
+    .open-youtube:hover {
+      color: #deffc0;
+      border-bottom-color: #deffc0;
+    }
+
+    footer {
+      max-width: var(--max);
+      margin: 0 auto;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.88rem;
+      padding: 0 1.2rem 2rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+    }
+
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.2rem; }
+      .section { padding: 0.98rem 0.88rem; }
+      .section p { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="kicker">Learning Guide • Quantum Computing</span>
+        <h1>量子運算：
+          當計算不再只靠 0 與 1，
+          世界會被改寫嗎？</h1>
+        <p>這份指南不會把你丟進公式叢林。我們用故事線帶你看懂量子位元、糾纏、誤差修正與產業現況，最後回答一個現實問題：量子運算到底離你有多近。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「概念切換器」，可在同一區塊快速切換 qubit / superposition / entanglement 三個核心概念。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若你直接用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_003/quantum_learning_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為何量子運算被期待</a>
+      <a href="#s2">2. qubit 與疊加態是什麼</a>
+      <a href="#s3">3. 糾纏與演算法優勢</a>
+      <a href="#s4">4. 為何今天還難以普及</a>
+      <a href="#s5">5. 未來十年的可行路徑</a>
+    </aside>
+
+    <main>
+      <section class="concept-box" aria-label="核心概念切換器">
+        <h2>核心概念切換器</h2>
+        <div class="switches">
+          <button type="button" data-key="qubit" class="active">Qubit</button>
+          <button type="button" data-key="superposition">Superposition</button>
+          <button type="button" data-key="entanglement">Entanglement</button>
+        </div>
+        <div class="switch-panel" id="conceptPanel">Qubit 是量子版的資訊單位。它不是「0 或 1」二選一，而是可在測量前處於機率振幅描述的量子狀態。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為何量子運算被期待</h3>
+        <p class="lead">所有科技熱潮都會問同一件事：它只是更快，還是能解以前根本解不掉的題？</p>
+        <p>傳統電腦過去幾十年的成功，建立在把世界拆成極大量二進位步驟，再用穩定硬體高速執行。這套模式仍然強大，但碰上特定問題時，成本會呈現爆炸式成長。像是高維度最佳化、量子材料模擬、部分密碼體系分析，問題規模一大，運算資源就被吃光。</p>
+        <p>量子運算吸引人的點，不是取代所有電腦，而是為少數「結構上更適合量子表達」的問題開新路。它像在既有公路系統旁，另開一條只服務特定貨物的高速專線。能不能成功，關鍵不在宣傳，而在它是否真的在實際任務上給出可重複的優勢。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜A beginner's guide to quantum computing</h4>
+            <p>頻道：TED｜用途：建立量子運算的整體圖像與現實邊界。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="QuR969uMICM" title="A beginner's guide to quantum computing" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支先幫你把「期待值」調對。關鍵是把量子運算看成補充型平台，而不是萬能替代品。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. qubit 與疊加態是什麼</h3>
+        <p class="lead">量子運算最常被誤解的一句話是：「它同時算所有答案。」</p>
+        <p>更精準地說，量子系統在演化過程中會以振幅方式同時承載多種可能性，但最終測量只會吐出一個結果。真正厲害的地方，不是把答案全部印出來，而是透過設計干涉路徑，讓對的答案機率被放大、錯的答案被抵消。這就是量子演算法設計的核心美學。</p>
+        <p>你可以把它想成音樂混音：每條聲軌都存在，但最後聽到的是特定組合的強弱關係。量子電路的工作，就是精準調音，而不是無腦疊加。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜How Does a Quantum Computer Work?</h4>
+            <p>頻道：Veritasium｜用途：把抽象量子概念轉成直覺可理解的模型。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="g_IaVepNDT4" title="How Does a Quantum Computer Work" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看這支時，請特別抓住「狀態演化」與「最終測量」的差別。能分清這兩件事，你就跨過量子入門最重要的一道門檻。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 糾纏與演算法優勢</h3>
+        <p class="lead">量子糾纏不是神祕力量，而是一種跨位元的關聯結構。</p>
+        <p>當 qubit 間形成糾纏時，系統整體狀態不能再拆成單一 qubit 的獨立乘積。這讓量子電路可以在「全局關聯」層級操作問題，而非逐一處理局部元件。某些演算法正是利用這種全局性，在理論上取得比傳統方法更好的複雜度。</p>
+        <p>但這裡也有陷阱：不是有糾纏就一定比較快，也不是任何問題都能映射成量子優勢。真正困難的是找到同時滿足「問題適配」「硬體可行」「誤差可控」的交集。那個交集，就是現代量子工程最昂貴也最迷人的戰場。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Quantum Computers Explained – Limits of Human Technology</h4>
+            <p>頻道：Kurzgesagt – In a Nutshell｜用途：建立量子優勢與限制並存的完整視角。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="JhHMJCUmq28" title="Quantum Computers Explained – Limits of Human Technology" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請把影片中的「能做」和「還做不到」各列三點。這個練習能避免你被單邊敘事帶著走。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 為何今天還難以普及</h3>
+        <p class="lead">最大的敵人不是算力，而是噪聲。</p>
+        <p>量子位元非常敏感，環境擾動、溫度波動、控制誤差都會破壞量子態，也就是所謂退相干。這代表即使理論上演算法漂亮，實際硬體仍可能在完成計算前就把資訊弄壞。於是整個產業把大量資源投入誤差修正與容錯架構，試圖把「示範機」推到「可用機」。</p>
+        <p>這個過程很像早期航空從實驗飛行到商業航線：不是先求最遠，而是先求可靠。沒有可靠度，所有里程碑都無法轉成生產力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜The high-stakes race to make quantum computers work</h4>
+            <p>頻道：TED-Ed｜用途：聚焦「可運作量子電腦」為何這麼難。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="r_t96FqWE4M" title="The high-stakes race to make quantum computers work" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這段最值得記住的不是「誰領先」，而是「為什麼領先很容易被誤差吃掉」。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 未來十年的可行路徑</h3>
+        <p class="lead">量子運算最可能先落地的，不是通用替代，而是和傳統超算協作的混合工作流。</p>
+        <p>短中期內，產業較務實的路徑是把量子裝置當成特定子問題加速器，再與傳統 HPC、雲端平台、AI 模型串接。這樣做的好處是可以邊用邊驗證，不必等到「完美量子電腦」才開始創造價值。藥物模擬、材料設計、金融風險分析都在這條路上試水溫。</p>
+        <p>未來真正決勝點，將是軟硬協同速度：硬體迭代、錯誤校正、編譯器優化、問題映射方法能否同步成熟。只要其中一塊掉隊，整體價值就會卡住。量子運算的故事，說到底不是魔法，而是工程耐力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜What is Quantum Computing?</h4>
+            <p>頻道：IBM Technology｜用途：從產業視角理解量子運算落地方式。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="lt4OsgmUTGI" title="What is Quantum Computing" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>最後收斂一句話：量子運算不是明天取代一切，而是今天開始重排「哪些問題值得重新計算」。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 003｜主題：量子運算｜敘事式教學頁 + YouTube 嵌入</footer>
+
+  <script>
+    const conceptText = {
+      qubit: 'Qubit 是量子版的資訊單位。它不是「0 或 1」二選一，而是可在測量前處於機率振幅描述的量子狀態。',
+      superposition: 'Superposition（疊加態）表示系統同時承載多種可能振幅。重點不是同時印出所有答案，而是透過干涉調整答案分布。',
+      entanglement: 'Entanglement（糾纏）讓多個 qubit 的狀態形成不可分割的關聯，能用全局方式表示問題結構。'
+    };
+
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+    const conceptPanel = document.getElementById('conceptPanel');
+    const switchButtons = Array.from(document.querySelectorAll('.switches button'));
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const p = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${p}%`;
+    };
+
+    switchButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-key');
+        switchButtons.forEach((b) => b.classList.toggle('active', b === btn));
+        conceptPanel.textContent = conceptText[key] || '';
+      });
+    });
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    }, { threshold: 0.14 });
+
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => {
+          a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+        });
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') {
+      runtimeNote.classList.add('show');
+    }
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

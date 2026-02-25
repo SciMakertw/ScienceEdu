@@ -1,0 +1,321 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：電網儲能與調度</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --panel: #151d31;
+      --panel2: #1e2a42;
+      --text: #eaf0ff;
+      --muted: #b9c6e7;
+      --line: #47577f;
+      --accent: #7bc3ff;
+      --accent2: #98ffd6;
+      --warn: #ffd69a;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 85% 6%, #2d3f73 0%, #18223e 38%, #0b0f1a 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #677cad; color: #d0e2ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Exo 2", "Noto Sans TC", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: .01em; }
+    .hero p { margin: .9rem 0 0; color: #c8d5f1; max-width: 760px; font-size: 1rem; }
+    .hero-note { border: 1px solid #5b6f9a; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(22,32,58,.84), rgba(16,24,46,.9)); color: #dce7ff; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(20,31,52,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #c4d4f5; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e3ecff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #314b79; color: #b3ffe0; }
+
+    .planner { border: 1px solid #5a6fa2; border-radius: 16px; background: linear-gradient(150deg, #1b2a4a, #182540); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #d8e5ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #657cad; border-radius: 10px; background: rgba(12,20,38,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #c9d8f4; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #7bc3ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #647ca2; border-radius: 10px; background: rgba(10,18,34,.74); padding: .66rem .75rem; font-size: .9rem; color: #d4e0f7; }
+    .plan-out b { color: #b9ffe1; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #abddff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d9e4fb; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #5a73a3; border-radius: 12px; background: #24406b; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #516893; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2f7ff; }
+    .video-meta p { margin: .28rem 0 0; color: #c9d8ef; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #132444; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #657a96; border-radius: 10px; background: rgba(35,49,66,.56); padding: .68rem .78rem; color: #dce6f4; font-size: .92rem; }
+    .debrief strong { color: #c6ffe7; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #c2faff; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #c2faff; }
+    .open-youtube:hover { color: #eefeff; border-bottom-color: #eefeff; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #b6c4df; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Grid Storage & Dispatch</span>
+        <h1>電網儲能與調度：
+          再生能源時代，
+          電力平衡怎麼做？</h1>
+        <p>電網的核心任務始終沒變：供需每秒平衡。但當太陽能與風能占比上升，調度難度和不確定性都會放大。這份指南帶你看懂儲能、抽蓄與需求響應如何組成新的電網韌性系統。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「調度策略模擬器」，調整再生波動、儲能時長、尖峰壓力後即時推薦調度優先順序。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_014/grid_storage_dispatch_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 電網平衡的基本約束</a>
+      <a href="#s2">2. 電池儲能（BESS）角色</a>
+      <a href="#s3">3. 抽蓄與長時儲能</a>
+      <a href="#s4">4. 需求響應與負載彈性</a>
+      <a href="#s5">5. 高再生占比下的調度路線</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="調度策略模擬器">
+        <h2>調度策略模擬器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="renewableVariability">再生能源波動（高 = 預測難）</label>
+            <input id="renewableVariability" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="storageDuration">可用儲能時長（高 = 可撐更久）</label>
+            <input id="storageDuration" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="peakPressure">尖峰負載壓力（高 = 高峰更陡）</label>
+            <input id="peakPressure" type="range" min="1" max="5" value="4">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>快速響應電池 + 需求響應聯動</b>，並搭配抽蓄或長時儲能做日內平衡。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 電網平衡的基本約束</h3>
+        <p class="lead">電網不是倉庫，傳統上幾乎無法大量「存電」，所以供給必須即時追上需求。</p>
+        <p>當發電結構以可控機組為主時，調度重點是經濟效率；當可變再生能源比例提高，調度重點會轉向靈活性與備援。也就是說，你不只要便宜電力，還要可快速調整的電力。這讓「可調度資源」的價值大幅提高。</p>
+        <p>因此，電網升級不是只有新增綠電裝置，而是整體系統重設：預測模型、儲能資源、需求側管理和市場規則都要同步調整。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜The Smart Grid Explained - An Understanding for Everyone</h4>
+            <p>頻道：EPCEenergyeducation - CAEL｜用途：建立電網運作與智慧調度基礎概念。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="4L31dHXP6i0" title="The Smart Grid Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先掌握「平衡責任」這個核心，再看後面所有儲能與需求策略會更清楚。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 電池儲能（BESS）角色</h3>
+        <p class="lead">電池儲能的價值在「快」，它最擅長處理秒到小時等級的波動與頻率支援。</p>
+        <p>BESS 在高再生系統中常被用於削峰填谷、頻率調節、備轉與短期套利。技術重點不只在電芯，還包含電池管理系統（BMS）、功率轉換系統（PCS）與能源管理系統（EMS）的協同。只要任一環節控制不穩，整體效益就會折損。</p>
+        <p>實務上，BESS 常與太陽能、風電或工業負載聯合運作，形成更可預測的輸出曲線。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Energy Storage 101</h4>
+            <p>頻道：Student Energy｜用途：理解不同儲能技術與電網應用場景。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="9eAFEU7pMwU" title="Energy Storage 101" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看影片時留意「功率型」與「能量型」需求差異，這是儲能選型最常被忽略的地方。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 抽蓄與長時儲能</h3>
+        <p class="lead">若電池擅長短跑，抽蓄更像馬拉松，能提供更長時段的系統支撐。</p>
+        <p>抽蓄透過離峰抽水、尖峰發電，把時間差轉成調度空間。它的優勢是規模大、壽命長、技術成熟；限制則是地理條件與建設周期。隨著高再生占比提升，長時儲能的重要性正在上升，因為系統需要跨日甚至跨週的彈性資源。</p>
+        <p>所以長期規劃上，短時電池與長時儲能往往不是替代，而是互補。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜How Pumped Storage Power Plants Work</h4>
+            <p>頻道：saVRee｜用途：掌握抽蓄運作原理與在電網中的調節價值。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="E-m7Psbuup0" title="How Pumped Storage Power Plants Work" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>抽蓄的關鍵不是效率滿分，而是大規模、長壽命與系統穩定性貢獻。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 需求響應與負載彈性</h3>
+        <p class="lead">電網調度不只管發電端，也可以「調需求」，把尖峰壓力往低谷移動。</p>
+        <p>需求響應透過價格訊號與合約機制，讓工業、商業或聚合用戶在關鍵時段調整用電。這種彈性資源可降低備用容量需求，並減少尖峰時段高成本發電機組啟動。對高再生系統而言，需求響應是成本效益非常高的平衡工具。</p>
+        <p>不過要落地，必須有量測、驗證與結算機制，否則很難形成可持續市場。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Demand response - Flow Power</h4>
+            <p>頻道：Australian Renewable Energy Agency (ARENA)｜用途：理解需求響應如何成為電網平衡資源。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="UWsAo46PUMU" title="Demand response Flow Power" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把需求響應當作「虛擬發電廠」會更容易理解它在調度中的價值。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 高再生占比下的調度路線</h3>
+        <p class="lead">再生能源佔比上升後，真正難題不在發電量，而在「什麼時候發」。</p>
+        <p>太陽能在白天集中、晚高峰需求卻常更高，形成典型錯配。此時需要靠儲能移峰、可調度機組補位、需求側管理協同，並搭配更精細的預測與市場設計。調度策略的優劣，最終會反映在棄電率、尖峰電價與停電風險上。</p>
+        <p>下一階段電網競爭力，會來自系統整合能力：誰能更快把分散資源編排成可控的整體。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Connecting Solar to the Grid is Harder Than You Think</h4>
+            <p>頻道：Practical Engineering｜用途：從工程實務看再生能源併網與調度困難點。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="7G4ipM2qjfw" title="Connecting Solar to the Grid is Harder Than You Think" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>總結一句：高再生電網的關鍵能力，是把「波動」變成「可管理的不確定性」。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 014｜主題：電網儲能與調度｜單頁教學頁 + YouTube 嵌入 + 調度策略模擬器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const renewableVariability = document.getElementById('renewableVariability');
+    const storageDuration = document.getElementById('storageDuration');
+    const peakPressure = document.getElementById('peakPressure');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const v = Number(renewableVariability.value);
+      const s = Number(storageDuration.value);
+      const p = Number(peakPressure.value);
+
+      const options = [
+        { name: '快速響應電池 + 需求響應聯動', score: v * 1.1 + p * 1.05 + s * 0.7 },
+        { name: '抽蓄/長時儲能優先，平滑日內曲線', score: s * 1.25 + v * 0.9 + p * 0.7 },
+        { name: '加強可調度機組備轉與即時調頻', score: p * 1.1 + v * 0.8 + (6 - s) * 0.6 },
+        { name: '先強化預測與市場機制，再擴大硬體投資', score: v * 0.95 + (6 - p) * 0.6 + 2 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [renewableVariability, storageDuration, peakPressure].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：半導體製程與晶片良率工程</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070d14;
+      --panel: #111c2a;
+      --panel2: #16263a;
+      --text: #e7f1ff;
+      --muted: #adc0d8;
+      --line: #2f4d6f;
+      --accent: #59d3ff;
+      --accent2: #7af4bc;
+      --warn: #ffd695;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at 10% 0%, #1d3d67 0%, #0d1a2a 36%, #070d14 100%);
+    }
+    body { margin: 0; font-family: "Noto Sans TC", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.28fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #4f79a8; color: #b9dcff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Rajdhani", "Noto Sans TC", sans-serif; font-size: clamp(2.1rem, 4.4vw, 3.34rem); line-height: 1.12; letter-spacing: .01em; }
+    .hero p { margin: .88rem 0 0; color: #c0d3e8; max-width: 760px; font-size: 1rem; }
+    .hero-note { border: 1px solid #436788; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(18,43,72,.82), rgba(13,30,49,.9)); color: #d6e8fa; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(14,31,52,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #bdd3ea; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #dfedff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #1c4263; color: #9ef7d6; }
+
+    .planner { border: 1px solid #406287; border-radius: 16px; background: linear-gradient(155deg, #142946, #102236); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #d1e9ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #4f7398; border-radius: 10px; background: rgba(10,24,39,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #c3d8ec; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #59d3ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #4c6d8d; border-radius: 10px; background: rgba(9,21,34,.74); padding: .66rem .75rem; font-size: .9rem; color: #cfdfef; }
+    .plan-out b { color: #9ff5d4; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.24rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #99e8ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d6e7f7; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #43678a; border-radius: 12px; background: #15314f; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #3c5c7a; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f0f7ff; }
+    .video-meta p { margin: .28rem 0 0; color: #c7dbef; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #091726; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #557086; border-radius: 10px; background: rgba(24,40,52,.58); padding: .68rem .78rem; color: #dbe7f3; font-size: .92rem; }
+    .debrief strong { color: #bcffe8; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #bbf8ff; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #bbf8ff; }
+    .open-youtube:hover { color: #e5feff; border-bottom-color: #e5feff; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #aec2d7; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Semiconductor Manufacturing</span>
+        <h1>半導體製程：
+          一粒沙如何變成
+          能跑 AI 的晶片？</h1>
+        <p>晶片不是被「做出來」，而是被「一層一層地寫進去」。從矽晶圓、微影、蝕刻、薄膜到封裝測試，每一步都在和機率、污染、時間賽跑。這份指南會把抽象的製程流程，轉成你能掌握的工程邏輯。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「良率-成本決策儀表板」，調整缺陷、複雜度與節拍後，即時查看優先改善策略。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_010/semiconductor_fabrication_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 晶片製造的全景</a>
+      <a href="#s2">2. 微影：把電路印到奈米尺度</a>
+      <a href="#s3">3. 晶圓廠與潔淨室節奏</a>
+      <a href="#s4">4. EUV 設備與瓶頸工程</a>
+      <a href="#s5">5. 良率、成本與下一代節點</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="良率-成本決策儀表板">
+        <h2>良率-成本決策儀表板</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="defectLevel">缺陷密度（高 = 壞點多）</label>
+            <input id="defectLevel" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="maskComplexity">遮罩複雜度（高 = 製程更難）</label>
+            <input id="maskComplexity" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="cyclePressure">交期壓力（高 = 節拍更緊）</label>
+            <input id="cyclePressure" type="range" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先壓低缺陷密度</b>，接著優化微影對準穩定度，最後調整排程節拍。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 晶片製造的全景</h3>
+        <p class="lead">同一片晶圓上，可能同時放著數百到上千顆晶片。工程師真正管理的，不是單顆晶片，而是一整片風險分布。</p>
+        <p>半導體製程的核心是「重複」：沉積一層、微影一次、蝕刻一次，再做清洗與量測，然後再來一輪。先進節點不是某一台神奇機器，而是上百道製程環節在長時間內維持可預測性。只要其中一個步驟飄移，良率就會被放大打擊。</p>
+        <p>所以晶圓廠最在意的不是單次成功，而是可複製性。工程語言上，這叫 process window：讓每一道工序都有足夠的容忍範圍，才有機會把研發成果變成穩定量產。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜How are microchips made?</h4>
+            <p>頻道：TED-Ed｜用途：快速建立從矽到晶片的完整製程地圖。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="IkRXpFIRUl4" title="How are microchips made" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先抓住流程節拍，再看每一步技術細節；這樣你會知道每個瓶頸為什麼會連動到成本與交期。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 微影：把電路印到奈米尺度</h3>
+        <p class="lead">微影的本質不是「拍照」，而是用光學、材料與統計把圖形誤差壓到可量產的範圍。</p>
+        <p>在晶片世界，線寬每縮小一點，對對準誤差、光阻反應、顆粒污染就更敏感。這就是為什麼微影被視為整條產線的戰略節點。你看到的是圖案，工程師看到的是臨界尺寸、線邊粗糙度與 overlay 誤差。</p>
+        <p>當製程進入奈米級，問題不再是「做不做得到」，而是「每次都做得到」。因此微影不只是一台曝光機，而是前後段量測、校正與回授控制構成的閉環系統。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Semiconductor Manufacturing Process Explained</h4>
+            <p>頻道：Samsung Semiconductor Newsroom｜用途：用產線視角理解微影與前段製程如何串接。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="Bu52CE55BN0" title="Semiconductor Manufacturing Process Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>注意影片中「同一步驟反覆發生」的節奏，這正是先進製程為何既昂貴又脆弱的原因。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 晶圓廠與潔淨室節奏</h3>
+        <p class="lead">先進晶圓廠像醫院手術室的放大版，但要求更嚴苛：一粒肉眼看不見的微粒，就可能讓整批報廢。</p>
+        <p>潔淨室管理不是打掃，而是流體與物流工程。人員移動、晶圓運輸、溫濕度、振動、壓差都要被精準控制，目的是把隨機性從系統裡移除。這也是為什麼 fab 的自動化程度極高，因為人本身就是最大的變異來源之一。</p>
+        <p>當你理解晶圓廠是「變異控制工廠」，就會明白良率不是某個部門的 KPI，而是全場協同結果：製程、設備、品保、排程都在同一張命運表上。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜300mm wafer fab virtual tour</h4>
+            <p>頻道：Texas Instruments｜用途：具體觀察晶圓廠設備、運輸與潔淨室運作節奏。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="5a8xjH2tOkM" title="300mm wafer fab virtual tour" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請把注意力放在「運輸與等待時間」上，許多成本不是來自單步工藝，而是全流程週轉效率。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. EUV 設備與瓶頸工程</h3>
+        <p class="lead">EUV 不是單一突破，而是把光源、真空、反射鏡、控制系統同時推到極限。</p>
+        <p>先進節點的競爭，很大程度取決於你能否穩定駕馭 EUV。這套系統面對的是極端條件：極短波長、超高精度定位、極低容錯率。任何微小漂移，都可能在晶圓上變成大量缺陷。</p>
+        <p>所以 EUV 議題的重點不只在「有沒有機器」，而在整體工程能力：校準速度、停機恢復、配套材料與量測回授。設備是門票，整合能力才是決勝點。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜How EUV lithography works</h4>
+            <p>頻道：IBM Research｜用途：理解 EUV 微影背後的核心物理與工程挑戰。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="RI3lCUEzSvE" title="How EUV lithography works" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看完後回頭想一件事：先進製程真正昂貴的部分，是把每個誤差來源都變成可管理變數。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 良率、成本與下一代節點</h3>
+        <p class="lead">晶片產業不是單純比誰做得更小，而是比誰能在更小的同時，維持可承受的成本曲線。</p>
+        <p>先進節點常出現一個現象：技術上可行，但商業上不一定划算。遮罩成本暴增、驗證周期拉長、設備稼動率稍有波動就侵蝕毛利。因此「良率爬坡速度」往往決定了產品上市節奏，也決定了企業是否能把先進技術轉成現金流。</p>
+        <p>未來幾年，封裝與系統協同設計會越來越關鍵。很多效能提升不再只靠縮線寬，而是靠架構、封裝和製程的共同優化。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜The $200M Machine that Prints Microchips</h4>
+            <p>頻道：Branch Education｜用途：從設備與成本角度理解先進節點的投資邏輯。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="B2482h_TNwg" title="The 200M Machine that Prints Microchips" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>總結一句話：先進製程是一門「把不確定性商品化」的產業，誰能更快收斂變異，誰就拿到市場主導權。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 010｜主題：半導體製程（晶片製造與良率工程）｜單頁教學頁 + YouTube 嵌入 + 良率-成本決策儀表板</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const defectLevel = document.getElementById('defectLevel');
+    const maskComplexity = document.getElementById('maskComplexity');
+    const cyclePressure = document.getElementById('cyclePressure');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const d = Number(defectLevel.value);
+      const m = Number(maskComplexity.value);
+      const c = Number(cyclePressure.value);
+      const options = [
+        { name: '先壓低缺陷密度（清洗/檢測/污染控制）', score: d * 1.25 },
+        { name: '優先穩定微影與遮罩流程（CD/Overlay）', score: m * 1.18 },
+        { name: '重排瓶頸機台節拍與批次策略', score: c * 1.12 },
+        { name: '建立跨站點良率回授看板', score: (d + m + c) / 3 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [defectLevel, maskComplexity, cyclePressure].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

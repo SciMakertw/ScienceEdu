@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：深海探測</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #031017;
+      --panel: #08212d;
+      --panel2: #0c2b3b;
+      --text: #dff6ff;
+      --muted: #9fc2d1;
+      --line: #1f4a60;
+      --accent: #56d6ff;
+      --accent2: #61f5cc;
+      --warn: #ffd78e;
+      --max: 1140px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 78% 8%, #124461 0%, #072131 40%, #020a11 100%); }
+    body { margin: 0; color: var(--text); font-family: "Noto Sans TC", sans-serif; line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.34fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #4f8ba3; color: #b6e5ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Space Mono", monospace; font-size: clamp(2rem, 4.1vw, 3.05rem); line-height: 1.14; }
+    .hero p { margin: .9rem 0 0; color: #b8d6e3; max-width: 720px; font-size: 1rem; }
+    .hero-note { border: 1px solid #4b7184; border-radius: 13px; padding: .82rem .9rem; background: linear-gradient(140deg, rgba(18,53,70,.82), rgba(16,40,57,.86)); color: #d6ecf8; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f6036; border-radius: 10px; background: #312a16; color: #ffe2a6; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 255px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(10,31,42,.86); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #b8d6e3; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #d8f0fb; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #1b4a63; color: #9ef7e1; }
+
+    .depth {
+      border: 1px solid #34627a;
+      border-radius: 16px;
+      background: linear-gradient(150deg, #0b2f40, #0d2536);
+      padding: .95rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 14px 34px rgba(0,0,0,.25);
+    }
+    .depth h2 { margin: 0 0 .58rem; color: #c9eeff; font-size: 1.03rem; }
+    .depth label { display: block; color: #b9dbe8; font-size: .86rem; margin-bottom: .4rem; }
+    .depth input[type="range"] { width: 100%; accent-color: #56d6ff; }
+    .depth-out { margin-top: .58rem; border: 1px solid #436f84; border-radius: 10px; background: rgba(12,28,40,.68); padding: .65rem .74rem; color: #cbdfec; font-size: .9rem; }
+    .depth-out b { color: #9ef7e1; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; font-family: "Space Mono", monospace; }
+    .lead { margin: .55rem 0 .72rem; color: #a6f3ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d5e9f5; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #3f6780; border-radius: 12px; background: #123348; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #385b72; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #edfbff; }
+    .video-meta p { margin: .28rem 0 0; color: #bed8e7; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #0b2331; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #54615c; border-radius: 10px; background: rgba(38,48,46,.56); padding: .68rem .78rem; color: #dbe7e2; font-size: .92rem; }
+    .debrief strong { color: #b9ffe8; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #baf9ff; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #baf9ff; }
+    .open-youtube:hover { color: #e4feff; border-bottom-color: #e4feff; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #a8bfca; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Deep Sea Exploration</span>
+        <h1>深海探測：
+          在黑暗與高壓之下，
+          人類究竟看見了什麼？</h1>
+        <p>深海不是空白地圖，而是地球最後的大型未知區。它關係到生態系、氣候調節、資源競爭與科技邊界。這份指南會帶你理解，為什麼每一次下潛都像在另一顆星球工作。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「深度壓力模擬器」，滑動深度即可看到壓力與任務風險如何倍增。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_008/deep_sea_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 深海探測為何重要</a>
+      <a href="#s2">2. 壓力、黑暗與技術門檻</a>
+      <a href="#s3">3. 深海生物與極端演化</a>
+      <a href="#s4">4. 資源、治理與風險</a>
+      <a href="#s5">5. 下一個十年的探測路線</a>
+    </aside>
+
+    <main>
+      <section class="depth" aria-label="深度壓力模擬器">
+        <h2>深度壓力模擬器</h2>
+        <label for="depthRange">選擇深度（公尺）：<span id="depthValue">1000</span> m</label>
+        <input id="depthRange" type="range" min="0" max="11000" step="100" value="1000">
+        <div class="depth-out" id="depthOutput">當前估算壓力：約 <b>101</b> 大氣壓。這已遠超一般潛水裝備，需專業深潛系統。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 深海探測為何重要</h3>
+        <p class="lead">深海距離我們並不遠，但在認知上，它比月球更陌生。</p>
+        <p>超過數千公尺的海域長期難以進入，導致大量生態、地質與化學循環資訊仍是未知。可是一旦把視角拉大，你會發現深海不是「邊角區域」：它參與碳循環、影響氣候穩定，並且承載尚未被理解的生物多樣性。</p>
+        <p>對人類來說，深海探測價值至少有三層。第一是科學，幫我們理解地球系統如何運作。第二是風險管理，像海底地質活動與海纜安全。第三是治理，當資源開發能力提升，規則與倫理必須同步前進。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜NOAA Ocean Exploration: Going Deep in Search of Discovery</h4>
+            <p>頻道：NOAA｜用途：從官方任務角度理解深海探測的目標與流程。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="JB1kYcJLr6o" title="NOAA Ocean Exploration Going Deep in Search of Discovery" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片建議先看任務分工：船、ROV、科學家與即時回傳資料如何協作。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 壓力、黑暗與技術門檻</h3>
+        <p class="lead">深海探測最大的敵人不是距離，而是環境條件對設備與人員的持續壓迫。</p>
+        <p>每下潛約 10 公尺，壓力就增加約 1 個大氣壓。這意味著在 1000 公尺處，外部壓力已達百倍量級。加上低溫、無光、通訊延遲與能量限制，任何任務都必須用高度工程化的系統設計：耐壓艙體、冗餘供電、精準導航與遠端操控。</p>
+        <p>這也是為何深海工程進展緩慢卻穩健。它不追求炫目速度，而追求在極端環境下可重複、可回收、可驗證的可靠操作。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜2023 Expedition Season Highlights: Deep Sea Science and Collaboration</h4>
+            <p>頻道：EVNautilus｜用途：看見現代深海考察的技術協作樣貌。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="OQpCcQhNfxM" title="2023 Expedition Season Highlights Deep Sea Science and Collaboration" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這支當作「系統工程視角」：深海成功任務通常不是單點突破，而是多系統穩定協同。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 深海生物與極端演化</h3>
+        <p class="lead">在沒有陽光的世界，生命靠化學能與極端適應延續。</p>
+        <p>深海生物展示了與陸地直覺完全不同的生存策略：生物發光、超慢代謝、高壓蛋白結構、依賴熱液噴口化學能的食物網。這些適應不只是奇觀，也可能帶來新材料、生物科技與藥物研究靈感。</p>
+        <p>更重要的是，它提醒我們「可居住環境」的定義比過去想像更寬。這不只改變海洋科學，也影響我們對外星生命可能性的推論。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜10 minutes of fascinating deep-sea animals | Into The Deep</h4>
+            <p>頻道：MBARI｜用途：直觀理解深海生物多樣性與極端適應。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="ryRcPeOM1sY" title="10 minutes of fascinating deep-sea animals" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看這段時可記一件事：深海不是「少數怪物」，而是完整且複雜的生態系。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 資源、治理與風險</h3>
+        <p class="lead">探測能力上升後，問題從「能不能到達」轉成「到達後怎麼治理」。</p>
+        <p>深海蘊含金屬結核、熱液礦床等資源，對能源轉型供應鏈有吸引力；但生態擾動、沉積羽流、長期不可逆影響仍有大量未知。當科學不確定性高時，治理框架就必須更嚴格，而不是更寬鬆。</p>
+        <p>這讓深海探測變成典型的跨學科議題：海洋科學、國際法、產業政策與環境倫理同時上桌。真正成熟的策略，通常是先提高觀測能力與基線資料，再決定哪些活動可行、哪些要延後。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜The otherworldly creatures in the ocean's deepest depths</h4>
+            <p>頻道：TED-Ed｜用途：連結深海生態價值與人類行動邊界。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="U69LIr0OrNc" title="The otherworldly creatures in the ocean's deepest depths" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片可用來回答一個政策問題：當生態價值高且不確定性大時，決策應該更審慎還是更激進？</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 下一個十年的探測路線</h3>
+        <p class="lead">未來深海探測不會只靠單次英雄式下潛，而是持續監測網與資料協作生態。</p>
+        <p>技術路線正在改變：更長續航的無人載具、邊緣運算、AI 影像辨識、即時資料共享平台，讓任務從「看見一次」走向「長期觀測」。這對科研價值巨大，因為深海現象很多是時序問題，不是快照問題。</p>
+        <p>對社會而言，最值得追蹤的不是某次創紀錄下潛，而是是否建立了可公開、可重複、可被監督的資料基礎。那才是深海治理與創新共存的前提。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Travel to the Depths of Our Mysterious Oceans | 4K UHD | Blue Planet II</h4>
+            <p>頻道：BBC Earth｜用途：用高品質視覺與敘事整合深海科學與公共理解。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="EF8C4v7JIbA" title="Travel to the Depths of Our Mysterious Oceans" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>最後收斂：深海探測真正的價值，是把未知轉成可治理的知識，而不是把未知變成新的盲目開發。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 008｜主題：深海探測（極端環境與治理風險）｜單頁教學頁 + YouTube 嵌入 + 深度壓力模擬器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const depthRange = document.getElementById('depthRange');
+    const depthValue = document.getElementById('depthValue');
+    const depthOutput = document.getElementById('depthOutput');
+
+    const renderDepth = () => {
+      const d = Number(depthRange.value);
+      depthValue.textContent = d.toString();
+      const atm = (d / 10) + 1;
+      let note = '淺海作業區，可由一般海洋工程系統處理。';
+      if (d >= 1000 && d < 4000) note = '中深海區，裝備耐壓與通訊成本快速上升。';
+      if (d >= 4000 && d < 7000) note = '深淵區，任務風險顯著增加，回收與維護難度高。';
+      if (d >= 7000) note = '超深淵區，接近極限工程條件，任何失效代價都非常高。';
+      depthOutput.innerHTML = `當前估算壓力：約 <b>${Math.round(atm)}</b> 大氣壓。${note}`;
+    };
+
+    depthRange.addEventListener('input', renderDepth);
+    renderDepth();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

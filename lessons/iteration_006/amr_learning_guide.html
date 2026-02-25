@@ -1,0 +1,357 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：抗生素抗藥性（AMR）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #081214;
+      --panel: #0f1f23;
+      --panel2: #132a30;
+      --text: #e6f4f1;
+      --muted: #a8c6be;
+      --line: #295157;
+      --accent: #59e2b8;
+      --accent2: #8ecbff;
+      --danger: #ff8f72;
+      --warn: #ffdc92;
+      --max: 1140px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 82% 8%, #1d3a42 0%, #0d2025 38%, #071012 100%); }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "IBM Plex Sans", sans-serif;
+      color: var(--text);
+      line-height: 1.82;
+    }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.35fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #4f7f74; color: #bcffe9; border-radius: 999px; padding: .22rem .72rem; letter-spacing: .08em; text-transform: uppercase; font-size: .8rem; margin-bottom: .74rem; }
+    h1 { margin: 0; font-size: clamp(2rem, 4.2vw, 3.2rem); line-height: 1.15; letter-spacing: -.01em; font-family: "IBM Plex Sans", sans-serif; }
+    .hero p { margin: .92rem 0 0; color: #bed6d0; max-width: 720px; font-size: 1rem; }
+    .hero-note { border: 1px solid #486d66; border-radius: 13px; padding: .82rem .9rem; background: linear-gradient(140deg, rgba(24,48,42,.8), rgba(20,37,50,.82)); color: #d3f2e8; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5d33; border-radius: 10px; background: #302816; color: #ffe2a3; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 255px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(16,34,39,.86); padding: .78rem; backdrop-filter: blur(7px); }
+    .toc h2 { margin: 0 0 .52rem; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; color: #b3cec8; }
+    .toc a { display: block; text-decoration: none; color: #d9ece8; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #1e454e; color: #9ff3d5; }
+
+    .sim {
+      border: 1px solid #33615c;
+      border-radius: 16px;
+      background: linear-gradient(150deg, #133036, #132a35);
+      padding: .95rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 14px 34px rgba(0,0,0,.24);
+    }
+    .sim h2 { margin: 0 0 .58rem; color: #c6f6e8; font-size: 1.03rem; }
+    .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .sim-item { border: 1px solid #3d6964; border-radius: 10px; background: rgba(14,30,35,.64); padding: .62rem .7rem; }
+    .sim-item label { display: block; color: #b7d8d1; font-size: .84rem; margin-bottom: .3rem; }
+    .sim-item select { width: 100%; background: #0f2025; border: 1px solid #4e7772; color: #d7ece8; border-radius: 8px; padding: .36rem .42rem; }
+    .risk {
+      margin-top: .6rem;
+      border: 1px solid #4e6564;
+      border-radius: 10px;
+      background: rgba(11,24,28,.7);
+      padding: .66rem .75rem;
+      font-size: .9rem;
+      color: #c8dfda;
+    }
+    .risk b.low { color: #8bf1bf; }
+    .risk b.mid { color: #ffd885; }
+    .risk b.high { color: #ff9c84; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #aaf5db; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #d5e8e3; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #3a6870; border-radius: 12px; background: #132f3b; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #355963; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #ecfbff; }
+    .video-meta p { margin: .28rem 0 0; color: #bfd4d6; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #0c1e27; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #5b5a3a; border-radius: 10px; background: rgba(44,44,26,.54); padding: .68rem .78rem; color: #e3e6c6; font-size: .92rem; }
+    .debrief strong { color: #f3f5ad; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #b8ffd8; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #b8ffd8; }
+    .open-youtube:hover { color: #e1ffee; border-bottom-color: #e1ffee; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #a5bdb8; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .sim-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • AMR</span>
+        <h1>抗生素抗藥性（AMR）：
+          一場正在發生的慢性疫情，
+          為什麼比你想像更近？</h1>
+        <p>抗生素曾讓感染從致命風險變成可治療事件；如今，抗藥性正把我們推回去。這份指南會帶你看懂抗藥性怎麼形成、如何擴散、為何醫院與社區都受影響，以及我們能做什麼。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「抗藥風險模擬器」，切換用藥情境，查看抗藥風險如何被放大或壓低。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_006/amr_learning_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 抗生素革命與反撲</a>
+      <a href="#s2">2. 抗藥性如何在細菌中誕生</a>
+      <a href="#s3">3. 醫院、農業與社區擴散鏈</a>
+      <a href="#s4">4. 為何新藥跟不上抗藥速度</a>
+      <a href="#s5">5. 個人與系統層解方</a>
+    </aside>
+
+    <main>
+      <section class="sim" aria-label="抗藥風險模擬器">
+        <h2>抗藥風險模擬器</h2>
+        <div class="sim-grid">
+          <div class="sim-item">
+            <label for="useCase">用藥情境</label>
+            <select id="useCase">
+              <option value="appropriate">遵照醫囑，必要時使用</option>
+              <option value="overuse">感冒/病毒也自行使用</option>
+              <option value="incomplete">症狀改善就停藥</option>
+            </select>
+          </div>
+          <div class="sim-item">
+            <label for="setting">環境</label>
+            <select id="setting">
+              <option value="community">一般社區</option>
+              <option value="hospital">醫療院所高密度接觸</option>
+              <option value="farm">畜牧密集使用場景</option>
+            </select>
+          </div>
+        </div>
+        <div class="risk" id="riskOutput">風險評估：<b class="low">低</b>。目前情境屬於較佳抗生素管理，抗藥壓力相對可控。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 抗生素革命與反撲</h3>
+        <p class="lead">20 世紀的抗生素革命拯救了無數生命，但同時也創造了新的演化壓力。</p>
+        <p>抗生素出現後，肺炎、敗血症、術後感染不再等同死刑。醫療體系得以擴張，器官移植、癌症化療、早產照護等高風險治療才真正可行。問題是，每次使用抗生素都在自然選擇中出一張牌：敏感菌被清除，耐藥菌更有機會活下來並擴散。</p>
+        <p>AMR 的可怕不在「某一種超級細菌」，而在它是多物種、多場景、持續累積的系統性壓力。它不會像疫情一樣突然封城，卻會慢慢侵蝕醫療安全底盤。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜What causes antibiotic resistance?</h4>
+            <p>頻道：TED-Ed｜用途：建立 AMR 的核心因果鏈。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="znnp-Ivj2ek" title="What causes antibiotic resistance" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請先記住：抗藥性不是身體對藥物上癮，而是細菌族群結構被改變。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 抗藥性如何在細菌中誕生</h3>
+        <p class="lead">細菌不是被動挨打的目標，它們能突變、交換基因，還能跨物種傳遞耐藥能力。</p>
+        <p>在抗生素壓力下，細菌可透過點突變改變標靶、增強外排幫浦、產生分解酶，甚至改變代謝路徑。更麻煩的是水平基因轉移：一株菌獲得耐藥基因後，可藉質體傳給其他菌株，讓抗藥性像「可複製工具包」一樣擴散。</p>
+        <p>這意味著 AMR 不是單點問題，而是演化速度與用藥壓力的競賽。治療設計因此越來越講究精準：用對藥、用足療程、避免不必要暴露。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Mechanisms of antibiotic resistance</h4>
+            <p>頻道：Osmosis from Elsevier｜用途：理解耐藥機制的分子層級細節。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="ReKG-vuYHY4" title="Mechanisms of antibiotic resistance" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看完後請把耐藥機制分成「阻止藥物進入、改變作用位點、破壞藥物」三類，會更容易記。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 醫院、農業與社區擴散鏈</h3>
+        <p class="lead">AMR 的擴散路徑是網路，不是直線：醫療、畜牧、環境與人群互相連動。</p>
+        <p>醫院裡高抗生素使用與脆弱病人群，容易形成高風險熱點；社區中不當處方與自行購藥會增加基礎壓力；農業與畜牧如果長期使用抗菌藥，則可能透過食物鏈與環境排放間接回到人群。這就是「One Health」框架為何重要：人類、動物、環境需同時治理。</p>
+        <p>因此 AMR 不是單一科別或單一國家的問題。它要求跨系統監測與資料共享，否則你在一端減壓，另一端可能持續加壓。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜The Antibiotic Apocalypse Explained</h4>
+            <p>頻道：Kurzgesagt – In a Nutshell｜用途：以系統視角理解 AMR 的社會衝擊。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="xZbcwi7SfZE" title="The Antibiotic Apocalypse Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片最重要的提醒是：AMR 不只是醫學議題，也是供應鏈與公共治理議題。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 為何新藥跟不上抗藥速度</h3>
+        <p class="lead">市場激勵與研發難度不對稱，讓「需要新藥」和「能持續開發」之間出現斷層。</p>
+        <p>抗生素的理想使用原則是「能少用就少用」，這對公共健康有利，但也降低了新藥銷售量預期。結果是研發成本高、回收慢，企業投入意願不足。與此同時，耐藥演化持續前進，臨床端面臨可用武器越來越少的壓力。</p>
+        <p>因此單靠市場機制往往不夠，需要公共資金、採購承諾與全球協作來補足研發管線。這是 AMR 最常被忽略的結構性難題。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Why should you care about antimicrobial resistance (AMR)?</h4>
+            <p>頻道：World Health Organization (WHO)｜用途：理解 AMR 對公共健康與政策的核心衝擊。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="Kq_OygMEboM" title="Why should you care about antimicrobial resistance AMR" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這段當政策視角補充：AMR 不是醫生的個人問題，而是整個衛生系統的韌性問題。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 個人與系統層解方</h3>
+        <p class="lead">解 AMR 沒有銀彈，但有一組可執行且互補的行動組合。</p>
+        <p>個人層面最直接的是：不要為病毒性感冒索取抗生素、遵照醫囑完成療程、不自行剩藥分裝。醫療體系層面需要抗生素管理計畫（ASP）、快速診斷、感染控制與處方審核。公共政策層面則要建立監測網、改善畜牧用藥規範、支持新藥與替代療法研發。</p>
+        <p>如果把 AMR 想成堤防滲漏，任何單一修補都不夠。只有多層防線同時運作，才能把風險維持在可控區間。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜The Evolution of Bacteria on a “Mega-Plate” Petri Dish</h4>
+            <p>頻道：Harvard Medical School｜用途：直觀看到細菌如何在抗生素梯度中演化。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="plVk4NVIUh8" title="The Evolution of Bacteria on a Mega Plate Petri Dish" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片是最好的收尾：抗藥性不是抽象名詞，而是你能看見的演化現場。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 006｜主題：抗生素抗藥性（AMR）｜單頁教學頁 + YouTube 嵌入 + 抗藥風險模擬器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const useCase = document.getElementById('useCase');
+    const setting = document.getElementById('setting');
+    const riskOutput = document.getElementById('riskOutput');
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const computeRisk = () => {
+      const use = useCase.value;
+      const env = setting.value;
+      let score = 0;
+      if (use === 'appropriate') score += 1;
+      if (use === 'overuse') score += 3;
+      if (use === 'incomplete') score += 4;
+
+      if (env === 'community') score += 1;
+      if (env === 'hospital') score += 3;
+      if (env === 'farm') score += 2;
+
+      if (score <= 3) {
+        riskOutput.innerHTML = '風險評估：<b class="low">低</b>。目前情境屬於較佳抗生素管理，抗藥壓力相對可控。';
+      } else if (score <= 5) {
+        riskOutput.innerHTML = '風險評估：<b class="mid">中</b>。已出現可觀抗藥壓力，建議強化用藥管理與感染控制。';
+      } else {
+        riskOutput.innerHTML = '風險評估：<b class="high">高</b>。這種組合容易快速放大耐藥選擇壓力，應優先介入。';
+      }
+    };
+
+    useCase.addEventListener('change', computeRisk);
+    setting.addEventListener('change', computeRisk);
+    computeRisk();
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：量子通訊與 QKD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0a12;
+      --panel: #18142a;
+      --panel2: #231d3a;
+      --text: #efe9ff;
+      --muted: #cabfe7;
+      --line: #5d4f88;
+      --accent: #9f9bff;
+      --accent2: #8fffd4;
+      --warn: #ffd79a;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 88% 3%, #4d3f85 0%, #271f45 40%, #0b0a12 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #7b6db2; color: #e0d7ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Space Mono", monospace; font-size: clamp(1.72rem, 3.8vw, 2.68rem); line-height: 1.15; letter-spacing: .01em; }
+    .hero p { margin: .9rem 0 0; color: #d4caef; max-width: 760px; font-size: 1rem; }
+    .hero-note { border: 1px solid #6c5c9a; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(38,31,66,.84), rgba(25,20,43,.92)); color: #e3dcfa; font-size: .92rem; }
+
+    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
+    .runtime-note.show { display: block; }
+    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(28,23,48,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d4cbef; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #ece6ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #4c3d7a; color: #bbffe3; }
+
+    .planner { border: 1px solid #6c5e98; border-radius: 16px; background: linear-gradient(150deg, #302757, #251f43); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #e5ddff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7c6dae; border-radius: 10px; background: rgba(20,15,36,.72); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #d7cdf1; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #9f9bff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7a6fa6; border-radius: 10px; background: rgba(15,12,27,.74); padding: .66rem .75rem; font-size: .9rem; color: #ddd4f6; }
+    .plan-out b { color: #bcffe6; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b9b7ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #e1dbf4; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #7c70ab; border-radius: 12px; background: #352f57; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #6d6296; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f4f0ff; }
+    .video-meta p { margin: .28rem 0 0; color: #d3caee; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1e1936; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #786d99; border-radius: 10px; background: rgba(44,37,62,.56); padding: .68rem .78rem; color: #e4ddf6; font-size: .92rem; }
+    .debrief strong { color: #d1ffe8; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #cbffef; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #cbffef; }
+    .open-youtube:hover { color: #f0fffa; border-bottom-color: #f0fffa; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #c0b6de; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .hero { padding-top: 4.15rem; }
+      .section { padding: .96rem .84rem; }
+      .section p { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Quantum Communication / QKD</span>
+        <h1>量子通訊與 QKD：
+從「物理不可複製」
+到「可驗證的金鑰安全」</h1>
+        <p>QKD（量子密鑰分發）被視為下一代高安全通訊技術，但它不是魔法。它依賴光子傳輸、誤碼估計、隱私放大與網路工程的完整協作。這份指南會把理論、系統與部署現實一次串起來。</p>
+      </div>
+      <div class="hero-note"><strong style="color:var(--warn)">本輪升級：</strong>加入「QKD 佈建決策器」，調整光纖損耗、鏈路距離、法規要求後，即時得到建議部署策略。</div>
+    </div>
+  </header>
+
+  <div class="runtime-note" id="runtimeNote">
+    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_016/quantum_qkd_guide.html</code>。</p>
+  </div>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. QKD 解決的是什麼問題</a>
+      <a href="#s2">2. BB84 與協議核心</a>
+      <a href="#s3">3. 實際系統與誤碼控制</a>
+      <a href="#s4">4. 衛星量子通訊延伸</a>
+      <a href="#s5">5. QKD 與 PQC 的策略關係</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="QKD 佈建決策器">
+        <h2>QKD 佈建決策器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="fiberLoss">光纖損耗壓力（高 = 傳輸更難）</label>
+            <input id="fiberLoss" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="linkDistance">鏈路距離需求（高 = 覆蓋更遠）</label>
+            <input id="linkDistance" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="complianceNeed">法規合規要求（高 = 安全等級更嚴）</label>
+            <input id="complianceNeed" type="range" min="1" max="5" value="4">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>都會短距 QKD 先行 + PQC 混合部署</b>，再逐步擴展跨區節點。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. QKD 解決的是什麼問題</h3>
+        <p class="lead">QKD 不是加密演算法本身，而是「金鑰分發」這一步的安全機制。</p>
+        <p>在傳統密碼體系中，若金鑰交換被攔截，後續再強的演算法也可能失守。QKD 的核心價值在於：利用量子態不可複製與量測擾動特性，讓竊聽行為被偵測。它提供的是可驗證的竊聽痕跡，而非「永不破解」的神話。</p>
+        <p>也因此，QKD 最常用在高敏感鏈路，例如政府、金融骨幹或關鍵基礎設施通信。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜PhD student explains Quantum Communications</h4>
+            <p>頻道：UK Department for Science, Innovation and Technology｜用途：建立量子通訊與 QKD 的整體背景。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="m6SIOLL_Cio" title="PhD student explains Quantum Communications" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先理解 QKD 在「系統安全鏈」的位置，才能正確評估它的投資價值。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. BB84 與協議核心</h3>
+        <p class="lead">BB84 是最經典的 QKD 協議，重點不在公式，而在流程控制。</p>
+        <p>BB84 透過不同量測基底傳送與比對，讓合法雙方可在公開通道協商出共享金鑰，同時用抽樣誤碼率判斷是否遭到竊聽。真正重要的是後續流程：糾錯、隱私放大、與金鑰更新節奏，這些決定系統最終可用性。</p>
+        <p>從工程視角看，QKD 的難點從來不是單次成功，而是長時間穩定產生可用金鑰率。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Outsmarting Hackers: Quantum Key Distribution Explained</h4>
+            <p>頻道：Qiskit｜用途：用現代化教學方式理解 BB84 與 QKD 基本流程。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="R0SOqLwLOR0" title="Quantum Key Distribution Explained" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把注意力放在「誤碼門檻」與「金鑰率」兩個指標，這是判斷系統健康度的關鍵。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 實際系統與誤碼控制</h3>
+        <p class="lead">QKD 實驗室成果要走向商用，最大挑戰通常是通道損耗與設備穩定性。</p>
+        <p>真實部署中，偏振漂移、偵測器噪聲、光纖損耗都會影響誤碼率。當誤碼超過門檻，金鑰生成效率會快速下降，甚至無法形成可用金鑰。這讓系統設計必須同時考慮物理層與運維層，並且建立持續監測機制。</p>
+        <p>因此，QKD 專案的成功標準常是「在目標距離下穩定運轉多久」，而不是單日 demo 成績。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Quantum Key Distribution</h4>
+            <p>頻道：Centre for Quantum Technologies｜用途：理解學研體系如何設計可運作的 QKD 系統。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="D7ld4fVq7VE" title="Quantum Key Distribution CQT" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片最值得看的，是如何把理論協議落成可監控、可維運的工程系統。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 衛星量子通訊延伸</h3>
+        <p class="lead">當地面光纖距離受限，衛星鏈路提供了跨洲量子通訊的新路徑。</p>
+        <p>衛星 QKD 的價值在於擴展距離與地理覆蓋，但它同時引入新的工程難題：光束指向精度、大氣擾動、地面站切換與軌道窗口。這些都使得衛星量子通訊成為高門檻系統整合工程。</p>
+        <p>即便如此，它對未來全球級安全網路具有戰略意義，特別是在跨國高敏感通信場景。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Quantum satellite achieves 'spooky action' at record distance</h4>
+            <p>頻道：Science Magazine｜用途：理解量子衛星通訊突破對長距離 QKD 的意義。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="4QlcKuxDGrs" title="Quantum satellite record distance" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請把這支片當成「能力邊界」參考：它展示了距離極限，也提醒了系統複雜度。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. QKD 與 PQC 的策略關係</h3>
+        <p class="lead">未來安全架構不是 QKD 或 PQC 二選一，而是分層混合。</p>
+        <p>後量子密碼（PQC）偏向軟體可擴散，QKD 偏向高保證物理鏈路。對多數組織而言，合理路線是把 PQC 作為大面積升級底座，再將 QKD 用於超高安全需求鏈路，形成分級防護架構。</p>
+        <p>部署重點在於策略一致性：資產分級、威脅模型、合規要求、與升級路徑必須對齊，否則技術再先進也難落地。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Post-Quantum Cryptography: the Good, the Bad, and the Powerful</h4>
+            <p>頻道：National Institute of Standards and Technology (NIST)｜用途：建立 PQC 與量子威脅的實務認知，作為 QKD 佈建對照。</p>
+          </div>
+          <div class="frame">
+            <iframe data-video-id="uE_Y1C4QPU8" title="Post Quantum Cryptography NIST" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>結論是「架構整合」：QKD 與 PQC 放在正確場景，才會產生最大防護效益。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 016｜主題：量子通訊與 QKD｜單頁教學頁 + YouTube 嵌入 + QKD 佈建決策器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const runtimeNote = document.getElementById('runtimeNote');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const fiberLoss = document.getElementById('fiberLoss');
+    const linkDistance = document.getElementById('linkDistance');
+    const complianceNeed = document.getElementById('complianceNeed');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const f = Number(fiberLoss.value);
+      const l = Number(linkDistance.value);
+      const c = Number(complianceNeed.value);
+
+      const options = [
+        { name: '都會短距 QKD 先行 + PQC 混合部署', score: (6 - f) * 1.05 + c * 1.1 + (6 - l) * 0.8 },
+        { name: '先建可信節點骨幹，再延伸跨區鏈路', score: l * 1.1 + c * 0.9 + f * 0.7 },
+        { name: '優先優化光層與偵測器，提升可用金鑰率', score: f * 1.2 + l * 0.7 + c * 0.8 },
+        { name: '以 PQC 全域升級為主，QKD 聚焦高敏感路徑', score: c * 1.0 + (6 - l) * 0.6 + (6 - f) * 0.6 + 2 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [fiberLoss, linkDistance, complianceNeed].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
