@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：先進核能 SMR 與核安工程</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --panel: #1a2034;
+      --panel2: #242e45;
+      --text: #eef3ff;
+      --line: #4f5f86;
+      --muted: #cad4f2;
+      --accent: #9ad1ff;
+      --accent2: #a6ffdb;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 84% 8%, #35528c 0%, #1d2d51 42%, #0b0f1a 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #7a92cb; color: #d8e5ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #d0daf5; max-width: 760px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(22,29,47,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d8e2fa; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e7eeff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #435982; color: #c8ffe8; }
+
+    .planner { border: 1px solid #687cb0; border-radius: 16px; background: linear-gradient(150deg, #263556, #212d49); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #e3ebff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7a8dbe; border-radius: 10px; background: rgba(15,22,38,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #d3ddf4; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #9ad1ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7f95c8; border-radius: 10px; background: rgba(10,14,26,.74); padding: .66rem .75rem; font-size: .9rem; color: #e0e8fb; }
+    .plan-out b { color: #d0ffeb; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b7e0ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #e0e7f8; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #7387bc; border-radius: 12px; background: #2f4167; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #6a7fb0; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f4f8ff; }
+    .video-meta p { margin: .28rem 0 0; color: #dbe4f7; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1f2c47; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7f92c2; border-radius: 10px; background: rgba(45,58,89,.56); padding: .68rem .78rem; color: #e7edfb; font-size: .92rem; }
+    .debrief strong { color: #d4ffec; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #bec9e6; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • SMR & Nuclear Safety Engineering</span>
+        <h1>先進核能 SMR 與核安工程：<br>從「低碳供電」到「可驗證安全」</h1>
+        <p>小型模組化反應爐（SMR）被視為新一代核能關鍵，但真正決定能否落地的，不只有發電效率，還有核安設計、執照流程、供應鏈與治理能力。這份指南會用工程視角拆解整體路線。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. SMR 為何成為焦點</a>
+      <a href="#s2">2. 模組化設計與建置路線</a>
+      <a href="#s3">3. 被動安全與縱深防禦</a>
+      <a href="#s4">4. 核安工程與執照審查</a>
+      <a href="#s5">5. 實務導入與系統整合</a>
+      <a href="#s6">6. 治理、信任與長期部署</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="SMR 部署策略評估器">
+        <h2>SMR 部署策略評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="gridNeed">電網穩定需求（高 = 需要穩定基載）</label>
+            <input id="gridNeed" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="licenseReady">執照審查準備度（高 = 法規文件成熟）</label>
+            <input id="licenseReady" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="supplyChain">供應鏈成熟度（高 = 模組製造能力足）</label>
+            <input id="supplyChain" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先做核安文件與供應鏈驗證，再進入首案建置</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. SMR 為何成為焦點</h3>
+        <p class="lead">SMR 的吸引力在於「可分期部署」與「更高設計標準化」，但它不是核能萬靈丹。</p>
+        <p>在高碳排壓力與電力韌性需求下，SMR 提供一條可能路徑：以較小容量、較短建置節奏，逐步補足穩定電力缺口。相比傳統大型核電，SMR 設計更強調模組化、工廠預製與標準化施工。</p>
+        <p>然而，真正挑戰不是概念，而是成本、法規、供應鏈與社會信任要同時到位。這也是為何同一項技術在不同國家進度差異很大。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Small Modular Reactors: A Potential New Frontier</h4>
+            <p>頻道：IAEAvideo｜用途：建立 SMR 在全球低碳能源中的定位與限制。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="SjkzWNEF6P0" title="IAEA Small Modular Reactors" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先掌握「SMR 解決的是什麼問題」，才能判斷它是否適合你的電力場景。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 模組化設計與建置路線</h3>
+        <p class="lead">SMR 的工程邏輯是把大量施工風險前移到工廠製造與標準驗證。</p>
+        <p>傳統核電專案常受現地施工複雜度影響，導致工期與成本波動。SMR 路線希望透過模組預製、標準化接口與重複部署降低不確定性。這讓專案管理重心從「單案施工」轉向「平台能力」。</p>
+        <p>因此，早期就要定義清楚：哪些部件可標準化、哪些場址條件必須客製化，否則模組化優勢會被現場變數抵消。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜What are Small Modular Reactors (SMRs)?</h4>
+            <p>頻道：Department for Energy Security & Net Zero (DESNZ)｜用途：理解 SMR 的技術與部署邏輯。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="AiGO5JsG3Oo" title="What are SMRs" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把注意力放在「可複製部署」這件事，這是 SMR 與大型核電的關鍵差異。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 被動安全與縱深防禦</h3>
+        <p class="lead">核安工程的核心不是單一技術，而是多層防護與失效情境管理。</p>
+        <p>新一代設計常強調被動安全（passive safety），也就是在失電或異常情況下，系統仍可依自然循環、重力或材料特性維持安全狀態。但被動安全不是「不用管」，而是必須透過嚴謹分析與測試驗證每一層假設。</p>
+        <p>工程上最重要的是防止單點失效演變成系統性事故，這就需要縱深防禦、冗餘設計與人機介面一起發揮作用。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜The safety and security of small modular reactors</h4>
+            <p>頻道：IAEAvideo｜用途：掌握 SMR 安全與保安設計重點。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="XOBQx8RJMRU" title="Safety and security of SMRs" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>評估核安時，不要只問「有沒有技術」，要問「失效時還有哪些後備機制」。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 核安工程與執照審查</h3>
+        <p class="lead">核能專案能否啟動，往往取決於安全論證文件品質與監管對話能力。</p>
+        <p>執照審查不是形式流程，而是把設計假設、風險模型、事故情境與應變能力全部轉成可驗證證據。對開發者而言，這代表工程、法規與營運團隊必須早期協作，而不是等設計完成才補文件。</p>
+        <p>越早建立「可審查的工程紀律」，越能降低後期反覆修改造成的延誤與成本。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜An Introduction to Nuclear Safety</h4>
+            <p>頻道：Institution of Mechanical Engineers (IMechE)｜用途：建立核安工程核心原則。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="YK_cC3U5nVk" title="Introduction to Nuclear Safety" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這支影片當審查清單導讀，反查你的專案有哪些論證缺口。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 實務導入與系統整合</h3>
+        <p class="lead">SMR 不是只把反應爐放上去，而是整個能源系統要重新協調。</p>
+        <p>真實部署會遇到電網接入、熱能利用、燃料供應、廢棄物管理與地方治理等連鎖問題。這些議題若不在前期一併規劃，後期很容易卡在非技術因素。</p>
+        <p>因此，多數成功案例都從示範專案起步，先建立監管經驗與跨部門協作模型，再逐步擴散到多場址部署。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜New Experiences with Small Reactors - IAEA</h4>
+            <p>頻道：United Nations｜用途：了解不同地區在小型反應爐導入上的實務經驗。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="Xp-Uom5OBsw" title="New Experiences with Small Reactors" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看重點不是哪個國家最快，而是他們如何處理工程與治理的接口。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 治理、信任與長期部署</h3>
+        <p class="lead">SMR 能否成為長期選項，取決於「可持續監管」與「社會信任」能否穩定建立。</p>
+        <p>核安是持續狀態，不是一次驗收。從設計到退役，每個階段都需要透明資訊、可追溯決策與獨立監督。尤其在新技術導入期，溝通品質本身就是安全體系的一部分。</p>
+        <p>對政策制定者與企業來說，最務實的路線是逐步部署、逐步驗證，用可量化成效累積可信度，而不是只靠願景敘事。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜Main Principles of Nuclear Installation Safety</h4>
+            <p>頻道：ICTP Science, Technology and Innovation｜用途：建立核設施安全原則與治理框架。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="NCJ-mHAUiAU" title="Main Principles of Nuclear Installation Safety" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>真正的核安成熟度，來自技術、制度與公眾溝通三者同時運作。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 019｜主題：先進核能 SMR 與核安工程｜單頁教學頁 + YouTube 嵌入 + SMR 部署策略評估器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const gridNeed = document.getElementById('gridNeed');
+    const licenseReady = document.getElementById('licenseReady');
+    const supplyChain = document.getElementById('supplyChain');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const g = Number(gridNeed.value);
+      const l = Number(licenseReady.value);
+      const s = Number(supplyChain.value);
+      const options = [
+        { name: '先做核安文件與供應鏈驗證，再進入首案建置', score: (6 - l) * 1.2 + (6 - s) * 1.1 + g * 0.8 },
+        { name: '以示範案小規模落地，逐步擴展模組部署', score: g * 1.0 + l * 0.8 + s * 0.9 },
+        { name: '優先強化電網整合與備援調度，再啟動土建', score: g * 1.3 + (6 - s) * 0.8 + l * 0.7 },
+        { name: '建立跨部門審查小組，並行推進執照與工程', score: l * 1.1 + s * 0.7 + g * 0.7 + 0.8 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [gridNeed, licenseReady, supplyChain].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
