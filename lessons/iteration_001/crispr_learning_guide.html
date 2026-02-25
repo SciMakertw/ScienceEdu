@@ -57,31 +57,9 @@
       transition: width 0.1s linear;
     }
 
-    .runtime-note {
-      display: none;
-      max-width: 1160px;
-      margin: 1rem auto 0;
-      padding: 0 1.2rem;
-    }
 
-    .runtime-note.show {
-      display: block;
-    }
 
-    .runtime-note p {
-      margin: 0;
-      padding: 0.9rem 1rem;
-      border-radius: 12px;
-      border: 1px solid #ecd5b2;
-      background: #fff2df;
-      color: #6c4918;
-      font-size: 0.92rem;
-    }
 
-    .runtime-note code {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.88rem;
-    }
 
     .hero {
       padding: 5.5rem 1.25rem 3rem;
@@ -324,9 +302,6 @@
 </head>
 <body>
   <div class="progress"><span id="progressBar"></span></div>
-  <div class="runtime-note" id="runtimeNote">
-    <p>偵測到你可能是直接用 <code>file://</code> 開啟檔案。YouTube 嵌入播放器可能出現錯誤 153。請改用本機伺服器開啟：<code>python -m http.server 5500</code>，再前往 <code>http://localhost:5500/outputs/iteration_001/crispr_learning_guide.html</code>。</p>
-  </div>
 
   <header class="hero">
     <div class="hero-inner">
@@ -457,7 +432,6 @@
 
   <script>
     const progressBar = document.getElementById('progressBar');
-    const runtimeNote = document.getElementById('runtimeNote');
     const tocLinks = Array.from(document.querySelectorAll('.toc a'));
     const sections = Array.from(document.querySelectorAll('.section'));
     const iframes = Array.from(document.querySelectorAll('.iframe-wrap iframe'));
@@ -493,10 +467,6 @@
 
     sections.forEach((sec) => tocObserver.observe(sec));
 
-    // YouTube embeds can fail with Error 153 when opened directly via file://
-    if (window.location.protocol === 'file:') {
-      runtimeNote.classList.add('show');
-    }
 
     iframes.forEach((frame) => {
       const id = frame.getAttribute('data-video-id');
@@ -529,3 +499,4 @@
   </script>
 </body>
 </html>
+

@@ -40,9 +40,6 @@
     .hero p { margin: .88rem 0 0; color: #c0d3e8; max-width: 760px; font-size: 1rem; }
     .hero-note { border: 1px solid #436788; border-radius: 13px; padding: .84rem .92rem; background: linear-gradient(145deg, rgba(18,43,72,.82), rgba(13,30,49,.9)); color: #d6e8fa; font-size: .92rem; }
 
-    .runtime-note { max-width: var(--max); margin: .9rem auto 0; padding: 0 1.1rem; display: none; }
-    .runtime-note.show { display: block; }
-    .runtime-note p { margin: 0; border: 1px solid #6f5f35; border-radius: 10px; background: #302915; color: #ffe1a4; padding: .74rem .84rem; font-size: .9rem; }
 
     .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
     .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(14,31,52,.84); padding: .78rem; backdrop-filter: blur(8px); }
@@ -109,9 +106,6 @@
     </div>
   </header>
 
-  <div class="runtime-note" id="runtimeNote">
-    <p>若使用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_010/semiconductor_fabrication_guide.html</code>。</p>
-  </div>
 
   <div class="layout">
     <aside class="toc">
@@ -239,7 +233,6 @@
 
   <script>
     const progressBar = document.getElementById('progressBar');
-    const runtimeNote = document.getElementById('runtimeNote');
     const sections = Array.from(document.querySelectorAll('.section'));
     const navLinks = Array.from(document.querySelectorAll('.toc a'));
     const iframes = Array.from(document.querySelectorAll('.frame iframe'));
@@ -290,7 +283,6 @@
     }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
     sections.forEach((s) => navObserver.observe(s));
 
-    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
 
     iframes.forEach((frame) => {
       const id = frame.getAttribute('data-video-id');
@@ -322,3 +314,4 @@
   </script>
 </body>
 </html>
+

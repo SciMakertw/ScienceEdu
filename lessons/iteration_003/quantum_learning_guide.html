@@ -105,24 +105,8 @@
       color: #dcf8c2;
     }
 
-    .runtime-note {
-      max-width: var(--max);
-      margin: 0.9rem auto 0;
-      padding: 0 1.2rem;
-      display: none;
-    }
 
-    .runtime-note.show { display: block; }
 
-    .runtime-note p {
-      margin: 0;
-      border: 1px solid #634d1c;
-      background: #2e220d;
-      color: #ffd98d;
-      border-radius: 11px;
-      padding: 0.78rem 0.9rem;
-      font-size: 0.9rem;
-    }
 
     .layout {
       max-width: var(--max);
@@ -358,9 +342,6 @@
     </div>
   </header>
 
-  <div class="runtime-note" id="runtimeNote">
-    <p>若你直接用 <code>file://</code> 開啟，YouTube 可能出現錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_003/quantum_learning_guide.html</code>。</p>
-  </div>
 
   <div class="layout">
     <aside class="toc">
@@ -485,7 +466,6 @@
     };
 
     const progressBar = document.getElementById('progressBar');
-    const runtimeNote = document.getElementById('runtimeNote');
     const sections = Array.from(document.querySelectorAll('.section'));
     const navLinks = Array.from(document.querySelectorAll('.toc a'));
     const iframes = Array.from(document.querySelectorAll('.frame iframe'));
@@ -530,9 +510,6 @@
 
     sections.forEach((s) => navObserver.observe(s));
 
-    if (window.location.protocol === 'file:') {
-      runtimeNote.classList.add('show');
-    }
 
     iframes.forEach((frame) => {
       const id = frame.getAttribute('data-video-id');
@@ -565,3 +542,4 @@
   </script>
 </body>
 </html>
+

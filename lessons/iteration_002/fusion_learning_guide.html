@@ -106,24 +106,8 @@
 
     .signal strong { color: var(--warn); }
 
-    .runtime-note {
-      max-width: var(--max);
-      margin: 1rem auto 0;
-      padding: 0 1.2rem;
-      display: none;
-    }
 
-    .runtime-note.show { display: block; }
 
-    .runtime-note p {
-      margin: 0;
-      border: 1px solid #5f4d29;
-      background: #2a210f;
-      color: #f7dd9b;
-      border-radius: 12px;
-      padding: 0.8rem 0.9rem;
-      font-size: 0.9rem;
-    }
 
     .layout {
       max-width: var(--max);
@@ -367,9 +351,6 @@
     </div>
   </header>
 
-  <div class="runtime-note" id="runtimeNote">
-    <p>若你是用 <code>file://</code> 開啟頁面，YouTube 可能回報錯誤 153。請改用本機伺服器：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_002/fusion_learning_guide.html</code>。</p>
-  </div>
 
   <div class="layout">
     <aside class="rail">
@@ -490,7 +471,6 @@
 
   <script>
     const progressBar = document.getElementById('progressBar');
-    const runtimeNote = document.getElementById('runtimeNote');
     const sections = Array.from(document.querySelectorAll('.section'));
     const links = Array.from(document.querySelectorAll('.rail a'));
     const iframes = Array.from(document.querySelectorAll('.frame-wrap iframe'));
@@ -525,9 +505,6 @@
 
     sections.forEach((section) => navObserver.observe(section));
 
-    if (window.location.protocol === 'file:') {
-      runtimeNote.classList.add('show');
-    }
 
     iframes.forEach((frame) => {
       const id = frame.getAttribute('data-video-id');
@@ -560,3 +537,4 @@
   </script>
 </body>
 </html>
+

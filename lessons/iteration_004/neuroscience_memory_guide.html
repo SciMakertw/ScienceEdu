@@ -110,24 +110,8 @@
       box-shadow: 0 8px 20px rgba(96, 62, 42, 0.08);
     }
 
-    .runtime-note {
-      max-width: var(--max);
-      margin: 0.9rem auto 0;
-      padding: 0 1.1rem;
-      display: none;
-    }
 
-    .runtime-note.show { display: block; }
 
-    .runtime-note p {
-      margin: 0;
-      border: 1px solid #c3a576;
-      background: #fff4de;
-      color: #6d552b;
-      border-radius: 10px;
-      padding: 0.75rem 0.85rem;
-      font-size: 0.9rem;
-    }
 
     .layout {
       max-width: var(--max);
@@ -385,9 +369,6 @@
     </div>
   </header>
 
-  <div class="runtime-note" id="runtimeNote">
-    <p>若以 <code>file://</code> 開啟頁面，YouTube 可能顯示錯誤 153。請改用：<code>python -m http.server 5500</code>，再開 <code>http://localhost:5500/outputs/iteration_004/neuroscience_memory_guide.html</code>。</p>
-  </div>
 
   <div class="layout">
     <aside class="toc">
@@ -529,7 +510,6 @@
 
   <script>
     const progressBar = document.getElementById('progressBar');
-    const runtimeNote = document.getElementById('runtimeNote');
     const sections = Array.from(document.querySelectorAll('.section'));
     const links = Array.from(document.querySelectorAll('.toc a'));
     const iframes = Array.from(document.querySelectorAll('.frame iframe'));
@@ -561,7 +541,6 @@
 
     sections.forEach((sec) => navObserver.observe(sec));
 
-    if (window.location.protocol === 'file:') runtimeNote.classList.add('show');
 
     iframes.forEach((frame) => {
       const id = frame.getAttribute('data-video-id');
@@ -616,3 +595,4 @@
   </script>
 </body>
 </html>
+
