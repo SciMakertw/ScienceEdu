@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：地熱增強系統 EGS 與地下工程風險</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b130f;
+      --panel: #1b3229;
+      --panel2: #254239;
+      --text: #eef8f2;
+      --muted: #c8dfd3;
+      --line: #517a68;
+      --accent: #8fe9c3;
+      --accent2: #a8dbff;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 85% 8%, #2f7d5f 0%, #1d4d3e 45%, #0b130f 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #7ab39b; color: #daf9eb; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #d3ebdf; max-width: 760px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(22,44,37,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #daf0e5; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e8fbf2; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3c6c5b; color: #ceffe9; }
+
+    .planner { border: 1px solid #64947f; border-radius: 16px; background: linear-gradient(150deg, #224538, #1d3c31); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #dff8ec; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #6a9e88; border-radius: 10px; background: rgba(12,29,24,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #d0e8dc; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #8fe9c3; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7cad97; border-radius: 10px; background: rgba(8,20,16,.74); padding: .66rem .75rem; font-size: .9rem; color: #e0f1e8; }
+    .plan-out b { color: #d3ffeb; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b9ffe0; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #e0f2e8; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #709f8b; border-radius: 12px; background: #2d5a4a; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #648b79; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fff8; }
+    .video-meta p { margin: .28rem 0 0; color: #d8ece2; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1f4338; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #82ac99; border-radius: 10px; background: rgba(45,75,64,.56); padding: .68rem .78rem; color: #e8f8f0; font-size: .92rem; }
+    .debrief strong { color: #d4ffeb; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Enhanced Geothermal Systems</span>
+        <h1>地熱增強系統 EGS 與地下工程風險：<br>從「深層熱能」走到「可控部署」</h1>
+        <p>EGS（Enhanced Geothermal Systems）常被稱為可擴展的長時穩定綠能選項，但它不是只要「往地下鑽更深」就能成功。要讓 EGS 走向大規模部署，必須同時解決地質不確定、鑽井成本、誘發地震風險與法規接受度。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. EGS 為何受關注</a>
+      <a href="#s2">2. 地下熱儲層工程化</a>
+      <a href="#s3">3. 鑽井技術與成本結構</a>
+      <a href="#s4">4. 誘發地震與風險治理</a>
+      <a href="#s5">5. 電網整合與商業可行性</a>
+      <a href="#s6">6. 部署路線與政策條件</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="EGS 導入策略評估器">
+        <h2>EGS 導入策略評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="geoUncertainty">地質不確定性（高 = 地層資料不足）</label>
+            <input id="geoUncertainty" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="drillCost">鑽井成本壓力（高 = CAPEX 壓力大）</label>
+            <input id="drillCost" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="seismicRisk">誘發地震風險（高 = 社會接受度敏感）</label>
+            <input id="seismicRisk" type="range" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先補足地質資料與風險監測，再擴大鑽井投資</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. EGS 為何受關注</h3>
+        <p class="lead">EGS 的吸引力在於它有機會提供「可調度、低碳、全天候」電力，不受日照與風況波動直接限制。</p>
+        <p>過去地熱發電多依賴天然高滲透、高熱流區，適用地點有限。EGS 想解決的核心瓶頸，是透過工程手段把原本不具備自然流體循環的熱岩區改造成可利用儲層。這代表理論上可開發區域會明顯增加，能源地理分布不再只集中在少數火山帶。</p>
+        <p>但「可開發」不代表「可商業化」。工程可行性、成本下降曲線、社會風險管理要同時成熟，EGS 才可能從示範專案變成穩定產業。也因此，現在看到的每個成功案例都不只是一口井，而是一整套地下工程與治理能力的驗證。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Energy Anywhere: The Power of Enhanced Geothermal Systems</h4>
+            <p>頻道：U.S. Department of Energy｜用途：建立 EGS 的整體定位與政策背景。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="4S3aiMxfwhY" title="DOE Enhanced Geothermal Systems" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先釐清 EGS 解的是「地熱資源可及性」問題，而不只是新增一種發電技術。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 地下熱儲層工程化</h3>
+        <p class="lead">EGS 的本體是地下儲層設計：你必須在高溫岩層建立可控流路，讓熱交換長期穩定。</p>
+        <p>實務上會涉及壓裂/刺激策略、注採井配置、流體循環設計與熱衰減管理。任何一段設計失衡，都可能導致產能快速衰退，甚至提早失去商業價值。這使得 EGS 與傳統油氣工程有共通語言，但目標函數不同：油氣追求流體產率，EGS 追求的是熱輸出穩定與壽命最大化。</p>
+        <p>另外，儲層模型必須持續更新。地層不是靜態容器，注採運作會改變裂隙結構與壓力場。如果沒有持續監測與模型回饋，早期看似順利的井組可能在數季後性能失真。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Stanford Energy Seminar | Enhanced Geothermal Systems: Are We There Yet?</h4>
+            <p>頻道：Stanford ENERGY｜用途：理解 EGS 成熟度、技術差距與研究前沿。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="rguJPPWAJr8" title="Stanford EGS seminar" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點不是「能不能做」，而是「能不能重複做、成本能否下降、壽命是否可預測」。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 鑽井技術與成本結構</h3>
+        <p class="lead">EGS 商業化最大的門檻常在鑽井：深度、地層硬度、完井品質直接決定 CAPEX。</p>
+        <p>當井深增加，鑽具磨耗、井壁穩定與作業時間都會推高成本。這也是近年業界借鏡油氣產業經驗的原因之一：更快鑽速、數位化井控、標準化完井流程，都有機會改善成本曲線。問題在於 EGS 地層環境與油氣並不完全同質，不能直接套模板。</p>
+        <p>因此，真正有效的做法往往是「技術組合」：鑽井效率提升 + 儲層設計優化 + 運轉維護策略。只有單點突破，通常撐不起長期 LCOE 競爭力。把這三者合在一起看，才會看到 EGS 何時能跨過示範到量產的門檻。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Geothermal Lecture | Dawn Owens | Stanford Understand Energy</h4>
+            <p>頻道：Stanford Understand Energy｜用途：梳理地熱工程的技術鏈與成本驅動因子。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="selKK3YjrSY" title="Stanford geothermal lecture" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把注意力放在鑽井與儲層不是平行議題，而是互相耦合的系統設計。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 誘發地震與風險治理</h3>
+        <p class="lead">EGS 最敏感的非技術風險之一，是誘發地震（induced seismicity）對社會接受度的衝擊。</p>
+        <p>地下注採改變應力場，可能觸發既有斷層滑移。多數事件規模有限，但對地方社區而言，體感風險往往大於專業數據敘事。若專案沒有透明監測與即時應變機制，技術本身再先進也很難取得長期社會授權。</p>
+        <p>成熟的治理做法通常包含：交通燈機制（traffic light protocol）、震測網密集部署、觸發門檻明確公開、以及注採策略即時調整。關鍵在於把風險管理前置，而不是出問題後才被動說明。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Geothermal and Induced Seismicity</h4>
+            <p>頻道：Pivot2021 - Geothermal. Reimagined.｜用途：聚焦 EGS 與誘發地震的機制與管控策略。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="-3Aw34VLTYs" title="Geothermal and induced seismicity" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片要看的不是恐懼敘事，而是如何把地震風險量化並納入運轉決策。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 電網整合與商業可行性</h3>
+        <p class="lead">EGS 若要成為主流，不只要發得出電，還要在電網與市場中「有角色且有價格競爭力」。</p>
+        <p>它的潛在優勢是高容量因子與穩定輸出，可在高比例再生電網中扮演韌性底座。但市場是否買單，取決於建置成本、運維可靠度、合約設計與融資條件。這意味著 EGS 不是純技術專案，而是工程、金融與政策的共同問題。</p>
+        <p>越來越多開發商開始強調「可擴展施工模型」與「可預測交付節奏」，因為資本市場最在意的不是單案峰值表現，而是是否可複製、可放大、可控風險。這種轉向其實標誌著 EGS 正從研究導向逐步走向產業導向。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Fervo Energy is delivering carbon-free geothermal energy</h4>
+            <p>頻道：Bill Gates｜用途：觀察 EGS 商業化路線與實場部署訊號。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="O_s4cPXZ3uk" title="Fervo geothermal deployment" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請特別看「可複製工法」與「專案融資語言」，這是商業化關鍵訊號。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 部署路線與政策條件</h3>
+        <p class="lead">EGS 的長期成敗，取決於「技術曲線」與「政策曲線」能否同步推進。</p>
+        <p>政策面若只給短期補貼，卻缺乏長期風險分攤與審查標準，開發商很難承擔早期不確定性。反過來，若政策過於保守而缺乏示範彈性，技術也無法累積足夠運行資料。這兩者需要動態平衡：既要保守管理地下風險，也要允許可控試點加速學習。</p>
+        <p>務實的部署策略通常是分階段：先做高監測密度示範、建立公開資料與社會溝通框架，再擴展到區域化商業專案。這條路不一定最快，但最可能在安全、成本與接受度之間達到可持續平衡。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜Full Steam Ahead: Enhanced/Engineered Geothermal Systems (EGS)</h4>
+            <p>頻道：Geothermal Rising｜用途：統整 EGS 從技術到產業化的中長期路線。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="pJbx8aCFk4o" title="Enhanced geothermal systems overview" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這支當結尾框架：技術驗證、風險治理、商業模型三者缺一不可。</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const geoUncertainty = document.getElementById('geoUncertainty');
+    const drillCost = document.getElementById('drillCost');
+    const seismicRisk = document.getElementById('seismicRisk');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const g = Number(geoUncertainty.value);
+      const d = Number(drillCost.value);
+      const s = Number(seismicRisk.value);
+      const options = [
+        { name: '先補足地質資料與風險監測，再擴大鑽井投資', score: g * 1.2 + s * 1.0 + d * 0.8 },
+        { name: '先優化鑽井效率，壓低單井成本後再擴展井組', score: d * 1.2 + g * 0.8 + s * 0.7 },
+        { name: '以小規模示範場建立交通燈機制與社會溝通', score: s * 1.3 + g * 0.8 + d * 0.6 },
+        { name: '同步推進電網合約與融資設計，提高商轉成功率', score: d * 0.9 + s * 0.7 + g * 0.7 + 0.8 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [geoUncertainty, drillCost, seismicRisk].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
