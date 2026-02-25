@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：行星防禦與小行星偏轉任務</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070b16;
+      --panel: #151f3a;
+      --panel2: #1e2b4c;
+      --text: #eef3ff;
+      --muted: #cbd6f3;
+      --line: #4a6095;
+      --accent: #8fd2ff;
+      --accent2: #9dffd4;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 86% 8%, #2f4b8f 0%, #1a294f 45%, #070b16 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.82; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #7392d1; color: #d7e5ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #d0dbf6; max-width: 760px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(15,23,43,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d9e4fb; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e8efff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3c568d; color: #cbffe7; }
+
+    .planner { border: 1px solid #6888c5; border-radius: 16px; background: linear-gradient(150deg, #23365e, #1e2d4f); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #e1ebff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7896cf; border-radius: 10px; background: rgba(11,18,35,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #d5e1f7; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #8fd2ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7f9bd3; border-radius: 10px; background: rgba(8,13,25,.74); padding: .66rem .75rem; font-size: .9rem; color: #e1e9fd; }
+    .plan-out b { color: #d3ffea; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #bae5ff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #e1e9fb; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #738fc6; border-radius: 12px; background: #2d4371; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #667fb1; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f4f8ff; }
+    .video-meta p { margin: .28rem 0 0; color: #dbe5f8; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1f3054; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7c97cb; border-radius: 10px; background: rgba(42,57,92,.56); padding: .68rem .78rem; color: #e8effd; font-size: .92rem; }
+    .debrief strong { color: #d2ffea; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    footer { max-width: var(--max); margin: 0 auto; text-align: center; color: #becae8; font-size: .88rem; padding: 0 1.1rem 2rem; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Planetary Defense & Asteroid Deflection</span>
+        <h1>行星防禦與小行星偏轉任務：<br>把「天體威脅」轉成可執行工程</h1>
+        <p>行星防禦不是科幻情節，而是跨天文觀測、軌道計算、航太工程與國際治理的系統工程。這份指南會從 DART 與 Hera 任務切入，帶你看懂「如何在撞擊前做出有效偏轉」。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 行星防禦在解什麼問題</a>
+      <a href="#s2">2. 早期發現與風險分級</a>
+      <a href="#s3">3. DART：動能撞擊驗證</a>
+      <a href="#s4">4. Hera：撞擊後科學回溯</a>
+      <a href="#s5">5. 任務鏈整合與決策窗口</a>
+      <a href="#s6">6. 國際協作與長期治理</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="偏轉任務策略評估器">
+        <h2>偏轉任務策略評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="leadTime">預警提前量（高 = 有更長準備時間）</label>
+            <input id="leadTime" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="orbitUncertainty">軌道不確定性（高 = 觀測誤差大）</label>
+            <input id="orbitUncertainty" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="launchReadiness">發射準備度（高 = 任務可快速執行）</label>
+            <input id="launchReadiness" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先提升觀測網與軌道解算精度，再決定偏轉窗口</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 行星防禦在解什麼問題</h3>
+        <p class="lead">行星防禦的目標不是「消滅所有小行星」，而是提前辨識真正有威脅的目標並及早干預。</p>
+        <p>地球附近小天體很多，但真正具高風險的比例很低。關鍵在於及時觀測、精準軌道預報與可執行的偏轉方案。這讓行星防禦成為一個時間敏感系統：越早發現，干預成本越低，成功率越高。</p>
+        <p>因此，行星防禦並非一次性任務，而是長期基礎設施，涵蓋監測網路、資料共享、與應急決策流程。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Planetary Defenders (NASA+ Original Documentary)</h4>
+            <p>頻道：NASA｜用途：建立行星防禦的整體圖像與任務脈絡。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="jOb2DQWvDvc" title="Planetary Defenders NASA Documentary" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先抓住「偵測、預測、干預」三層鏈條，這是後面所有章節的主軸。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 早期發現與風險分級</h3>
+        <p class="lead">沒有持續觀測網，就沒有行星防禦。</p>
+        <p>偏轉任務常被聚焦在撞擊瞬間，但真正決勝點是更早期的資料品質。天體的大小、反照率、軌道擾動都會影響風險判斷。若觀測不足，就可能高估或低估威脅，讓決策偏離。</p>
+        <p>因此，風險分級要動態更新，並把新觀測資料即時回灌到軌道模型，才能避免錯失介入窗口。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜NASA's AskAstrobio: Planetary Defense & the Near-Earth Object Surveyor</h4>
+            <p>頻道：NASA Astrobiology｜用途：理解近地天體觀測任務與防禦體系的關係。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="rMja2_-rFrE" title="NEO Surveyor and Planetary Defense" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把焦點放在「觀測能力是偏轉成功的前置條件」，不是附加項。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. DART：動能撞擊驗證</h3>
+        <p class="lead">DART 的關鍵貢獻是把「理論可行」變成「實際可驗證」。</p>
+        <p>動能撞擊法看似直觀，但實務上受目標組成、撞擊角度、噴射物反衝等因素影響。DART 成功讓 Dimorphos 軌道週期改變，證明人類有能力用工程手段主動改變小天體軌道。</p>
+        <p>這次任務的重要性不只在一次撞擊，而是建立了可重複、可計算、可改進的偏轉工程模型。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜DART, NASA's First Planetary Defense Test Mission</h4>
+            <p>頻道：Johns Hopkins Applied Physics Laboratory｜用途：掌握 DART 任務設計與工程目標。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="hbL07cZUEMU" title="DART mission overview by JHU APL" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點是「可量測改變量」，這是偏轉任務能否進入工程標準的核心。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. Hera：撞擊後科學回溯</h3>
+        <p class="lead">有了撞擊結果，下一步是把未知參數補齊，讓未來任務更準確。</p>
+        <p>DART 提供了第一筆實戰數據，但我們仍需更精細了解撞擊後天體形狀、質量分布與碎屑動力學。Hera 任務扮演的就是「驗證與校準」角色，把第一次偏轉實驗轉成更成熟的預測模型。</p>
+        <p>這也說明行星防禦是連續任務鏈，而不是單點壯舉。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Solving asteroid mysteries | Hera planetary defence mission</h4>
+            <p>頻道：European Space Agency, ESA｜用途：理解 Hera 如何補完 DART 之後的科學與工程資料。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="wXMv-ZU-3zc" title="ESA Hera mission" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片的價值在於看懂「後續量測」如何降低下一次偏轉的不確定性。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 任務鏈整合與決策窗口</h3>
+        <p class="lead">偏轉任務最難的是整合：觀測、導航、發射與國際決策要在有限時間內協同。</p>
+        <p>當風險升高時，真正困難通常不是缺技術，而是缺可執行節奏。任務鏈需要明確角色分工：誰負責軌道更新、誰定義發射窗口、誰負責結果驗證與公眾溝通。</p>
+        <p>若流程不清楚，即使技術準備充分，也可能在決策環節錯過最佳時機。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Altering Orbit: The Impact of NASA's DART Mission</h4>
+            <p>頻道：Johns Hopkins Applied Physics Laboratory｜用途：觀察 DART 後續如何轉成可運用的任務知識。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="OaF-c9-utC0" title="Altering Orbit DART impact" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把它當作「任務回顧模板」，檢查每個決策節點如何影響結果。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 國際協作與長期治理</h3>
+        <p class="lead">行星防禦沒有單一國家可以獨立完成，治理架構必須國際化。</p>
+        <p>潛在撞擊風險跨越國界，因此資訊透明、標準一致與協調機制是必要條件。從 NASA 的 DART 到 ESA 的 Hera，已經顯示跨機構合作能把任務從示範推向常態化能力。</p>
+        <p>下一階段重點是持續演練與制度化，讓「偏轉能力」成為穩定公共安全基礎設施。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜ESA's Hera mission launch (Official broadcast)</h4>
+            <p>頻道：European Space Agency, ESA｜用途：觀察國際行星防禦任務如何走向正式部署。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="O13Sp00Ltlw" title="ESA Hera mission launch" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這是任務制度化的重要訊號，代表行星防禦正從概念走向長期治理。</div>
+      </section>
+    </main>
+  </div>
+
+  <footer>迭代 020｜主題：行星防禦與小行星偏轉任務｜單頁教學頁 + YouTube 嵌入 + 偏轉任務策略評估器</footer>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const leadTime = document.getElementById('leadTime');
+    const orbitUncertainty = document.getElementById('orbitUncertainty');
+    const launchReadiness = document.getElementById('launchReadiness');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const t = Number(leadTime.value);
+      const o = Number(orbitUncertainty.value);
+      const l = Number(launchReadiness.value);
+      const options = [
+        { name: '先提升觀測網與軌道解算精度，再決定偏轉窗口', score: o * 1.2 + (6 - t) * 0.9 + (6 - l) * 0.7 },
+        { name: '啟動動能撞擊任務預研，並同步做任務演練', score: t * 1.1 + l * 1.0 + (6 - o) * 0.8 },
+        { name: '優先建立國際協作流程與資訊通報機制', score: o * 0.9 + (6 - l) * 0.9 + t * 0.7 + 0.6 },
+        { name: '以示範任務驗證關鍵技術，再擴展至常態化防禦', score: l * 1.2 + t * 0.8 + (6 - o) * 0.6 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [leadTime, orbitUncertainty, launchReadiness].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
