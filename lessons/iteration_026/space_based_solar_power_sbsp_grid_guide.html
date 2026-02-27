@@ -1,0 +1,322 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：太空太陽能發電 SBSP 與地面接收站</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #071118;
+      --panel: #152f3f;
+      --panel2: #1a4157;
+      --text: #ecf8ff;
+      --muted: #c7deea;
+      --line: #4f7590;
+      --accent: #8ddfff;
+      --accent2: #a9ffd8;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 82% 8%, #2a6488 0%, #183a52 42%, #071118 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6d93ad; color: #d7f2ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #cfe6f3; max-width: 780px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,41,57,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d7ebf8; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e8f5ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3a6989; color: #d4ffec; }
+
+    .planner { border: 1px solid #678fae; border-radius: 16px; background: linear-gradient(150deg, #21455c, #1a3a4f); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #def5ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7097b1; border-radius: 10px; background: rgba(11,24,36,.72); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cee4f1; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #8ddfff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7ea4bd; border-radius: 10px; background: rgba(8,18,27,.74); padding: .66rem .75rem; font-size: .9rem; color: #e0edf7; }
+    .plan-out b { color: #d3ffea; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b8edff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #deedf8; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #7399b3; border-radius: 12px; background: #2a5a75; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #67879f; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #d8e8f4; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1e4258; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7ea2bc; border-radius: 10px; background: rgba(41,70,89,.56); padding: .68rem .78rem; color: #e7f2fa; font-size: .92rem; }
+    .debrief strong { color: #d4ffeb; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Space-Based Solar Power</span>
+        <h1>太空太陽能發電 SBSP 與地面接收站：<br>從概念驗證走向可併網基礎設施</h1>
+        <p>太空太陽能發電（SBSP）試圖把太空中的太陽能轉成微波或雷射，無線傳輸到地面接收站，再併入電網。它最大的吸引力是潛在的長時穩定供電，但同時也帶來航太製造、軌道運維、無線傳能安全與法規治理等複合挑戰。這份指南用工程與系統角度，拆解 SBSP 的真實落地路線。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. SBSP 的價值主張與邊界</a>
+      <a href="#s2">2. 軌道電站架構與發電鏈</a>
+      <a href="#s3">3. 無線傳能與地面接收站</a>
+      <a href="#s4">4. 電網整合與系統調度角色</a>
+      <a href="#s5">5. 成本模型與供應鏈現實</a>
+      <a href="#s6">6. 示範到商轉的部署策略</a>
+      <a href="#s7">7. 專案審查實務與風險清單</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="SBSP 導入策略評估器">
+        <h2>SBSP 導入策略評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="launchCost">發射與在軌建置成本可接受度（高 = 成本壓力較低）</label>
+            <input id="launchCost" type="range" min="1" max="5" value="2">
+          </div>
+          <div class="planner-item">
+            <label for="gridNeed">穩定基載需求（高 = 系統急需長時穩定供電）</label>
+            <input id="gridNeed" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="policyReady">法規與公眾接受準備度（高 = 審查路徑明確）</label>
+            <input id="policyReady" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先做低功率軌道示範，建立無線傳能與安全驗證數據</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. SBSP 的價值主張與邊界</h3>
+        <p class="lead">SBSP 被關注的核心原因，不是「太空很酷」，而是它承諾提供不受晝夜與雲層顯著影響的長時供電。</p>
+        <p>地面光電在白天輸出高、夜間歸零，系統需要儲能與備援承接。SBSP 的理論優勢是把發電端放在日照條件更穩定的軌道上，再把能量定向傳送到地面。若效率與安全可控，它可能補上再生電力組合裡最昂貴的缺口，也就是長時間可預測供電。對高度依賴進口燃料、又要提升能源自主的地區，這個價值主張特別具有吸引力。</p>
+        <p>但 SBSP 不是「把地面光電搬到太空」這麼簡單。它是一個跨領域系統，至少包含太空結構、姿態控制、能量轉換、波束控制、地面整流天線、電網介面與安全監測。任何環節效率不足，都可能放大到整體不可行。換言之，SBSP 的風險不是單點風險，而是系統耦合風險，評估時必須從全鏈路看待。</p>
+        <p>工程端常見誤區是只談發電潛力，忽略運轉可維持性。真正的落地問題包括：軌道硬體壽命如何保障、在軌維修如何實施、地面接收站如何選址、極端天候與空域限制如何管理。這些議題若在前期沒有對應策略，即使技術演示成功，也很難進入商業化階段。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜SOLARIS: Preparing for space-based solar power</h4>
+            <p>頻道：European Space Agency, ESA｜用途：理解歐洲在 SBSP 的系統規劃與政策視角。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="8ScTbb-43A4" title="ESA SOLARIS space based solar power" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先看 SBSP 在國家級計畫中被如何定義，這會影響後續技術門檻與投資邏輯。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 軌道電站架構與發電鏈</h3>
+        <p class="lead">SBSP 的軌道端不是單一衛星，而更像一座可擴充的在軌發電平台，重點在模組化與可部署性。</p>
+        <p>典型架構包含大面積太陽能收集陣列、功率轉換模組、無線傳能發射陣列與姿態控制子系統。由於發射成本與火箭艙體尺寸限制，平台通常需要高度模組化，並支援在軌展開或組裝。這代表設計邏輯會與地面電廠非常不同，必須優先考慮質量效率、冗餘拓樸與在軌故障隔離。</p>
+        <p>功率鏈設計也極具挑戰。從太陽能板輸出到微波/雷射發射，中間經過多級轉換，每一級都有損耗。若總效率不足，地面收到的淨功率會顯著下滑，直接削弱經濟性。這也是為什麼多數計畫先做小功率技術驗證，逐步累積效率與穩定性資料，再談大規模發電。</p>
+        <p>另外，軌道熱管理與材料耐久是常被低估的問題。長期日照與熱循環、輻射環境、微隕石衝擊都會影響系統壽命。工程團隊不只要做「能發電」的原型，而是要做「能長期運轉且可預測退化」的產品。沒有可預測壽命曲線，金融模型與保險模型都很難成立。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Space Solar Power Demonstrator</h4>
+            <p>頻道：caltech｜用途：觀察 SBSP 實際在軌示範與技術驗證邏輯。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="c2mgpMy-_mU" title="Caltech space solar power demonstrator" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點看「先驗證哪一段鏈路」，這反映了工程風險優先排序。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 無線傳能與地面接收站</h3>
+        <p class="lead">SBSP 成敗很大程度取決於無線傳能鏈路，而不是只看軌道端發電能力。</p>
+        <p>從物理層來看，微波傳輸通常被認為是較可行路徑，因為大氣穿透與全天候運作相對穩定；雷射則可能有更高能量密度優勢，但受到雲層與氣象影響更明顯。不同路線對地面站設計、控制系統、保護區域與運維成本的影響都不同，因此技術路線不能只看實驗室效率，必須連動場域條件一起評估。</p>
+        <p>地面接收站（rectenna）不是被動終端，而是系統安全與效率的關鍵節點。它牽涉接收陣列密度、波束指向誤差容忍、周邊用地限制與並網設備配置。若接收站選址不當，即使太空端性能優秀，也可能在土地、環評或社會溝通上卡關。這意味著 SBSP 的工程設計從一開始就必須與地方治理協同。</p>
+        <p>最常見的公共疑慮來自安全問題，包括波束外溢、航空活動干擾與生態影響。技術上可透過功率密度限制、多層監測、波束自動切斷與保護走廊降低風險，但是否能取得社會授權，取決於資料透明度與第三方驗證機制。簡言之，安全不是口號，而是可以被審計的運轉制度。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜NASA - Space Solar Power - Part 3 - SSP Technologies: Wireless Power Transmission</h4>
+            <p>頻道：National Space Society｜用途：理解 SBSP 無線傳能技術原理與系統限制。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="en_796av4O4" title="NASA Space Solar Power wireless power transmission" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請聚焦「功率傳輸效率與波束控制」兩個指標，它們是商業化關鍵。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 電網整合與系統調度角色</h3>
+        <p class="lead">SBSP 若只被視為發電技術，價值會被低估；它真正的角色應在系統調度層重新定義。</p>
+        <p>若 SBSP 可提供高可用率輸出，它可能在電網中扮演「長時穩定電源」角色，降低對化石備援的依賴，並減少大規模儲能需求成長速度。這對高再生滲透率系統特別重要，因為當光電與風電占比提高，系統最缺的是長時間可預測供電，而不是更多短時高峰電力。</p>
+        <p>但實務導入要先回答幾個調度問題：SBSP 是否可依需求調節輸出？遇到鏈路異常時如何切換備援？與抽蓄、電池、需求響應的協同機制是什麼？如果這些問題沒有制度化答案，系統操作員通常不會把 SBSP 視為可依賴容量。換言之，技術可行不等於調度可用。</p>
+        <p>因此，早期示範應包含電網介面測試，而不只做單點能量傳輸。包含預測資料格式、調度時間解析度、告警協議與事故演練，都應進入試點驗證範圍。當 SBSP 能夠提供與傳統機組相當的可操作性與可審計性，它才會真正被納入容量規劃與長期投資決策。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Plans to beam solar generated electricity wirelessly from space to homes – BBC News</h4>
+            <p>頻道：BBC News｜用途：從公共政策與社會面向看 SBSP 併網與落地討論。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="eJi5gGjkCt0" title="BBC on beaming solar power from space" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>觀察媒體如何呈現技術與風險平衡，這會影響社會接受與政策節奏。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 成本模型與供應鏈現實</h3>
+        <p class="lead">SBSP 最大爭議在成本，但成本不是單一數字，而是一整條供應鏈成熟度函數。</p>
+        <p>總成本通常由發射服務、軌道硬體製造、在軌組裝與運維、地面接收站建置、並網設備與保險合規共同構成。任何一環缺乏規模化經驗，整體成本就可能居高不下。這也是為什麼很多分析認為 SBSP 在短期很難直接與成熟地面再生能源競價，但仍可能在特定情境下具策略價值。</p>
+        <p>從產業化角度看，SBSP 的成本下降依賴兩條曲線同時進步。第一條是太空端曲線，包括可重複發射、低成本平台製造與模組化在軌部署。第二條是地面端曲線，包括接收站標準化、並網流程優化與運維人才體系建立。只有兩條曲線同步下行，SBSP 才可能從示範科技轉為可複製基礎設施。</p>
+        <p>此外，商業模式設計同樣重要。若能透過長約購電、公共示範基金與風險分攤機制降低早期融資成本，首批專案更有機會產生可驗證運轉資料，進一步帶動後續投資。早期案的任務不是追求最美觀指標，而是建立可信賴的「工程-財務-治理」閉環。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Meet the start-up testing space-based solar farms that use lasers to send power to Earth</h4>
+            <p>頻道：CNBC Television｜用途：理解新創在 SBSP 商業化上的策略與障礙。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="237sUL7b5ds" title="CNBC startup testing space based solar farms" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把焦點放在商業化假設是否可驗證，而不是只看宣傳口號。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 示範到商轉的部署策略</h3>
+        <p class="lead">SBSP 的合理路線是分階段擴張，每一階段都要有可審核的技術與治理里程碑。</p>
+        <p>第一階段應是低功率在軌示範，目標不是供電規模，而是證明關鍵鏈路可重複運作，包括姿態控制、波束指向、接收站轉換效率與異常切斷機制。第二階段可進入區域示範電網，驗證連續運轉可用率、運維節奏與電網調度互動。第三階段才是多站點擴展，形成可複製的部署模型。</p>
+        <p>在政策治理上，應同步建立跨部門框架，涵蓋太空法規、電力監管、環評標準、空域協調與資安規範。SBSP 由於跨域性極高，若仍採單一部門審查，很容易在責任界面上出現空白。把治理框架前置，不僅能降低社會疑慮，也能縮短後續專案核准時間。</p>
+        <p>對於需要長期能源韌性的地區，SBSP 可先從關鍵基礎設施備援電力或離網高價值負載切入，再逐步進入主電網容量市場。這種路線雖然保守，但更符合風險管理原則。當技術可靠性、制度可信度與成本曲線同時改善，SBSP 才有機會成為下一代低碳基載的一部分。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜All you need to know about space based solar power</h4>
+            <p>頻道：Sabine Hossenfelder｜用途：快速檢視 SBSP 的技術可行性與常見質疑。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="3ZPrIE5ZMZA" title="All you need to know about space based solar power" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>最後用這支影片做反方檢核，確認你的部署假設是否能被質疑後仍站得住腳。</div>
+      </section>
+
+      <section class="section" id="s7">
+        <h3>7. 專案審查實務與風險清單</h3>
+        <p class="lead">如果你要把 SBSP 從簡報帶到審查會議，最有效的方法是先把「可驗證風險」講清楚，再談願景。</p>
+        <p>第一類是技術風險，要分成可量測與不可量測兩種。可量測風險包含傳輸效率下限、波束偏差上限、在軌模組故障率、地面接收站停機率與備援切換時間；不可量測風險通常來自尚未建立的運轉邊界。審查端最在意的是你是否清楚列出「何時判定成功、何時判定失敗」，以及失敗後如何縮小影響範圍。沒有明確指標的風險管理，通常會被視為尚未工程化。</p>
+        <p>第二類是治理風險，特別是跨機關責任界面。SBSP 同時觸及航太、能源、通訊、空域與環評，若專案文件仍以單一主管機關視角撰寫，後續一定會在審查接力過程中失速。較可行做法是提前建立跨域對照表：每個技術子系統對應哪些法規、由誰審核、需要哪些測試證據、何時提供第三方報告。把這些內容前置，能大幅降低「技術本身可行，但程序卡關」的風險。</p>
+        <p>第三類是財務風險，核心在於現金流可信度。對投資方而言，SBSP 的不確定性不只在 CAPEX，更在商轉前的驗證週期與里程碑是否可執行。建議把資本投入拆成關卡化機制，每通過一個技術與合規門檻才釋放下一段資金，並搭配明確退場條件。這種設計雖然看起來保守，卻能提高專案可融資性，因為它把風險轉成可管理的決策節點，而不是一次性豪賭。</p>
+        <p>第四類是社會風險，常見於資訊不對稱。公眾通常不會先質疑你是否用了最佳演算法，而是先問「這會不會影響生活安全」。因此，與其在後期做被動澄清，不如在前期就公開安全設計原則、即時監測機制、異常通報流程與停機邏輯。當社會能看見可問責機制，討論會從情緒對抗轉向證據對話，專案推進成本也會顯著下降。</p>
+        <p>最後，把 SBSP 專案文件做成三層結構會更有效率。第一層是給決策者看的系統摘要，重點放在價值、風險與里程碑；第二層是給審查者看的合規與測試證據；第三層才是給工程團隊的詳細設計與參數。三層之間要能互相追溯，避免出現「高層講一套、技術文件又是另一套」的斷層。當文件與驗證流程一致，SBSP 才有可能從前沿概念轉為可持續交付的能源工程。</p>
+        <p>你可以用一份簡化版「啟動檢核表」來提升執行品質：是否定義了最小可行示範功率與測試週期、是否明確列出波束功率密度上限與自動停機門檻、是否完成接收站候選場址的土地與環評初篩、是否與電網端確認資料交換格式與告警機制、是否建立第三方量測流程與公開報告節奏、是否定義異常事件分級與對應處置時間、是否規劃示範後的升級或退場條件。這份檢核表的價值在於把抽象風險轉成可追蹤任務，讓跨領域團隊在同一張地圖上協作。當每個檢核項都能對應到責任人、完成期限與驗收證據，SBSP 專案的推進效率會比單靠口頭協調高得多，也更能應對外部審查壓力。</p>
+        <p>在技術驗證層面，建議至少固定追蹤三組核心指標：第一組是能量鏈效率，包含軌道端輸出、傳輸損耗與地面轉換淨效率；第二組是運轉穩定度，包含可用率、故障間隔時間與恢復時間；第三組是安全合規，包含波束偏差事件數、保護機制觸發紀錄與第三方稽核結果。只要這三組指標可以連續、透明且可重現，SBSP 的工程可信度就會明顯提升，並形成下一輪擴容的決策基礎。</p>
+        <p>當你能把指標、責任、時程、合規文件整合成同一份路線圖，SBSP 專案才會從「討論題目」變成「可交付工程」，並且具備持續擴展能力。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const launchCost = document.getElementById('launchCost');
+    const gridNeed = document.getElementById('gridNeed');
+    const policyReady = document.getElementById('policyReady');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const l = Number(launchCost.value);
+      const g = Number(gridNeed.value);
+      const p = Number(policyReady.value);
+      const options = [
+        { name: '先做低功率軌道示範，建立無線傳能與安全驗證數據', score: (6 - l) * 1.1 + (6 - p) * 1.0 + g * 0.7 },
+        { name: '先導入關鍵負載備援場景，再逐步走向電網容量市場', score: g * 1.2 + p * 0.8 + l * 0.6 },
+        { name: '先完善法規與跨域治理框架，再推升軌道裝置規模', score: p * 1.3 + g * 0.7 + l * 0.5 },
+        { name: '先集中降本於發射與模組製造，追求商轉臨界點', score: l * 1.2 + g * 0.8 + p * 0.6 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [launchCost, gridNeed, policyReady].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
