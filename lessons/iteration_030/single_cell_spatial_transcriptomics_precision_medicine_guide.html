@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：單細胞空間轉錄體與精準醫療系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08131b;
+      --panel: #173447;
+      --panel2: #1f4960;
+      --text: #ecf8ff;
+      --muted: #c9deea;
+      --line: #4f7693;
+      --accent: #8ddfff;
+      --accent2: #a9ffd8;
+      --max: 1160px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 82% 8%, #2c688d 0%, #1a425a 42%, #08131b 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6e95b1; color: #d9f2ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #cfe5f3; max-width: 780px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,40,56,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d8eaf7; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e8f5ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3a6886; color: #cbffe9; }
+
+    .planner { border: 1px solid #6792ad; border-radius: 16px; background: linear-gradient(150deg, #21485f, #1a3b50); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #def4ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7099b6; border-radius: 10px; background: rgba(11,26,37,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cee4f2; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #8ddfff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7ca2bd; border-radius: 10px; background: rgba(8,18,26,.74); padding: .66rem .75rem; font-size: .9rem; color: #e0edf7; }
+    .plan-out b { color: #d3ffeb; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b7edff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #deedf8; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #7399b4; border-radius: 12px; background: #2a5a76; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #6687a0; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #d9e9f5; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1e435a; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7ea2bc; border-radius: 10px; background: rgba(42,71,90,.56); padding: .68rem .78rem; color: #e7f2fa; font-size: .92rem; }
+    .debrief strong { color: #d4ffeb; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Single-Cell Spatial Transcriptomics</span>
+        <h1>單細胞空間轉錄體與精準醫療系統：<br>從細胞圖譜走向臨床決策</h1>
+        <p>單細胞與空間轉錄體讓我們不只知道「哪些基因表現」，還能知道「在哪些細胞、哪些組織位置、在什麼微環境下表現」。這種解析度正在改變精準醫療：從癌症分型、免疫治療反應預測，到藥物機轉驗證與伴隨檢測設計。本指南聚焦工程化落地流程，而非只談技術名詞。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為何需要單細胞與空間資訊</a>
+      <a href="#s2">2. 單細胞轉錄體流程與偏差來源</a>
+      <a href="#s3">3. 空間轉錄體平台與設計取捨</a>
+      <a href="#s4">4. 多模態整合與計算挑戰</a>
+      <a href="#s5">5. 精準醫療場景與臨床轉譯</a>
+      <a href="#s6">6. 品質控管與可重現性治理</a>
+      <a href="#s7">7. 導入策略與KPI儀表板</a>
+      <a href="#s8">8. 產業化與下一代路線</a>
+      <a href="#s9">9. 法規與資料共享治理</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="單細胞精準醫療導入評估器">
+        <h2>單細胞精準醫療導入評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="sampleQuality">樣本前處理能力（高 = 樣本品質穩定）</label>
+            <input id="sampleQuality" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="computeReadiness">計算與分析成熟度（高 = 多模態整合能力好）</label>
+            <input id="computeReadiness" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="clinicalDemand">臨床轉譯需求強度（高 = 臨床問題明確）</label>
+            <input id="clinicalDemand" type="range" min="1" max="5" value="4">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先做高價值病種試點，建立樣本-分析-臨床回饋閉環</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為何需要單細胞與空間資訊</h3>
+        <p class="lead">傳統 bulk 轉錄體提供平均訊號，但臨床決策常需要看見細胞異質性與微環境結構。</p>
+        <p>在腫瘤、免疫與發炎疾病中，同一塊組織內常同時存在多種細胞狀態。若只看平均表現，關鍵亞群可能被稀釋，導致錯過風險訊號。單細胞技術把每個細胞作為分析單位，空間轉錄體再補上組織座標，讓研究者能同時回答「誰在表現」與「在哪裡表現」。</p>
+        <p>這種資訊對精準醫療非常關鍵。例如免疫治療反應常與腫瘤邊界的免疫細胞分布有關，單靠基因平均值不夠；藥物抗性也可能來自少量細胞亞群，必須靠單細胞層級追蹤。當解析度提高，臨床假說會更可驗證，治療分層策略也更可操作。</p>
+        <p>但高解析度也意味著更高流程複雜度：樣本品質、批次效應、分析參數與解釋標準都會影響最終結論。要避免「技術漂亮但臨床無法採用」，從一開始就要把實驗設計、計算流程與臨床問題對齊。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Single Cell Sequencing - Eric Chow (UCSF)</h4>
+            <p>頻道：iBiology Techniques｜用途：建立單細胞測序方法論與應用輪廓。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="k9VFNLLQP8c" title="Single cell sequencing Eric Chow UCSF" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先掌握方法邏輯，再思考哪些臨床問題值得用高成本解析度處理。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 單細胞轉錄體流程與偏差來源</h3>
+        <p class="lead">單細胞流程的最大風險通常在前端樣本，而不是後端演算法。</p>
+        <p>從組織解離、細胞捕捉、文庫製備到定序，每一環都可能引入偏差。解離過程會選擇性損失脆弱細胞，造成細胞組成偏移；低品質細胞與雙細胞（doublets）若未妥善過濾，會污染下游聚類與差異分析。這些問題若在前段未被量化控制，後段再複雜的模型也難補救。</p>
+        <p>工程上應建立標準化 QC 門檻，例如每細胞基因數、線粒體比例、UMI 分布與批次內一致性，並對關鍵判斷留存可追溯紀錄。對多中心合作尤其重要，因為不同實驗室若 QC 標準不一致，整合分析會出現系統性偏差，最終影響臨床結論可信度。</p>
+        <p>此外，分析流程要明確區分探索性與決策性結果。探索性分析可接受較寬參數空間，但用於臨床決策支持的模型，必須有固定流程與驗證版本。這種治理分層可避免研究靈活性與臨床穩健性互相衝突。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Introduction to single cell RNA-seq (SIB)</h4>
+            <p>頻道：SIB Swiss Institute of Bioinformatics｜用途：理解 scRNA-seq 完整流程與分析基礎。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="_ND6pEsf5Kg" title="Single cell transcriptomics introduction SIB" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>可把這支當流程地圖，逐步對照你的實驗與分析環節。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 空間轉錄體平台與設計取捨</h3>
+        <p class="lead">空間轉錄體不是單一技術，而是一組在解析度、通量與成本之間取捨的平台。</p>
+        <p>常見方案包含 spot-based 與 in situ 路線。spot-based 通常覆蓋範圍大、流程相對成熟，但單位訊號可能混合多細胞；in situ 路線可提供更高空間解析度，但流程與資料處理更複雜、成本也更高。選型時要先回到臨床問題：你需要全片掃描，還是需要細胞級定位？</p>
+        <p>實驗設計還要考慮組織特性與保存方式。不同組織厚度、RNA 完整度與染色流程都會影響訊號品質。若前處理與平台不匹配，常會得到看似完整但不可解釋的圖譜。把病理團隊納入設計早期，通常能顯著提升資料可用性。</p>
+        <p>在工程管理上，建議先從可重複病種樣本開始建立基準流程，再逐步擴展到異質性更高場景。這樣能先穩定資料品質，再放大應用範圍，避免一開始就陷入難以收斂的流程調參。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Spatial Technology: Introduction</h4>
+            <p>頻道：10x Genomics｜用途：快速掌握空間轉錄體平台能力與使用邊界。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="20-qNM4Ax3s" title="10x spatial technology introduction" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點是看平台能力邊界，避免以錯誤假設設計實驗。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 多模態整合與計算挑戰</h3>
+        <p class="lead">真正困難的不是生成單一資料集，而是把多模態資料整合成可行決策訊號。</p>
+        <p>單細胞、空間、病理影像與臨床資料各自有不同尺度與噪聲特性。整合時常見問題包括批次效應、對齊誤差、特徵冗餘與模型過擬合。若整合策略不嚴謹，結果可能看似一致卻缺乏可重現性，無法支撐臨床採用。</p>
+        <p>實務上應分層整合：先在同質資料內做穩定表徵，再做跨模態映射，最後才進入預測任務。每一層都要有獨立驗證指標，避免把所有不確定性一次堆到最終模型。這種分層方法雖然較慢，但更符合高風險醫療場景的工程要求。</p>
+        <p>此外，計算平台需具備可重現與可追溯設計，包括固定版本環境、流程編排、參數簽章與輸出稽核。缺少這些機制，即使模型性能良好，也很難通過臨床與法規審查。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Models and Methods for Spatial Transcriptomics</h4>
+            <p>頻道：CGSI 2023｜用途：建立空間轉錄體模型方法與分析框架視角。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="CRuSrd8JWI0" title="Models and methods for spatial transcriptomics" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看完後可反推你的分析管線，找出最可能的偏差節點。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 精準醫療場景與臨床轉譯</h3>
+        <p class="lead">技術價值最終要落在臨床決策：分層、預測、監測與治療選擇。</p>
+        <p>空間與單細胞資料可用於識別治療反應相關生物標記、描繪腫瘤微環境、追蹤疾病進程與藥物機轉。對精準醫療來說，關鍵不是資料量，而是能否形成可執行決策規則。例如哪些病人適合特定治療、何時調整療程、哪些訊號代表復發風險升高。</p>
+        <p>轉譯過程中，病理醫師、腫瘤科醫師與計算團隊需共同定義可用報告格式。若輸出只有高維圖譜而缺乏臨床語義，決策端很難採用。把技術輸出翻譯成臨床問題語言，是導入成功率的關鍵。</p>
+        <p>此外，臨床驗證應以前瞻式設計逐步推進，先從輔助判讀開始，再進入治療路徑整合。這種漸進策略能降低風險，也有助於建立跨部門信任。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Uncovering hidden biomarkers with Xenium In Situ</h4>
+            <p>頻道：10x Genomics｜用途：觀察空間平台如何支撐生物標記發現與轉譯。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="9oJlEYz7vm8" title="Xenium in situ uncovering hidden biomarkers" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點看「從訊號到標記」的轉譯鏈路，這是臨床價值核心。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 品質控管與可重現性治理</h3>
+        <p class="lead">精準醫療系統最怕的是一次成功、次次失敗，因此可重現性治理必須前置。</p>
+        <p>建議建立端到端 SOP：樣本接收、前處理、實驗批次安排、資料清洗、模型訓練、報告輸出與結果審核。每一段都要有量化門檻與例外處置流程，並保留版本紀錄。這不只是實驗室管理需求，也直接關係到臨床安全與法規責任。</p>
+        <p>跨中心合作時更需要統一質控語言。若各中心使用不同指標與閾值，聯合分析容易產生不可解釋差異。把質控標準做成共享儀表板，並定期做交叉比對，可明顯提升資料整合品質。</p>
+        <p>另外，建議把「失敗樣本」納入系統學習。很多流程優化來自失敗案例，而非成功案例。若能系統化追蹤失敗原因與修正效果，平台成熟速度會大幅提升。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜Precision Medicine (MIT OpenCourseWare)</h4>
+            <p>頻道：MIT OpenCourseWare｜用途：補足精準醫療方法論與系統化思維。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="kZrb6ZIwJqg" title="MIT OpenCourseWare precision medicine" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支可作為治理與臨床轉譯框架的補強視角。</div>
+      </section>
+
+      <section class="section" id="s7">
+        <h3>7. 導入策略與KPI儀表板</h3>
+        <p class="lead">要把單細胞空間技術變成臨床能力，必須有明確分階段 KPI。</p>
+        <p>第一階段 KPI 可聚焦技術可行性：樣本成功率、資料可用率、批次一致性、分析時程。第二階段聚焦轉譯價值：生物標記可重現性、病人分層改善幅度、臨床團隊採用率。第三階段聚焦系統化擴張：跨中心一致性、單案成本下降、報告週轉時間與法規合規效率。</p>
+        <p>KPI 不應只追求模型指標，還要包含運營與臨床採用指標。若只看演算法表現，系統很容易變成研究展示而非臨床工具。把技術、流程、臨床與治理放在同一儀表板，才能讓跨部門做出一致決策。</p>
+        <p>每季應做一次回顧會議，評估哪些環節拖慢價值落地，並調整下一季投資優先序。這種節奏可避免專案失焦，保持穩定迭代。</p>
+      </section>
+
+      <section class="section" id="s8">
+        <h3>8. 產業化與下一代路線</h3>
+        <p class="lead">未來競爭焦點不只在平台解析度，而在「多中心可複製的臨床交付能力」。</p>
+        <p>下一代趨勢包括更高通量 in situ、蛋白與轉錄體聯合量測、與病理影像及臨床資料的即時整合。這些進展將持續提高可解釋性，但也增加流程複雜度與治理要求。真正具產業價值的團隊，會把技術創新與流程標準化同步推進。</p>
+        <p>對醫療機構而言，務實路線是「高價值病種試點 → 多病種擴張 → 多中心網路化」。每一階段都要有可審核成果，才能支撐後續資源投入。當樣本、分析、報告與臨床回饋形成穩定閉環，單細胞空間轉錄體才會從先進技術變成日常精準醫療基礎能力。</p>
+        <p>這條路徑雖然不會一蹴可幾，但一旦建立，就能持續沉澱高價值生物知識資產，並提升整體醫療系統對複雜疾病的決策品質。</p>
+      </section>
+
+      <section class="section" id="s9">
+        <h3>9. 法規與資料共享治理</h3>
+        <p class="lead">單細胞與空間轉錄體要進入臨床常態，關鍵不只在技術成熟，還在資料治理能否被監管與醫療機構接受。</p>
+        <p>由於資料敏感度高，跨機構合作時必須先定義資料最小必要揭露、去識別化流程、研究與臨床使用邊界，以及第三方存取審查機制。若這些規則不清楚，專案很容易在倫理審查或法務流程停滯。建議把資料共享規則做成標準化合約模板，並對每次資料流轉保留可稽核紀錄。</p>
+        <p>臨床導入還需建立「分析結果責任鏈」。誰負責模型版本核可、誰簽核報告、誰追蹤臨床後果，都需要明確分工。當責任鏈透明，臨床團隊才會願意把新技術納入決策流程。反之，即使技術指標再好，也可能因責任不明而無法實際使用。</p>
+        <p>最務實的做法是建立跨部門治理委員會，固定檢視資料品質、模型漂移、合規狀態與臨床回饋，並把改版決策制度化。當治理與技術一起迭代，單細胞精準醫療系統才能在真實醫療環境長期穩定運作。這一步也能降低跨院合作摩擦，讓擴張時程更可預期，同時維持臨床決策品質一致性，並降低導入失敗風險與運作不確定性。治理穩定才有長期價值，且利於擴散。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const sampleQuality = document.getElementById('sampleQuality');
+    const computeReadiness = document.getElementById('computeReadiness');
+    const clinicalDemand = document.getElementById('clinicalDemand');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const s = Number(sampleQuality.value);
+      const c = Number(computeReadiness.value);
+      const d = Number(clinicalDemand.value);
+      const options = [
+        { name: '先做高價值病種試點，建立樣本-分析-臨床回饋閉環', score: d * 1.2 + s * 0.8 + c * 0.7 },
+        { name: '先強化樣本前處理與QC標準，再擴展分析範圍', score: s * 1.3 + c * 0.7 + d * 0.6 },
+        { name: '先建多模態分析平台與版本治理，再導入臨床流程', score: c * 1.3 + d * 0.7 + s * 0.6 },
+        { name: '先聚焦伴隨檢測場景，建立可重現標記庫', score: d * 1.1 + c * 0.8 + s * 0.7 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [sampleQuality, computeReadiness, clinicalDemand].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
