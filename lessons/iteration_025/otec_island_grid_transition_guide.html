@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：海洋熱能轉換 OTEC 與島嶼電力</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07141a;
+      --panel: #14333f;
+      --panel2: #1a4554;
+      --text: #ecf8ff;
+      --muted: #c6ddea;
+      --line: #507689;
+      --accent: #8be0ff;
+      --accent2: #a8ffd8;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 80% 8%, #2b6783 0%, #1a4256 42%, #07141a 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6f95ab; color: #d9f3ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #cfe6f2; max-width: 760px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(20,44,56,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d8ecf7; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #eaf6ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3d6f89; color: #d4ffec; }
+
+    .planner { border: 1px solid #6792a8; border-radius: 16px; background: linear-gradient(150deg, #214a5d, #1a3c4d); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #def5ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7199ad; border-radius: 10px; background: rgba(11,24,34,.72); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cee5f0; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #8be0ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7ea6ba; border-radius: 10px; background: rgba(8,18,26,.74); padding: .66rem .75rem; font-size: .9rem; color: #e1eef6; }
+    .plan-out b { color: #d3ffea; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b8eeff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #deedf7; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #739bb0; border-radius: 12px; background: #2b5d74; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #698aa0; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #d8e8f2; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1f4559; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7ea5ba; border-radius: 10px; background: rgba(41,72,88,.58); padding: .68rem .78rem; color: #e6f3fb; font-size: .92rem; }
+    .debrief strong { color: #d4ffeb; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d6ffef; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d6ffef; }
+    .open-youtube:hover { color: #f3fffa; border-bottom-color: #f3fffa; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • OTEC And Island Power Systems</span>
+        <h1>海洋熱能轉換 OTEC 與島嶼電力：<br>從溫差發電走向穩定供電系統</h1>
+        <p>OTEC（Ocean Thermal Energy Conversion）利用海洋表層暖水與深層冷水的溫差發電，理論上可提供 24 小時運轉的可再生基載電力。這份指南不只講原理，而是聚焦島嶼電力場景下的系統設計、經濟性與部署策略。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. OTEC 為何適合島嶼電力</a>
+      <a href="#s2">2. 發電循環與工程瓶頸</a>
+      <a href="#s3">3. 深海取水與設備可靠度</a>
+      <a href="#s4">4. 與儲能及電網調度整合</a>
+      <a href="#s5">5. 成本結構與商業模式</a>
+      <a href="#s6">6. 部署路徑與政策策略</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="OTEC 導入策略評估器">
+        <h2>OTEC 導入策略評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="tempGradient">海溫差條件（高 = 長期穩定溫差）</label>
+            <input id="tempGradient" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="gridDependence">島嶼燃油依賴度（高 = 亟需替代）</label>
+            <input id="gridDependence" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="infraReadiness">港灣與維運基礎（高 = 導入阻力低）</label>
+            <input id="infraReadiness" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先建小規模示範與維運訓練，再擴展成區域基載</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. OTEC 為何適合島嶼電力</h3>
+        <p class="lead">OTEC 的關鍵價值在於「全天候可預測輸出」，這正是島嶼電網最缺的能力。</p>
+        <p>許多島嶼電力系統長期依賴柴油或重油機組，燃料運輸成本高、價格波動大，並且暴露在供應中斷風險。太陽光電與風電可以降低燃料使用，但輸出波動仍需要大量備援。若地理條件允許，OTEC 可作為穩定電源，補上高再生組合中的基載缺口。</p>
+        <p>這也是 OTEC 與其他海洋能源路線最大的差異。它不是追求短時高峰功率，而是追求長時穩定運轉。對電網操作者來說，可預測性通常比瞬間峰值更有價值，因為它直接影響備轉容量需求與調度壓力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Learn about Ocean Thermal Energy Conversion (OTEC)</h4>
+            <p>頻道：Global OTEC｜用途：建立 OTEC 系統定位與島嶼電力應用背景。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="KGnauw2Ckys" title="Learn about OTEC" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先看完整價值主張，再去判斷你的目標場域是否符合溫差與負載條件。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 發電循環與工程瓶頸</h3>
+        <p class="lead">OTEC 原理並不複雜，但效率受限於小溫差，工程上必須靠大流量與高可靠設備補足。</p>
+        <p>常見 OTEC 系統包含閉循環與開循環兩大類。閉循環使用低沸點工質在蒸發器與冷凝器間循環；開循環則直接利用海水蒸發。由於海溫差通常有限，單位發電效率不高，所以熱交換器、泵浦與管路設計會決定整體可行性。</p>
+        <p>真正的難點是系統化優化。若只追求理論效率，可能忽略海洋環境下的結垢、腐蝕、壓降與維修頻率。工程團隊需要在效率、耐久與維運成本之間找到可長期運轉的平衡，這比單次示範發電更具挑戰。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜TU Delft - OTEC</h4>
+            <p>頻道：TU Delft｜用途：理解 OTEC 熱力循環與效率限制的工程視角。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="FHBVgRWAt3c" title="TU Delft OTEC" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看完後請把焦點放在「低溫差如何逼出大規模設備需求」這件事。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 深海取水與設備可靠度</h3>
+        <p class="lead">OTEC 能否長期運轉，核心在於深層冷水管線與海洋環境下的可靠度管理。</p>
+        <p>深海取水管通常尺度大、結構長，受到海流、波浪與材料疲勞長期作用。任何取水效率下降都會直接影響發電輸出。加上海水腐蝕、海生物附著與維修窗口受天候限制，運維策略必須在設計初期就納入，而不是事後補救。</p>
+        <p>因此，OTEC 專案通常需要建立完整的狀態監測與預防維護節奏，包括泵浦健康監測、熱交換效率追蹤、管線結構檢查與備件策略。這些工作看似保守，卻是把示範案變成可融資資產的必要條件。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜How does an OTEC plant work?</h4>
+            <p>頻道：Global OTEC｜用途：快速掌握 OTEC 裝置運作流程與關鍵設備節點。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="iX38V_gJXjU" title="How does an OTEC plant work" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請把設備流程圖畫出來，對照哪些節點最可能成為停機來源。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 與儲能及電網調度整合</h3>
+        <p class="lead">OTEC 不必獨自承擔所有負載，而是與太陽能、風能與儲能形成互補組合。</p>
+        <p>島嶼電網常見挑戰是白天光電高、夜間燃油高，負載與再生輸出時序不一致。OTEC 若提供穩定底層功率，儲能就可專注在短時調頻與尖峰移轉，降低電池循環壓力。這種分工可提升整體系統效率，也更容易做長期資產規劃。</p>
+        <p>導入時要先定義調度角色：OTEC 是基載跟隨、恆定輸出還是可部分調節。不同設定會改變與儲能、柴油機組的互動方式，也會影響控制策略與系統保護設計。沒有清楚角色分工，再好的單機技術也難以轉化成電網價值。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜OTEC: The Huge Ocean Energy Source You've Never Heard Of</h4>
+            <p>頻道：The Upshift｜用途：從系統層級理解 OTEC 在能源組合中的定位。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="HsyIbzIiaBM" title="OTEC huge ocean energy source" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>建議把這支影片當成討論稿，與你的電網調度情境逐項對照。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 成本結構與商業模式</h3>
+        <p class="lead">OTEC 初期 CAPEX 偏高，但若替代高成本燃油，長期經濟性可能優於傳統方案。</p>
+        <p>成本拆解通常包含海工平台或岸上站體、深海取水系統、熱交換與動力設備、併網設施及維運人力。對島嶼市場來說，單看 LCOE 容易低估「燃料風險降低」與「供應韌性提升」的價值。評估時應同時納入燃料價格波動、停電成本與碳成本。</p>
+        <p>商業化常見路線是先做公私協作示範，再透過長約購電（PPA）與政策工具降低融資成本。當設備供應鏈成熟、標準化程度提高，後續專案成本才有機會下滑。也就是說，早期案的任務不只發電，更是建立可複製投資模型。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Don: The Legacy and Future of Ocean Thermal Energy Conversion (OTEC)</h4>
+            <p>頻道：Global OTEC｜用途：理解 OTEC 產業歷程、現況與商業化關鍵條件。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="c1rDWeE1Vq4" title="Legacy and future of OTEC" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點是觀察技術以外的融資、供應鏈與政策約束如何影響落地速度。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 部署路徑與政策策略</h3>
+        <p class="lead">務實路徑是從「可控規模示範」逐步擴大，而不是一開始就追求大型商轉。</p>
+        <p>第一階段應聚焦於可持續運轉與維運能力，建立全年可用率、故障處理時間與運轉成本的實證資料。第二階段再把 OTEC 納入島嶼能源規劃，與儲能、光電、風電形成協同調度。第三階段才是跨島或跨區域複製，降低單案開發不確定性。</p>
+        <p>政策端可透過示範補助、併網規範、長約採購與在地維運培訓來降低導入摩擦。工程端則要用標準化設計縮短審查與建置週期。當兩端同步推進，OTEC 才可能從前沿技術變成島嶼電力的長期選項。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜Ocean Thermal Energy Conversion ( OTEC ): The Future of Baseload, Dispatchable Renewable Energy</h4>
+            <p>頻道：MakaiOceanEngineer｜用途：聚焦 OTEC 作為可調度再生基載的實務價值。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="LJV4d4XtHuo" title="OTEC future of baseload dispatchable renewable energy" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這支當收斂章節，思考你的場域該如何定義第一個可驗證里程碑。</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const tempGradient = document.getElementById('tempGradient');
+    const gridDependence = document.getElementById('gridDependence');
+    const infraReadiness = document.getElementById('infraReadiness');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const t = Number(tempGradient.value);
+      const g = Number(gridDependence.value);
+      const i = Number(infraReadiness.value);
+      const options = [
+        { name: '先建小規模示範與維運訓練，再擴展成區域基載', score: (6 - i) * 1.2 + t * 0.8 + g * 0.7 },
+        { name: '先與儲能打包導入，優先降低燃油尖峰負載', score: g * 1.2 + t * 0.8 + i * 0.6 },
+        { name: '先完善港灣與深海維運能力，再投入主機建置', score: i * 1.3 + t * 0.7 + g * 0.6 },
+        { name: '先鎖定高溫差海域，追求早期發電可用率', score: t * 1.3 + g * 0.7 + i * 0.5 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [tempGradient, gridDependence, infraReadiness].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
