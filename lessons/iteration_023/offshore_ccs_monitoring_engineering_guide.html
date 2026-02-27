@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：海底碳封存與監測工程</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07101a;
+      --panel: #163146;
+      --panel2: #1d3d56;
+      --text: #ebf6ff;
+      --muted: #c4dceb;
+      --line: #4c7392;
+      --accent: #8dd9ff;
+      --accent2: #9fffd9;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 84% 8%, #2a678c 0%, #183b56 45%, #07101a 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6b95b1; color: #d8f1ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #cde5f3; max-width: 760px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,40,56,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d8eaf7; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e9f5ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3a6886; color: #cbffe9; }
+
+    .planner { border: 1px solid #6590ad; border-radius: 16px; background: linear-gradient(150deg, #214660, #1a3950); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #def4ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7099b6; border-radius: 10px; background: rgba(11,26,37,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cee4f2; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #8dd9ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7ca2bd; border-radius: 10px; background: rgba(8,18,26,.74); padding: .66rem .75rem; font-size: .9rem; color: #e0edf7; }
+    .plan-out b { color: #d3ffeb; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b7edff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #deedf8; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #7399b4; border-radius: 12px; background: #2a5a76; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #6687a0; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #d9e9f5; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1e435a; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7ea2bc; border-radius: 10px; background: rgba(42,71,90,.56); padding: .68rem .78rem; color: #e7f2fa; font-size: .92rem; }
+    .debrief strong { color: #d4ffeb; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Offshore CO2 Storage Monitoring</span>
+        <h1>海底碳封存與監測工程：<br>從「封存注入」走到「長期可驗證安全」</h1>
+        <p>海底碳封存（offshore CCS）不是把二氧化碳打進地下就結束，而是一個長期工程系統：場址選擇、注入設計、井筒完整性、地球物理監測、法規驗證與社會信任，必須同時成立。這份指南聚焦在工程與監測面，幫你看懂真正的落地難點。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 海底封存的角色與邏輯</a>
+      <a href="#s2">2. 注入與儲層設計</a>
+      <a href="#s3">3. 監測、報告與查證（MRV）</a>
+      <a href="#s4">4. 海底監測技術與資料品質</a>
+      <a href="#s5">5. 工程風險與社會接受度</a>
+      <a href="#s6">6. 產業化路線與跨國協作</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="封存監測策略評估器">
+        <h2>封存監測策略評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="reservoirConfidence">儲層模型信心度（高 = 地質資料完整）</label>
+            <input id="reservoirConfidence" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="monitorDensity">監測密度需求（高 = 需要更頻繁監測）</label>
+            <input id="monitorDensity" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="complianceStrict">法規查證嚴格度（高 = MRV 壓力高）</label>
+            <input id="complianceStrict" type="range" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先補強監測與查證流程，再擴大注入規模</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 海底封存的角色與邏輯</h3>
+        <p class="lead">海底碳封存的真正價值，是為難減排產業提供可規模化的減碳去路。</p>
+        <p>鋼鐵、水泥、化工等部門即便大幅電氣化，仍可能殘留製程排放。海底封存把「捕集後 CO2 的去向」從短期暫存變成長期處置，讓整體減排路線閉環。與陸上相比，離岸儲層在某些地區有更大容量與更清楚地質資料基礎，特別適合跨企業共用基礎設施。</p>
+        <p>不過，封存不是單一技術，它是系統工程。輸送、注入、監測、保險、責任歸屬與跨境規則都要配套。任何一段缺口都會把技術可行變成商業不可行。你可以把它理解成「地下版公共基礎設施」：成功關鍵在長期治理，不在一次展示。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Pioneering cross-border Carbon Capture and Storage</h4>
+            <p>頻道：Shell｜用途：理解跨國 CO2 運輸與離岸封存價值鏈。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="o2R-r4-lTMc" title="Cross-border CCS value chain" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先看清楚「捕集-運輸-封存」是一條連續鏈，不是獨立項目拼接。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 注入與儲層設計</h3>
+        <p class="lead">注入工程的本質是壓力管理與井筒完整性管理，而非單純追求注入量。</p>
+        <p>海底封存通常選擇深部鹽水層或枯竭油氣層，要求有足夠蓋層完整性與可預測流體行為。設計階段必須評估注入速率、壓力上限、井位布局與長期遷移路徑。如果過度追求短期注入效率，可能導致壓力累積、井周風險提升，反而削弱長期安全。</p>
+        <p>工程團隊需要做的是在容量、壓力、安全三者間找平衡，並把假設寫進可更新模型。這個模型不是開工前的一次文件，而是運轉中持續校準的數位資產。模型品質，直接決定你能否對外說服監管者與投資方。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Northern Lights value chain animation</h4>
+            <p>頻道：Northern Lights JV｜用途：掌握離岸 CO2 儲運基礎設施的工程流程。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="P-UiN_2HldU" title="Northern Lights value chain" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支影片可當流程圖，對照你專案的井口、管線、終端與儲層管理節點。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 監測、報告與查證（MRV）</h3>
+        <p class="lead">沒有 MRV，封存就難以被金融與法規體系承認。</p>
+        <p>封存專案最常被問的不是「能不能注入」，而是「能不能證明留在地下」。MRV 的目標是把地質過程轉成可審計證據，涵蓋注入量、壓力、地震活動、井筒狀態與可能洩漏路徑。這些資料最終要支撐碳權核算、法規合規與公共溝通。</p>
+        <p>成熟 MRV 需要多層資料整合：井下測值、地震監測、海床感測、重力/電磁等地球物理訊號，最後回到儲層模型做一致性檢查。重點不在單一儀器多精密，而是整體證據鏈能否經得起外部審查。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Measuring, monitoring and verification of geological carbon storage</h4>
+            <p>頻道：Environmental Geoscience Program EGP｜用途：建立 MRV 框架與實務檢核重點。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="RQBf_UQ1mFc" title="Measuring monitoring and verification of geological carbon storage" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把 MRV 當成核心產品，不是附屬報告，這會改變整個專案設計優先順序。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 海底監測技術與資料品質</h3>
+        <p class="lead">海底環境讓監測更困難：設備可靠度、訊號衰減與維護成本都比陸上更嚴苛。</p>
+        <p>離岸專案常用海床感測節點、井口監測、時間序列地震與聲學方法觀察封存行為。工程現實是，海況、設備佈放限制、長期維護窗口會直接影響資料連續性。若資料時間軸斷裂，再好的模型也難以追溯封存行為。</p>
+        <p>因此，監測設計不能只看技術規格，還要看可維運性。你需要問：故障時多久能修復？資料缺口如何補償？哪些指標必須冗餘？這些決策看似保守，卻是降低監管風險與公眾疑慮的關鍵。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜Carbon capture and storage - The critical role of monitoring subsea</h4>
+            <p>頻道：Sonardyne｜用途：理解海底監測在 CCS 工程中的關鍵位置。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="dulA9hS3470" title="Critical role of monitoring subsea CCS" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先定義要回答的風險問題，再反推監測組合；不要反過來被儀器牽著走。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 工程風險與社會接受度</h3>
+        <p class="lead">離岸封存最大的挑戰之一，是把「工程可信度」轉成「社會可接受性」。</p>
+        <p>即便技術數據顯示安全，公眾仍會關心洩漏可能性、海洋生態影響與責任歸屬。這些疑慮若在前期未被正面處理，專案後期很容易在許可流程或地方溝通階段失速。工程團隊需要把風險溝通視為技術工作的一部分，而非公關收尾。</p>
+        <p>可操作的做法包括：公開監測指標、明確觸發門檻、定期第三方審核、事故情境演練與透明回報節奏。當外部利害關係人看見可追溯、可問責的機制，接受度通常會顯著提高。換句話說，社會信任不是宣傳做出來，而是制度做出來。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Carbon capture and storage research at the British Geological Survey</h4>
+            <p>頻道：British Geological Survey｜用途：觀察研究機構如何支撐封存風險評估與決策。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="7j3OTLmaE-g" title="BGS carbon capture and storage research" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點看「科學證據如何進入政策與許可流程」，這是落地核心。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 產業化路線與跨國協作</h3>
+        <p class="lead">海底封存要規模化，必須從單案思維走向區域網絡思維。</p>
+        <p>當多個排放源共用輸送與封存基礎設施，單位成本才有機會下降，融資風險才可被分攤。這就要求跨企業、跨港口、甚至跨國合作，並建立一致的品質與查證標準。沒有標準化，專案很難複製；沒有複製，產業很難擴張。</p>
+        <p>現階段最值得關注的不是單一「最大案」，而是能否形成可持續 pipeline：示範案提供學習、第二批案改善流程、第三批案壓低成本。當這條曲線成形，海底封存才會從政策試點轉為常態化減碳基礎設施。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜Time-lapse construction of the Northern Lights CO2 infrastructure</h4>
+            <p>頻道：Northern Lights JV｜用途：觀察從規劃到建置的工程落地節奏。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="hENxRds2fmI" title="Northern Lights CO2 infrastructure construction" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支可作為部署樣板，特別是多方協作下的工程排程與接口管理。</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const reservoirConfidence = document.getElementById('reservoirConfidence');
+    const monitorDensity = document.getElementById('monitorDensity');
+    const complianceStrict = document.getElementById('complianceStrict');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const r = Number(reservoirConfidence.value);
+      const m = Number(monitorDensity.value);
+      const c = Number(complianceStrict.value);
+      const options = [
+        { name: '先補強監測與查證流程，再擴大注入規模', score: m * 1.2 + c * 1.0 + (6 - r) * 0.8 },
+        { name: '先做高信心場址，降低早期示範風險', score: r * 1.2 + c * 0.8 + m * 0.7 },
+        { name: '優先建置海底監測冗餘，提升長期可驗證性', score: m * 1.3 + c * 0.8 + r * 0.6 },
+        { name: '先推跨境輸送協議，再擴展封存容量', score: c * 1.1 + r * 0.7 + m * 0.6 + 0.8 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [reservoirConfidence, monitorDensity, complianceStrict].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
