@@ -1,0 +1,335 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：地震早期預警與斷層破裂物理</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08121a;
+      --panel: #173346;
+      --panel2: #20485f;
+      --text: #ecf7ff;
+      --muted: #c9deea;
+      --line: #4f7593;
+      --accent: #8bdcff;
+      --accent2: #a7ffd8;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 84% 10%, #2b678b 0%, #1a4159 42%, #08121a 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6f95af; color: #d9f1ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #cfe5f2; max-width: 780px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(18,40,56,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d8eaf7; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e8f5ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3a6886; color: #cbffe9; }
+
+    .planner { border: 1px solid #6792ad; border-radius: 16px; background: linear-gradient(150deg, #21475e, #1a3a50); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #def4ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7099b6; border-radius: 10px; background: rgba(11,26,37,.7); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cee4f2; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #8bdcff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7ca2bd; border-radius: 10px; background: rgba(8,18,26,.74); padding: .66rem .75rem; font-size: .9rem; color: #e0edf7; }
+    .plan-out b { color: #d3ffeb; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b7edff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #deedf8; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #7399b4; border-radius: 12px; background: #2a5a76; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #6687a0; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #d9e9f5; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1e435a; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7ea2bc; border-radius: 10px; background: rgba(42,71,90,.56); padding: .68rem .78rem; color: #e7f2fa; font-size: .92rem; }
+    .debrief strong { color: #d4ffeb; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Earthquake Early Warning And Rupture Physics</span>
+        <h1>地震早期預警與斷層破裂物理：<br>從秒級警報到可操作風險治理</h1>
+        <p>地震早期預警（EEW）不是「預測地震」，而是在破壞性震波到達前，爭取幾秒到數十秒的反應時間。要把這幾秒變成真正減災效果，必須同時理解地震破裂物理、感測網路、警報決策邏輯、社會行為與基礎設施應變。本指南用工程與科學整合視角，拆解 EEW 的落地關鍵。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. EEW 的價值與誤解</a>
+      <a href="#s2">2. 地震破裂物理基礎</a>
+      <a href="#s3">3. 感測網路與警報演算法</a>
+      <a href="#s4">4. 警報門檻與誤報風險</a>
+      <a href="#s5">5. 關鍵設施與自動化應變</a>
+      <a href="#s6">6. 社會行為與訓練設計</a>
+      <a href="#s7">7. 部署KPI與迭代路線</a>
+      <a href="#s8">8. 多災種整合與未來方向</a>
+      <a href="#s9">9. 情境演練與跨機關協同</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="EEW 導入優先級評估器">
+        <h2>EEW 導入優先級評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="seismicExposure">地震暴露度（高 = 震害風險高）</label>
+            <input id="seismicExposure" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="sensorCoverage">感測覆蓋成熟度（高 = 網路密度高）</label>
+            <input id="sensorCoverage" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="responseMaturity">應變流程成熟度（高 = 警報可被執行）</label>
+            <input id="responseMaturity" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先補關鍵區域感測與機構應變流程，再擴大全民警報覆蓋</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. EEW 的價值與誤解</h3>
+        <p class="lead">EEW 的核心不是預知未來，而是把「震波傳播時間差」轉成可執行行動。</p>
+        <p>地震發生後，較快但破壞力較小的 P 波先到，較慢但破壞力更大的 S 波與表面波後到。EEW 就是利用這段時間差，在強震波抵達前送出警報。對個人可能只有幾秒可躲避；對高鐵、工廠、電梯、手術室等系統，這幾秒可能足以觸發自動停機與保護，顯著降低連鎖災害。</p>
+        <p>常見誤解是「警報不準就沒價值」。事實上，EEW 是風險管理系統，不是二元預測器。它要平衡漏報與誤報，並且隨資料持續優化。真正重要的是警報是否能在可接受誤差範圍內，觸發有價值的應變動作。若沒有對應行動設計，再精準的警報也難轉化成減災效果。</p>
+        <p>因此，評估 EEW 不應只看警報秒數，還要看整體鏈路：感測、運算、傳輸、決策、執行、復盤。很多地區技術端已能提供警報，但因組織流程不足，最終效益打折。這也是為何本指南把工程與治理放在同一框架下討論。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Earthquake early warning from UC Berkeley's Seismo lab</h4>
+            <p>頻道：UC Berkeley｜用途：理解學研端如何把 EEW 轉化為實際服務。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="c7am_QqMM1c" title="Earthquake early warning from UC Berkeley Seismo lab" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先看「資料→警報→行動」整條鏈，而不只看偵測技術本身。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 地震破裂物理基礎</h3>
+        <p class="lead">EEW 的演算法上限，受地震破裂物理理解程度直接約束。</p>
+        <p>地震是斷層面上應力累積後快速釋放的過程，破裂起始位置、破裂方向、滑移速度與破裂長度會決定地表震動分布。若破裂呈現強烈方向性，某些區域可能遭受遠高於平均的搖晃。這也是為什麼同樣規模地震，不同城市體感差異很大。</p>
+        <p>對 EEW 來說，初期可觀測訊號有限，模型需要在不完整資訊下快速估計後續破裂演化。這要求演算法結合物理先驗與統計學習，而不是單靠歷史資料擬合。若忽略破裂動力學，系統可能在大型複雜地震中低估風險，造成關鍵時刻決策失誤。</p>
+        <p>在教育與訓練中，把破裂物理講清楚也很重要。當決策者理解 EEW 的物理邊界，就能更合理設定應變門檻與容錯機制，避免把系統當成全知全能工具。正確認知邊界，反而是提升整體可靠度的第一步。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Earthquake and Tsunami Physics</h4>
+            <p>頻道：Stanford Physics｜用途：建立斷層破裂與震波傳播的物理基礎。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="0TmQyk0U32s" title="Earthquake and tsunami physics Stanford" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看這支時請把重點放在「破裂過程如何影響可預警時間」。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 感測網路與警報演算法</h3>
+        <p class="lead">EEW 系統的效能由「感測密度 + 通訊延遲 + 推論穩定性」共同決定。</p>
+        <p>感測網路需要在高風險區域有足夠密度，才能快速辨識事件特徵。若站點稀疏，系統可能延遲判定或在初期估計偏差過大。另一方面，通訊鏈路和資料品質同樣關鍵，噪訊、時鐘偏移、封包遺失都會直接影響警報品質。</p>
+        <p>演算法設計上，多數系統會採分層策略：先用快速規則或簡化模型做初判，再以更多資料迭代修正。這種設計的優點是能在極短時間給出可行警報，但也意味著早期警報不確定性較高。工程上要做的是把不確定性顯性化，並讓應變流程可隨警報更新動態調整。</p>
+        <p>此外，跨機構資料交換標準必須先建立。若不同單位格式、時間基準與品質指標不一致，跨區協作會很脆弱。把資料標準化與品質監控平台化，是提升系統韌性的必要條件。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜ShakeAlert—Earthquake Early Warning System for the West Coast</h4>
+            <p>頻道：IRIS Earthquake Science｜用途：掌握 EEW 系統從感測到警報發布的工程全景。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="bq7eQ6kBgxA" title="ShakeAlert earthquake early warning system" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>建議把影片流程畫成架構圖，對照你要部署的節點責任。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 警報門檻與誤報風險</h3>
+        <p class="lead">警報門檻設定是 EEW 最難的治理題，不是單純演算法調參。</p>
+        <p>門檻太高會漏報，門檻太低會誤報。對民眾端，過多誤報會降低信任並造成警報疲勞；對關鍵設施端，漏報可能造成高昂損失。因此，不同對象需要不同策略：民眾可採保守警報，關鍵設施可用更敏感的觸發邏輯，再搭配分級應變動作。</p>
+        <p>好的設計是把警報做成分層訊號，而不是單一開關。例如第一層提示準備，第二層觸發保護，第三層進入緊急模式。這能讓系統在不確定性下仍保持可操作性，避免一次性決策過度僵硬。分層設計也更容易做事後評估與持續優化。</p>
+        <p>在治理上，應建立誤報與漏報的透明回顧制度，定期公開統計與改進措施。這不僅提升公信力，也讓參與單位能在同一數據框架下調整門檻。沒有透明機制，系統很難長期維持社會支持。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜How EEW systems work, and how to keep safe in an earthquake</h4>
+            <p>頻道：Seismology Research Centre｜用途：理解警報邏輯如何連結實際避難與應變。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="lLBLNwLrYWw" title="How earthquake early warning systems work" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支可用來檢查「警報內容是否能被一般人立刻理解與執行」。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 關鍵設施與自動化應變</h3>
+        <p class="lead">EEW 的高價值場景通常在機械系統可自動反應的基礎設施。</p>
+        <p>高鐵減速、電梯就近停靠、化工流程切換、手術設備保護、電網保護邏輯等，都能在秒級警報下啟動。這些場景的共同點是「行動可程式化」，因此對警報延遲與可靠度要求更高。若系統架構沒先做冗餘與回退，警報可能反而引入新風險。</p>
+        <p>部署時應先做失效模式分析：通訊中斷怎麼辦、警報晚到怎麼辦、連續警報怎麼避免系統抖動。把這些情境寫進控制邏輯與演練流程，才能讓自動化措施在極端事件下保持穩定。這是把示範方案轉為工程產品的核心步驟。</p>
+        <p>此外，關鍵設施端需要與政府警報系統建立清楚接口，包含資料格式、優先級規則與責任分界。接口治理不清，現場往往會因多來源訊號衝突而延誤行動，抵消警報帶來的時間優勢。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Rupture Dynamics and Earthquake Source Properties</h4>
+            <p>頻道：IRIS Earthquake Science Presentations｜用途：連結破裂動力學與工程防護需求。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="2rtp_nBVHaI" title="Rupture dynamics and earthquake source properties" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看破裂動力學可幫助你設定更合理的自動化觸發門檻。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 社會行為與訓練設計</h3>
+        <p class="lead">沒有演練，警報只是通知；有演練，警報才是行動指令。</p>
+        <p>民眾在地震警報出現時，常因驚嚇、誤解或猶豫而失去反應時間。要提升有效性，必須把行為設計前置：警報文案簡短明確、動作指引可立即執行、頻率適中避免麻痺。學校、醫院、交通場站等高人流場域應有定期演練，讓反應成為肌肉記憶。</p>
+        <p>行為策略也要考慮場景差異。家庭、辦公室、工廠、車站的最佳動作不同，不能用單一模板覆蓋全部。建立情境化指引，並把演練結果回饋到警報設計，才能逐步提升系統效益。這種「警報-行為-回饋」閉環，是 EEW 長期成功的關鍵。</p>
+        <p>公共溝通上，應持續說明系統邊界：不是所有地震都有足夠預警時間，也不是所有區域都能收到同樣品質的警報。透明地揭示限制，反而能建立更穩定信任，避免事件後因期待落差造成反彈。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜Earthquake Faults—3 basic types</h4>
+            <p>頻道：IRIS Earthquake Science｜用途：建立斷層型態與風險溝通的基礎認知。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="r5fS__4MA44" title="Earthquake faults three basic types" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>用這支補足基礎地質概念，能讓警報教育更具說服力。</div>
+      </section>
+
+      <section class="section" id="s7">
+        <h3>7. 部署KPI與迭代路線</h3>
+        <p class="lead">EEW 系統必須以可量測 KPI 迭代，才能從專案走向長期公共服務。</p>
+        <p>建議至少追蹤四組指標：第一組是技術效能（平均警報提前量、警報延遲、定位誤差）；第二組是可靠度（系統可用率、站點故障恢復時間、通訊成功率）；第三組是行動效益（演練達成率、關鍵設施觸發成功率、避難行為執行率）；第四組是治理指標（誤報率、漏報率、事件復盤完成時程）。</p>
+        <p>當 KPI 持續可見，團隊才能判斷下一輪投資應該放在感測擴建、演算法升級還是行為訓練。若沒有量化儀表板，資源分配很容易被單一事件情緒帶偏，導致系統演進失衡。工程管理的核心是讓每次改版都能回到指標驗證，而不是靠印象決策。</p>
+        <p>實務上可採三階段路線：第一階段建核心區域能力，第二階段擴展到高風險走廊，第三階段整合跨區域互援。每階段都要有明確驗收門檻與退場條件，確保計畫可持續而非一次性衝刺。</p>
+      </section>
+
+      <section class="section" id="s8">
+        <h3>8. 多災種整合與未來方向</h3>
+        <p class="lead">下一代 EEW 不只追求更快警報，而是要成為多災種韌性平台的一部分。</p>
+        <p>地震事件常伴隨次生風險，如海嘯、山崩、火災與基礎設施連鎖失效。若 EEW 能與其他監測系統和應急平台整合，決策者可在同一介面看到跨風險情境，提高處置效率。這種整合需要資料語義一致、事件編碼標準化與跨機關協作機制，並非單靠新演算法就能完成。</p>
+        <p>技術前沿方面，機器學習可協助改善快速定位與震度估計，但在高風險場景仍需可解釋與可審計設計。未來趨勢不是「AI取代地震學」，而是讓物理模型與資料驅動模型協同，提高速度與穩健性。這樣的混合架構，較能在極端事件下維持可信表現。</p>
+        <p>對城市治理者而言，真正目標是把 EEW 內化成日常韌性能力：平時有演練、事件有行動、事後有復盤、長期有改進。當這套循環建立，EEW 才會從科技專案變成公共安全基礎設施，持續創造可觀測價值。</p>
+      </section>
+
+      <section class="section" id="s9">
+        <h3>9. 情境演練與跨機關協同</h3>
+        <p class="lead">EEW 的最後一哩不是演算法，而是多機關在高壓情境下是否能一致行動。</p>
+        <p>建議把演練分成三層：第一層是單位內部演練，確保學校、醫院、工廠、交通場站都能在警報後 5-10 秒內執行標準動作；第二層是跨單位聯合演練，驗證資訊傳遞、指揮權限與資源調度是否順暢；第三層是跨機關桌上推演，專門處理複合災害與長時間中斷情境。三層演練若能形成固定節奏，系統韌性會比單次大型演習更穩定。</p>
+        <p>跨機關協同的實務關鍵在於接口責任明確。警報來源、地方政府、消防、交通、醫療與公用事業都需要預先定義「誰先做什麼、多久完成、失敗如何升級」。這些規則應寫入可稽核的操作手冊，並透過每次演練持續修訂。當責任界面清楚，事件期間決策時間才會縮短，避免因訊息不一致造成黃金秒數流失。</p>
+        <p>最後，演練成果要回饋到技術層。若某類場景反覆出現誤判或延遲，就應回頭調整警報門檻、通訊策略或行為指引，而不是只檢討現場人員。把「演練-資料-改版」做成閉環，EEW 系統才能在真實世界持續進化，並在下一次事件中提供更可驗證的保護效果，持續精進。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const seismicExposure = document.getElementById('seismicExposure');
+    const sensorCoverage = document.getElementById('sensorCoverage');
+    const responseMaturity = document.getElementById('responseMaturity');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const e = Number(seismicExposure.value);
+      const s = Number(sensorCoverage.value);
+      const r = Number(responseMaturity.value);
+      const options = [
+        { name: '先補關鍵區域感測與機構應變流程，再擴大全民警報覆蓋', score: e * 1.1 + (6 - s) * 0.9 + (6 - r) * 1.0 },
+        { name: '先優化警報門檻與分級策略，降低誤報疲勞風險', score: e * 0.9 + s * 0.7 + r * 1.1 },
+        { name: '先建關鍵設施自動化防護，再整合跨機關通報平台', score: r * 1.2 + e * 0.8 + s * 0.7 },
+        { name: '先強化公眾演練與行為指引，提升警報執行率', score: r * 1.0 + e * 0.8 + (6 - s) * 0.8 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [seismicExposure, sensorCoverage, responseMaturity].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
