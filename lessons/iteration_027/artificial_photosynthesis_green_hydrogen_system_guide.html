@@ -1,0 +1,331 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：人工光合作用與綠氫合成系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #071317;
+      --panel: #16333f;
+      --panel2: #1d4655;
+      --text: #ecf8ff;
+      --muted: #c7deea;
+      --line: #4e7487;
+      --accent: #8ce0ff;
+      --accent2: #a9ffd8;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 83% 8%, #2d6981 0%, #194255 42%, #071317 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6f95aa; color: #d9f3ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #cfe6f2; max-width: 780px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(20,43,55,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d8ecf7; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #e9f5ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3c6f86; color: #d4ffec; }
+
+    .planner { border: 1px solid #6892a9; border-radius: 16px; background: linear-gradient(150deg, #21495e, #1a3b4d); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #def5ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #719ab0; border-radius: 10px; background: rgba(11,24,34,.72); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cfe4ef; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #8ce0ff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7fa6bb; border-radius: 10px; background: rgba(8,18,26,.74); padding: .66rem .75rem; font-size: .9rem; color: #e1eef6; }
+    .plan-out b { color: #d3ffea; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b9eeff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #deedf8; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #739ab0; border-radius: 12px; background: #2a5c73; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #67899f; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #d8e9f4; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1f4459; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7ea4b8; border-radius: 10px; background: rgba(41,72,89,.56); padding: .68rem .78rem; color: #e7f2fa; font-size: .92rem; }
+    .debrief strong { color: #d4ffeb; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d7fff0; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d7fff0; }
+    .open-youtube:hover { color: #f4fffb; border-bottom-color: #f4fffb; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Artificial Photosynthesis And Green Hydrogen</span>
+        <h1>人工光合作用與綠氫合成系統：<br>從催化材料走向可部署能源方案</h1>
+        <p>人工光合作用希望模仿自然，把陽光、水與二氧化碳轉成可用燃料；綠氫系統則聚焦以低碳電力製氫，替代高碳工業氫來源。兩者都在回答同一個問題：如何把間歇性再生能源轉成可儲存、可調度、可跨產業使用的化學能。這份指南用工程與產業視角，梳理技術路線與落地條件。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為什麼人工光合作用重要</a>
+      <a href="#s2">2. 反應路線與催化材料</a>
+      <a href="#s3">3. PEC/電解製氫系統設計</a>
+      <a href="#s4">4. 儲存運輸與安全治理</a>
+      <a href="#s5">5. 成本曲線與商業模式</a>
+      <a href="#s6">6. 示範到量產的部署策略</a>
+      <a href="#s7">7. 專案驗證指標與審查重點</a>
+      <a href="#s8">8. 政策與供應鏈執行藍圖</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="綠氫導入策略評估器">
+        <h2>綠氫導入策略評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="renewableAccess">低碳電力可取得性（高 = 可穩定供應）</label>
+            <input id="renewableAccess" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="h2Demand">工業氫需求強度（高 = 在地需求大）</label>
+            <input id="h2Demand" type="range" min="1" max="5" value="4">
+          </div>
+          <div class="planner-item">
+            <label for="infraLevel">儲運基礎成熟度（高 = 管線與儲槽完備）</label>
+            <input id="infraLevel" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先做工業園區示範，建立製氫-用氫閉環與安全規範</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為什麼人工光合作用重要</h3>
+        <p class="lead">人工光合作用的真正價值，是把「電力減碳」延伸到「分子減碳」，讓難電氣化部門有可行路線。</p>
+        <p>再生能源快速成長後，系統挑戰不再只是多裝機，而是如何把電力跨時間、跨產業、跨地域轉移。人工光合作用與綠氫系統提供了化學能載體的可能，能把短時電力轉成可長時儲存與運輸的燃料。對鋼鐵、化工、航運等難減排部門而言，這不只是替代能源，而是製程轉型的前提條件。</p>
+        <p>如果把能源系統當作供應鏈來看，太陽能與風能更像上游原料，氫與衍生燃料則是中游關鍵中間體。沒有中游，終端減碳會卡在波動性與可用性問題。這也是為什麼越來越多國家把綠氫視為戰略技術，而不只是實驗室研究題目。</p>
+        <p>但應用前提是整體效率與成本要可接受。人工光合作用目前仍在材料與系統整合的早期階段，離大規模商轉有距離；綠氫電解雖較成熟，仍面臨電價、設備壽命、供應鏈與基礎設施約束。理解這些邊界，才能避免把技術承諾當成即刻可落地能力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Scientists Create Artificial Leaf That Converts CO2 into Fuel</h4>
+            <p>頻道：Dr Ben Miles｜用途：快速掌握人工光合作用的核心概念與反應目標。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="giCAe5S_70I" title="Artificial leaf converts CO2 into fuel" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先看懂技術欲解決的系統問題，再評估它在你場域中的必要性。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 反應路線與催化材料</h3>
+        <p class="lead">人工光合作用的工程瓶頸，常常不在「能不能反應」，而在「能不能長期穩定且低成本反應」。</p>
+        <p>從反應路線來看，常見方向包括光催化、光電化學（PEC）與電化學耦合路徑。不同路線對材料要求差異很大，例如吸光能力、能帶匹配、表面反應活性、耐腐蝕與可製造性。實驗室中表現優秀的材料，到了放大測試常因壽命或製程成本失去優勢，這是從論文到產業最常見的落差。</p>
+        <p>催化系統設計必須同時看活性、選擇性與耐久性。只追求初始高效率，往往會犧牲長期穩定，最終反而拉高度電或度氫成本。工程上更實際的做法是定義可接受壽命下的效率區間，並把維修週期、替換成本與回收機制納入初期設計。</p>
+        <p>材料供應鏈也不能忽視。若高度依賴稀有元素，規模化會受制於價格波動與地緣風險。近年不少研究轉向地球豐度較高的催化材料，目的就是讓技術有機會走向可複製部署，而不是停留在示範等級。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜This artificial leaf produces hydrogen from air and sunlight</h4>
+            <p>頻道：World Economic Forum｜用途：看人工光合作用如何對接實際能源應用。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="6YyUa-a5iBs" title="Artificial leaf produces hydrogen from air and sunlight" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點觀察技術敘事如何從材料突破延伸到系統整合。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. PEC/電解製氫系統設計</h3>
+        <p class="lead">綠氫系統的成敗，不只看電解槽效率，還要看整個製氫站在波動電力下的運轉策略。</p>
+        <p>工業部署常見路線是鹼性、PEM 或高溫固態電解，不同路線有各自的效率、動態響應、材料與成本特徵。若電力來源來自高比例再生能源，系統必須處理頻繁啟停與部分負載運轉，這會影響設備壽命與維護節奏。換句話說，電解槽規格書只是起點，實際表現取決於調度與運維設計。</p>
+        <p>對 PEC 路線而言，工程難點在把光吸收、載流子分離與表面反應三件事同時做好，並在真實環境下維持穩定。這意味著測試不能只在理想條件下做短時間性能比較，而需要長周期、變動光照、溫度與水質條件的耐久驗證。缺少這些資料，技術很難獲得投資端信任。</p>
+        <p>系統整合層面還包括水處理、氣體純化、壓縮與熱管理。這些看似周邊單元，實際上常是能耗與故障來源。把整站當成單一產品設計，而不是把設備拼裝，才有機會把效率與可靠度同步提升。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Developing Materials for PEC, PC Solar-driven Water Splitting</h4>
+            <p>頻道：UNIST｜用途：理解光驅動水分解材料與系統驗證思路。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="fkNZtkocGkI" title="Developing materials for PEC and PC solar driven water splitting" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把影片當研究到工程轉譯的案例，看哪些指標可直接進入產業驗證。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 儲存運輸與安全治理</h3>
+        <p class="lead">氫能導入最大的非技術門檻，往往是儲運與安全制度能否跟上。</p>
+        <p>即使製氫端效率達標，若儲存、運輸、加注與使用端沒有同步升級，整個鏈條仍難以擴張。氫氣體積能量密度低，壓縮或液化需要額外能耗與設備投資，並帶來安全管理要求。工程團隊必須在集中式與分散式佈局間做取捨，兼顧成本、風險與供應穩定性。</p>
+        <p>安全治理不該等到事故後才補強。從設計期就要納入洩漏偵測、分區隔離、通風策略、點火源管理、緊急停機與人員訓練。這些要求不是額外負擔，而是換取社會接受與保險可保條件的必要投資。</p>
+        <p>更進一步看，安全資料透明化是擴散關鍵。若專案能持續公開運轉與事件數據，監管單位與地方社群更容易建立信任，後續許可流程也會更順。能源轉型的速度，很多時候取決於制度可信度，而不只是硬體效率。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜A More Efficient Method for Harvesting Hydrogen</h4>
+            <p>頻道：Michigan Engineering｜用途：理解製氫技術改進如何轉化為實務價值。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="uNQLOU8aATc" title="A more efficient method for harvesting hydrogen" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>重點在「效率提升是否伴隨可製造性與安全可控性」。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 成本曲線與商業模式</h3>
+        <p class="lead">綠氫能否擴張，核心在總成本結構，而不只是單一製氫設備報價。</p>
+        <p>總成本通常包含低碳電力、電解設備、平衡系統、儲運設施、運維與融資成本。很多專案早期估算只看 CAPEX，忽略了電力可用率與容量因子對單位氫成本的巨大影響。當電力價格波動大或設備利用率偏低，經濟性會快速惡化。</p>
+        <p>可行商業模式通常從近端需求開始，例如煉油、化工、鋼鐵或交通場景，先建立在地「製氫-用氫」閉環，降低長距運輸負擔。待需求與基礎設施成熟，再擴展到更大區域交易。這種分階段路線雖不華麗，但能有效控制早期風險。</p>
+        <p>政策工具同樣關鍵，包括碳定價、長約採購、示範補助與保證機制。它們的角色不是永久補貼，而是縮短技術學習曲線與資本進場門檻。當設備標準化、供應鏈規模化後，市場競爭力才會逐步由政策驅動轉向技術驅動。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Our SME showcase: higher efficiency green hydrogen production</h4>
+            <p>頻道：Royal Society of Chemistry｜用途：看中小企業如何把催化創新導入綠氫產業鏈。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="rty-Z5K0ieo" title="Higher efficiency green hydrogen production" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>注意商業化訊號：供應鏈、客戶驗證與製程放大的節奏。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 示範到量產的部署策略</h3>
+        <p class="lead">從實驗室走向產業，最穩健路徑是分階段驗證，而不是一次追求全規模商轉。</p>
+        <p>第一階段建議先做中小規模示範，目標是取得連續運轉、效率衰減、故障模式與安全事件的真實資料。第二階段再把系統接到具體工業需求，驗證供應穩定性與商業合約可行性。第三階段才是跨場域複製與標準化，讓建置週期與成本逐步下降。</p>
+        <p>部署策略要和人才策略同步。綠氫系統牽涉電力、化工、機械、材料與安全管理，若沒有跨域運維團隊，示範案很容易在交接階段失效。把培訓、認證與標準作業流程前置，能顯著降低擴張時的品質波動。</p>
+        <p>國際合作也值得重視，特別在標準制定與供應鏈互認方面。當設備規格、檢測方法與安全規範可互通，跨區域專案的交易與融資效率會明顯提升。這是綠氫從地方試點走向全球市場的必要條件。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜Membrane-free water splitting for hydrogen production</h4>
+            <p>頻道：Royal Society of Chemistry｜用途：觀察新型水分解路線的放大與部署潛力。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="DEvLiicFi0U" title="Membrane free water splitting for hydrogen production" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請用「效率-壽命-成本」三軸去評估這類新路線的可行性。</div>
+      </section>
+
+      <section class="section" id="s7">
+        <h3>7. 專案驗證指標與審查重點</h3>
+        <p class="lead">要讓人工光合作用與綠氫專案被採信，關鍵不是宣稱潛力，而是交付可審核的證據鏈。</p>
+        <p>建議把驗證指標分成三層。第一層是技術層，包含轉換效率、穩態輸出、動態響應、衰減率與可用率。第二層是工程層，包含安全事件頻率、維護停機時間、備件週期與系統恢復能力。第三層是商業層，包含單位氫成本、合約履約率、需求匹配度與現金流穩定性。三層指標若能連續追蹤，專案可信度會遠高於單次展示。</p>
+        <p>審查文件也應從一開始就對齊這三層指標。技術團隊提交的測試報告需要能直接映射到監管與投資端關心的問題，例如安全邊界、故障應對、運轉透明度與財務可持續性。若文件結構只對工程師友善，卻無法被外部審查者理解，專案推進仍會受阻。</p>
+        <p>此外，建立第三方驗證機制可以顯著提高外部信任。包括定期性能稽核、事故演練記錄與公開摘要報告，都能降低社會與監管疑慮。這不只是合規工作，也是在為後續融資與擴張鋪路。</p>
+        <p>最後，請把風險管理做成可執行清單：哪些條件觸發降載、哪些事件觸發停機、誰負責對外通報、多久完成復原。當每個項目都能對應責任人與時程，專案才具備可複製能力，能從示範案走向穩定交付。</p>
+      </section>
+
+      <section class="section" id="s8">
+        <h3>8. 政策與供應鏈執行藍圖</h3>
+        <p class="lead">綠氫與人工光合作用要真正落地，不能只靠單點技術突破，而要同步建構政策、標準與供應鏈能力。</p>
+        <p>第一步是定義場域優先序。建議先從高碳排且已有用氫需求的工業聚落切入，因為這類場域最容易形成在地閉環，縮短示範到商用的距離。若一開始就追求跨區域大規模供應，往往會同時面對儲運、法規、合約與金融風險，導致推進速度反而變慢。</p>
+        <p>第二步是標準先行。包含氫純度分級、設備測試規範、運轉資料格式、安全事件通報與第三方稽核流程，都應在示範早期同步建立。標準化的價值在於降低跨專案溝通成本，並讓供應商、監管機構與投資方能在同一語言下評估風險與績效。沒有可互通標準，示範案的學習很難被下一案直接複製。</p>
+        <p>第三步是供應鏈分層治理。核心裝置如電解槽、關鍵催化材料、壓縮與儲存設備需要長期採購策略與備援來源；周邊系統如水處理、監測儀表與控制軟體則需要在地維護能力。把供應鏈分成「關鍵不可替代」與「可在地化替代」兩層管理，可同時提升韌性與成本控制效率。</p>
+        <p>第四步是金融機制設計。早期案建議採里程碑放款，讓資金釋放與技術驗證結果綁定，降低一次性投資風險。當專案進入穩定運轉後，再轉向長約採購與資產化融資，逐步擴大規模。這種分段式金融策略能提高投資人可預測性，也能避免技術成熟前過度擴張。</p>
+        <p>在執行管理上，建議每季至少檢核一次跨部門 KPI，包括單位氫成本變化、設備可用率、安全事件數、示範合約履約率與供應鏈交期穩定度。這些指標能夠把技術進展轉化為經營語言，讓管理層、監管單位與資方在同一張儀表板上做決策。若缺少固定 KPI 週期，專案很容易在不同部門間各說各話，導致資源分配失焦。</p>
+        <p>年度規劃可採用「一個核心示範 + 兩個複製據點」策略。核心示範負責驗證新技術與新流程，複製據點則專注於標準化、建置速度與運維品質。這樣的組合可以同時保留創新彈性與商業化紀律，避免全部資源被單一試點綁死。當複製據點的建置時程與成本逐步收斂，代表技術已從研究導向進入產業導向。</p>
+        <p>最後要強調人才與治理節奏。綠氫與人工光合作用涉及材料、電化學、工安、電網與產業策略，不可能只靠單一部門完成。建立跨域專案辦公室、明確責任分工與固定檢核節奏，是確保計畫持續前進的基本條件。當技術、制度與供應鏈三條線同步推進，這類新能系統才有機會成為主流能源基礎設施，也才能在外部景氣波動下保持建置與投運連續性。這也是把示範成果沉澱為長期產業競爭力的唯一可靠方法，並穩定支撐後續擴建決策與跨區域複製，形成長期韌性並可審計。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const renewableAccess = document.getElementById('renewableAccess');
+    const h2Demand = document.getElementById('h2Demand');
+    const infraLevel = document.getElementById('infraLevel');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const r = Number(renewableAccess.value);
+      const d = Number(h2Demand.value);
+      const i = Number(infraLevel.value);
+      const options = [
+        { name: '先做工業園區示範，建立製氫-用氫閉環與安全規範', score: d * 1.2 + (6 - i) * 1.0 + r * 0.8 },
+        { name: '先強化低碳電力供應，再擴大電解槽規模', score: r * 1.3 + d * 0.7 + i * 0.6 },
+        { name: '先建儲運與加注節點，打通產業鏈瓶頸', score: i * 1.2 + d * 0.8 + r * 0.6 },
+        { name: '先聚焦高附加價值用氫場景，提升初期回收效率', score: d * 1.1 + r * 0.8 + i * 0.7 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [renewableAccess, h2Demand, infraLevel].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
