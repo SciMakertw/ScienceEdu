@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>學習指南：高空風能與系統穩定控制</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #071016;
+      --panel: #14303d;
+      --panel2: #1b4254;
+      --text: #ebf8ff;
+      --muted: #c7deea;
+      --line: #4f7389;
+      --accent: #89deff;
+      --accent2: #a7ffd5;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: radial-gradient(circle at 82% 10%, #2a627f 0%, #1a3e53 42%, #071016 100%); }
+    body { margin: 0; font-family: "Noto Sans TC", "Manrope", sans-serif; color: var(--text); line-height: 1.85; }
+
+    .progress { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,.08); z-index: 50; }
+    .progress span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .08s linear; }
+
+    .hero { padding: 5rem 1.1rem 2rem; border-bottom: 1px solid var(--line); }
+    .hero-inner { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem; align-items: end; }
+    .badge { display: inline-block; border: 1px solid #6f94a9; color: #d8f3ff; border-radius: 999px; padding: .22rem .72rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .74rem; }
+    h1 { margin: 0; font-family: "Manrope", sans-serif; font-size: clamp(2rem, 4.3vw, 3.2rem); line-height: 1.12; letter-spacing: -.01em; }
+    .hero p { margin: .9rem 0 0; color: #d0e7f2; max-width: 760px; font-size: 1rem; }
+
+    .layout { max-width: var(--max); margin: 0 auto; padding: 1rem 1.1rem 2rem; display: grid; grid-template-columns: 258px 1fr; gap: 1rem; }
+    .toc { position: sticky; top: 1rem; align-self: start; border: 1px solid var(--line); border-radius: 14px; background: rgba(19,42,55,.84); padding: .78rem; backdrop-filter: blur(8px); }
+    .toc h2 { margin: 0 0 .52rem; color: #d8ecf7; font-size: .86rem; text-transform: uppercase; letter-spacing: .08em; }
+    .toc a { display: block; text-decoration: none; color: #eaf6ff; border-radius: 8px; padding: .4rem .48rem; font-size: .9rem; }
+    .toc a:hover, .toc a.active { background: #3b6b84; color: #d4ffec; }
+
+    .planner { border: 1px solid #6790a6; border-radius: 16px; background: linear-gradient(150deg, #20465a, #19394b); padding: .95rem; margin-bottom: 1rem; box-shadow: 0 14px 34px rgba(0,0,0,.25); }
+    .planner h2 { margin: 0 0 .58rem; color: #def5ff; font-size: 1.03rem; }
+    .planner-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .55rem; }
+    .planner-item { border: 1px solid #7098ac; border-radius: 10px; background: rgba(10,24,33,.72); padding: .6rem .65rem; }
+    .planner-item label { display: block; color: #cfe5f0; font-size: .82rem; margin-bottom: .28rem; }
+    .planner-item input { width: 100%; accent-color: #89deff; }
+    .plan-out { margin-top: .6rem; border: 1px solid #7ea4b7; border-radius: 10px; background: rgba(8,18,25,.74); padding: .66rem .75rem; font-size: .9rem; color: #e1eef6; }
+    .plan-out b { color: #d3ffea; }
+
+    .section { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(165deg, var(--panel), var(--panel2)); padding: 1.15rem 1rem; margin-bottom: .95rem; opacity: 0; transform: translateY(14px); transition: opacity .62s ease, transform .62s ease; }
+    .section.show { opacity: 1; transform: translateY(0); }
+    .section h3 { margin: 0; font-size: clamp(1.22rem, 2.1vw, 1.72rem); line-height: 1.26; }
+    .lead { margin: .55rem 0 .72rem; color: #b9eeff; border-left: 3px solid var(--accent); padding-left: .56rem; font-size: .95rem; }
+    .section p { margin: .66rem 0; color: #e0eef7; font-size: .98rem; }
+
+    .video-card { margin-top: .95rem; border: 1px solid #7398ad; border-radius: 12px; background: #2a5a72; overflow: hidden; }
+    .video-meta { padding: .7rem .88rem; border-bottom: 1px solid #67869a; }
+    .video-meta h4 { margin: 0; font-size: 1rem; color: #f2fbff; }
+    .video-meta p { margin: .28rem 0 0; color: #d9e8f2; font-size: .9rem; }
+    .frame { position: relative; width: 100%; padding-bottom: 56.25%; background: #1f4458; }
+    .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    .debrief { margin-top: .74rem; border: 1px solid #7ea2b6; border-radius: 10px; background: rgba(40,70,86,.58); padding: .68rem .78rem; color: #e6f3fb; font-size: .92rem; }
+    .debrief strong { color: #d4ffeb; }
+
+    .open-youtube { display: inline-block; margin: .68rem .88rem .9rem; color: #d6ffef; font-size: .9rem; text-decoration: none; border-bottom: 1px dashed #d6ffef; }
+    .open-youtube:hover { color: #f2fffa; border-bottom-color: #f2fffa; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .planner-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="badge">Learning Guide • Airborne Wind Energy</span>
+        <h1>高空風能與系統穩定控制：<br>從飛行發電概念走向可併網工程</h1>
+        <p>高空風能（Airborne Wind Energy, AWE）希望利用更高空、更加穩定且更強的風資源發電，透過風箏翼、纜繩與地面發電單元形成新型風電系統。這份指南聚焦在工程可行性、控制安全與電網整合，幫你從示範影片走到部署思維。</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為什麼要做高空風能</a>
+      <a href="#s2">2. 平台架構與能量轉換</a>
+      <a href="#s3">3. 飛行控制與安全包線</a>
+      <a href="#s4">4. 併網調度與系統穩定</a>
+      <a href="#s5">5. 維運成本與法規治理</a>
+      <a href="#s6">6. 商業化路徑與落地策略</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="高空風能導入策略評估器">
+        <h2>高空風能導入策略評估器</h2>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="windStability">高空風場穩定度（高 = 較穩定）</label>
+            <input id="windStability" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="gridFlexibility">電網彈性（高 = 吸收波動能力佳）</label>
+            <input id="gridFlexibility" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="regReadiness">法規與空域準備度（高 = 審查路徑清楚）</label>
+            <input id="regReadiness" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="plan-out" id="planOutput">建議優先：<b>先做中小型示範場，建立控制可靠度與合規證據</b>。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為什麼要做高空風能</h3>
+        <p class="lead">高空風能的核心主張是：把風機從塔架限制中解放，去捕捉更高空且更穩定的風。</p>
+        <p>傳統風機受塔高、葉片尺寸、材料成本與運輸限制，能觸及的風資源有明顯邊界。AWE 嘗試以飛行翼與纜繩替代部分重型結構，降低鋼材與混凝土用量，並把發電系統延伸到更高空層。若控制可靠，單位材料所換得的發電量可能更有競爭力。</p>
+        <p>但工程現實是，AWE 不只是把風箏放上天。它同時涉及氣動設計、飛行控制、機電轉換、地面站可靠度與空域治理。只看發電效率很容易高估成熟度，真正難點在於如何把「可飛」轉成「可持續運轉、可審查、可融資」的系統能力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Makani's first offshore energy kite flight</h4>
+            <p>頻道：Makani｜用途：理解離岸情境下高空風能示範任務的工程輪廓。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="F6NW0QeKLZA" title="Makani first offshore energy kite flight" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>先把這支影片當成系統總覽，觀察飛行端、纜繩端與地面端如何協同。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 平台架構與能量轉換</h3>
+        <p class="lead">AWE 的設計分歧，主要在「發電機放在空中」還是「放在地面」兩條路線。</p>
+        <p>空中發電路線讓翼面直接帶動機載發電機，電力經導電纜線回傳地面；地面發電路線則利用纜繩張力驅動地面捲揚發電。前者在飛行端更複雜，後者在往復機構與機械疲勞管理上更嚴苛。兩者都要面對週期載荷、材料壽命與維修可及性問題。</p>
+        <p>工程評估時不只看峰值功率，還要看年發電量曲線、停機策略與維護窗口。高空資源雖好，但若維運頻率過高或故障恢復時間過長，最終會反映在度電成本與可融資性。這也是為什麼示範場數據比概念圖更有說服力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Makani Energy Kite</h4>
+            <p>頻道：Makani｜用途：理解風箏翼、旋翼與控制系統的整體設計思路。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="GSYMHzgLLn8" title="Makani energy kite" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看影片時請特別注意能量轉換鏈條，這會決定後續可靠度與維護成本。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 飛行控制與安全包線</h3>
+        <p class="lead">高空風能若要長時間運轉，控制系統必須先在各種風況下維持可預測行為。</p>
+        <p>系統要處理的不只是穩態飛行，還有起飛、爬升、發電軌跡、回收與降落等多階段轉換。每次模式切換都會牽動載荷變化與控制難度，若模型與感測精度不足，故障模式會快速放大。這也是 AWE 專案普遍重視數位模擬與硬體在迴路測試的原因。</p>
+        <p>在工程治理上，安全包線（operational envelope）是關鍵概念。團隊需要定義可運轉風速區間、突風觸發門檻、纜繩張力上限與自動退場邏輯，並且把每次事件變成可追溯資料。沒有可驗證的控制紀錄，就很難通過保險、監管與融資的多重審查。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Pulling Power from the Sky: The Story of Makani [Feature Film]</h4>
+            <p>頻道：X, The Moonshot Factory｜用途：從研發歷程理解飛行控制與工程取捨。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="qd_hEja6bzE" title="Pulling Power from the Sky" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這支片重點不是勵志，而是看到真實研發循環裡控制與可靠度如何互相牽制。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 併網調度與系統穩定</h3>
+        <p class="lead">AWE 的發電價值，最終要在電網端被兌現，而不是只停留在單機效率。</p>
+        <p>高空風能的輸出仍有波動，調度端關心的是可預測性、爬升速率、事件通報與備援能力。若 AWE 場站能提供更穩定的風資源，理論上可降低短時預測誤差；但要真正轉化成系統價值，還需要與儲能、需求響應與區域調度規則協同設計。</p>
+        <p>因此，專案早期就該納入電網模型，不要等硬體成熟後才談併網。包含預測資料格式、調度時間粒度、降載策略與故障切離機制，都會影響是否能被系統操作員接受。換句話說，電網整合不是收尾工作，而是商業化的先決條件。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜The Benefits of Integrating Airborne Wind Energy in Highly-Renewable Energy Systems</h4>
+            <p>頻道：Airborne Wind Energy Online｜用途：理解 AWE 在高再生電力系統中的調度價值。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="qP2AJELncdo" title="Integrating airborne wind energy in renewable systems" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>這段內容可直接對接「電力系統層級」的思考，不再只看單機性能指標。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 維運成本與法規治理</h3>
+        <p class="lead">AWE 的長期門檻在於維運可預期與法規可通行，而不是一次亮眼示範。</p>
+        <p>纜繩疲勞、翼面磨損、關鍵致動器壽命與天候停機比例，會直接決定可用率與運維費用。若每次故障都需要長時間停機與高成本檢修，整體經濟性就會被侵蝕。工程團隊必須建立預防維護節奏、備件策略與遠端診斷流程，讓停機風險可管理。</p>
+        <p>另一個核心是法規。AWE 牽涉空域使用、地面安全邊界、電網併接與環評程序，跨部門協調複雜度高。專案若缺乏清楚的合規路線，往往會在擴張階段遭遇審查瓶頸。與監管單位早期共同定義測試框架，通常比後期補件更有效率。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜AWEC 2024 conference opening</h4>
+            <p>頻道：Airborne Wind Energy Online｜用途：掌握產業社群對法規、驗證與商業化的共同議題。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="dYJ607PNUCM" title="AWEC 2024 conference opening" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>注意會議開場提到的驗證與治理語言，這些通常就是未來審查的關鍵詞。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 商業化路徑與落地策略</h3>
+        <p class="lead">AWE 要形成產業，不是靠單一明星專案，而是靠可複製的部署節奏。</p>
+        <p>比較務實的路線通常是「示範場驗證控制可靠度」再「擴大到多機協同」最後「進入區域電網常態調度」。每一步都要有可量測的里程碑，例如可用率、度電成本、故障間隔、審查通過時間。只有這些指標持續改善，資金才會願意跟進下一階段。</p>
+        <p>對台灣或島嶼型電力系統而言，AWE 可先從離島、偏遠工業負載或與儲能綁定的試點切入，再逐步連結主電網調度。重點不是追求一次到位，而是建立可擴張模板。當工程、法規與運維方法可複製，高空風能才有機會從前沿技術變成可靠基礎設施。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜10th International Airborne Wind Energy Conference (AWEC 2024)</h4>
+            <p>頻道：Airborne Wind Energy Online｜用途：掌握最新國際社群對 AWE 路線與落地策略的共識。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="t464wpwNM8Y" title="10th International Airborne Wind Energy Conference" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請把這支當成「產業雷達」，用來判斷技術成熟與商業化的真實節點。</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const windStability = document.getElementById('windStability');
+    const gridFlexibility = document.getElementById('gridFlexibility');
+    const regReadiness = document.getElementById('regReadiness');
+    const planOutput = document.getElementById('planOutput');
+
+    const updatePlan = () => {
+      const w = Number(windStability.value);
+      const g = Number(gridFlexibility.value);
+      const r = Number(regReadiness.value);
+      const options = [
+        { name: '先做中小型示範場，建立控制可靠度與合規證據', score: (6 - r) * 1.1 + (6 - w) * 0.8 + g * 0.6 },
+        { name: '先併入具備儲能的彈性節點，強化併網穩定度', score: g * 1.2 + w * 0.8 + r * 0.7 },
+        { name: '先推動空域與審查框架標準化，再擴張機組規模', score: r * 1.3 + g * 0.6 + w * 0.6 },
+        { name: '先集中高風況場址，追求早期發電量與成本曲線', score: w * 1.2 + g * 0.7 + r * 0.5 }
+      ].sort((a, b) => b.score - a.score);
+
+      planOutput.innerHTML = `建議優先：<b>${options[0].name}</b>，其次是 ${options[1].name}，再來是 ${options[2].name}。`;
+    };
+
+    [windStability, gridFlexibility, regReadiness].forEach((el) => el.addEventListener('input', updatePlan));
+    updatePlan();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? (top / total) * 100 : 0;
+      progressBar.style.width = `${pct}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((s) => sectionObserver.observe(s));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      });
+    }, { rootMargin: '-35% 0px -52% 0px', threshold: 0 });
+    sections.forEach((s) => navObserver.observe(s));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (!card || card.querySelector('.open-youtube')) return;
+      const link = document.createElement('a');
+      link.className = 'open-youtube';
+      link.href = watchUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '若嵌入播放器失敗，直接在 YouTube 開啟影片';
+      card.appendChild(link);
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
