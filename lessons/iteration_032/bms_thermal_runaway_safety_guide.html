@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="電池管理系統 BMS 與熱失控防護學習指南：從量測、均衡、故障偵測到熱傳播阻斷與系統級安全設計。">
+  <title>學習指南：電池管理系統 BMS 與熱失控防護</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #150f0b;
+      --panel: #2b1f18;
+      --panel-2: #3a2a1f;
+      --line: #7d5f46;
+      --text: #f8f1e9;
+      --muted: #e0d3c5;
+      --accent: #ffbd7a;
+      --accent-2: #f68d5f;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(255,189,122,.16), transparent 30%),
+        radial-gradient(circle at 88% 10%, rgba(246,141,95,.16), transparent 26%),
+        linear-gradient(180deg, #1a120d 0%, #150f0b 100%);
+    }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Noto Sans TC", sans-serif;
+      line-height: 1.85;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,.08);
+      z-index: 70;
+    }
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width .08s linear;
+    }
+
+    .hero {
+      padding: 5rem 1.15rem 2rem;
+      border-bottom: 1px solid rgba(255,189,122,.22);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -120px -120px auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,189,122,.22), rgba(255,189,122,0));
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.45fr .95fr;
+      gap: 1rem;
+      align-items: end;
+    }
+    .chip {
+      display: inline-block;
+      border: 1px solid rgba(255,189,122,.55);
+      border-radius: 999px;
+      padding: .24rem .8rem;
+      font-size: .8rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #ffe0ba;
+      margin-bottom: .88rem;
+    }
+    h1 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: clamp(2.2rem, 4.7vw, 3.9rem);
+      line-height: 1.05;
+      letter-spacing: -.02em;
+    }
+    .hero p {
+      margin: .95rem 0 0;
+      color: var(--muted);
+      max-width: 820px;
+      font-size: 1rem;
+    }
+    .hero-box {
+      border: 1px solid rgba(255,189,122,.34);
+      border-radius: 16px;
+      background: linear-gradient(155deg, rgba(49,35,26,.95), rgba(33,24,18,.92));
+      padding: .92rem;
+      box-shadow: 0 16px 30px rgba(0,0,0,.2);
+    }
+    .hero-box h2 {
+      margin: 0 0 .55rem;
+      font-size: .95rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #ffd5a2;
+    }
+    .hero-box ul {
+      margin: 0;
+      padding-left: 1rem;
+      color: #f0e5d8;
+      font-size: .93rem;
+    }
+    .hero-box li + li { margin-top: .4rem; }
+
+    .layout {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1rem 1.15rem 2.3rem;
+      display: grid;
+      grid-template-columns: 265px 1fr;
+      gap: 1rem;
+    }
+    .toc {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      border: 1px solid rgba(255,189,122,.22);
+      border-radius: 15px;
+      background: rgba(31,22,16,.88);
+      backdrop-filter: blur(10px);
+      padding: .84rem;
+    }
+    .toc h2 {
+      margin: 0 0 .55rem;
+      font-size: .84rem;
+      color: #ffd9ab;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .toc a {
+      display: block;
+      text-decoration: none;
+      color: #f6eee5;
+      padding: .42rem .5rem;
+      border-radius: 10px;
+      font-size: .91rem;
+    }
+    .toc a:hover,
+    .toc a.active {
+      background: rgba(255,189,122,.14);
+      color: #fff8ef;
+    }
+
+    .planner {
+      border: 1px solid rgba(246,141,95,.38);
+      border-radius: 18px;
+      background: linear-gradient(160deg, rgba(63,42,30,.96), rgba(37,27,20,.95));
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 16px 32px rgba(0,0,0,.22);
+    }
+    .planner h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #fff0de;
+    }
+    .planner p {
+      margin: .45rem 0 .85rem;
+      color: #efdccb;
+      font-size: .94rem;
+    }
+    .planner-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .7rem;
+    }
+    .planner-item {
+      border: 1px solid rgba(255,189,122,.2);
+      border-radius: 12px;
+      background: rgba(20,14,10,.28);
+      padding: .72rem;
+    }
+    .planner-item label {
+      display: block;
+      margin-bottom: .35rem;
+      color: #f7ebdf;
+      font-size: .84rem;
+    }
+    .planner-item input {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+    .planner-out {
+      margin-top: .75rem;
+      border: 1px solid rgba(255,189,122,.3);
+      border-radius: 11px;
+      background: rgba(10,7,5,.34);
+      padding: .75rem .8rem;
+      color: #f6ede4;
+      font-size: .93rem;
+    }
+    .planner-out b { color: #ffdbac; }
+
+    .section {
+      border: 1px solid rgba(255,189,122,.22);
+      border-radius: 19px;
+      background: linear-gradient(165deg, rgba(50,35,25,.95), rgba(35,25,18,.95));
+      padding: 1.2rem 1.1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 18px 34px rgba(0,0,0,.2);
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section h3 {
+      margin: 0;
+      font-family: "Fraunces", serif;
+      font-size: clamp(1.5rem, 2.4vw, 1.95rem);
+      line-height: 1.16;
+    }
+    .lead {
+      margin: .55rem 0 .78rem;
+      border-left: 3px solid var(--accent);
+      padding-left: .6rem;
+      color: #ffddb0;
+      font-size: .95rem;
+    }
+    .section p {
+      margin: .68rem 0;
+      color: #f4ece3;
+      font-size: .99rem;
+    }
+
+    .video-card {
+      margin-top: 1rem;
+      border: 1px solid rgba(246,141,95,.34);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #211710;
+    }
+    .video-meta {
+      padding: .8rem .9rem;
+      border-bottom: 1px solid rgba(246,141,95,.24);
+      background: linear-gradient(180deg, rgba(74,48,34,.88), rgba(52,36,27,.88));
+    }
+    .video-meta h4 {
+      margin: 0;
+      color: #fff5e8;
+      font-size: 1rem;
+    }
+    .video-meta p {
+      margin: .32rem 0 0;
+      color: #f0dfcf;
+      font-size: .9rem;
+    }
+    .frame {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: #0f0a07;
+    }
+    .frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .debrief {
+      margin-top: .76rem;
+      border: 1px solid rgba(255,189,122,.3);
+      border-radius: 11px;
+      background: rgba(94,61,38,.18);
+      padding: .72rem .8rem;
+      color: #f7efe7;
+      font-size: .93rem;
+    }
+    .debrief strong { color: #ffd9a5; }
+    .open-youtube {
+      display: inline-block;
+      margin: .7rem .9rem .9rem;
+      text-decoration: none;
+      color: #f7efe5;
+      border-bottom: 1px dashed rgba(247,239,229,.75);
+      font-size: .9rem;
+    }
+    .open-youtube:hover {
+      color: #fff;
+      border-bottom-color: #fff;
+    }
+
+    .closing {
+      border-top: 1px solid rgba(255,189,122,.2);
+      padding-top: 1rem;
+      color: #e5d5c6;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner, .layout, .planner-grid {
+        grid-template-columns: 1fr;
+      }
+      .toc { position: static; }
+    }
+    @media (max-width: 640px) {
+      .hero { padding-top: 4.4rem; }
+      h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="chip">Lesson 032 • Learning Guide</span>
+        <h1>電池管理系統 BMS 與熱失控防護</h1>
+        <p>真正的電池安全，從來不是只靠一顆保險絲或一句「通過測試」。它是一條連續的工程鏈：從單顆電芯量測、均衡與健康估測，到模組級熱管理、異常偵測、壓力釋放路徑，再到整車或儲能櫃的隔離策略與復原流程。當你把這些環節拆開看，會發現 BMS 的角色不是當記錄員，而是把風險提早攔在「可控」階段；一旦這個角色失靈，熱失控就會從局部異常變成系統事故。</p>
+      </div>
+      <aside class="hero-box">
+        <h2>本課定位</h2>
+        <ul>
+          <li>主領域：Technology｜次領域：Engineering</li>
+          <li>6 個章節，涵蓋 BMS 感測、均衡、熱失控機理與防護設計</li>
+          <li>互動元件：電池安全導入評估器</li>
+        </ul>
+      </aside>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. BMS 為什麼是電池系統的大腦</a>
+      <a href="#s2">2. 量測與均衡決定壽命與風險邊界</a>
+      <a href="#s3">3. 熱失控不是突然爆炸，而是失控鏈條</a>
+      <a href="#s4">4. 從單顆到模組，熱傳播怎麼被看見</a>
+      <a href="#s5">5. 故障預警與壓力監測如何提早止損</a>
+      <a href="#s6">6. 系統級防護：設計、測試、營運一體化</a>
+    </aside>
+
+    <main>
+      <section class="planner" aria-label="電池安全導入評估器">
+        <h2>電池安全導入評估器</h2>
+        <p>調整三個成熟度指標，看看你目前的電池系統比較像停在「可運作」階段，還是已經進入「可持續安全運作」階段。</p>
+        <div class="planner-grid">
+          <div class="planner-item">
+            <label for="sense">量測可視性：電壓/溫度/電流與異常事件記錄是否完整？</label>
+            <input id="sense" type="range" min="1" max="5" value="2">
+          </div>
+          <div class="planner-item">
+            <label for="thermal">熱管理能力：散熱、隔熱與熱擴散阻斷設計是否成熟？</label>
+            <input id="thermal" type="range" min="1" max="5" value="3">
+          </div>
+          <div class="planner-item">
+            <label for="response">應變流程：是否具備降額運轉、隔離與復原演練？</label>
+            <input id="response" type="range" min="1" max="5" value="2">
+          </div>
+        </div>
+        <div class="planner-out" id="plannerOutput">目前判定：<b>先補量測與故障可視性</b>。建議優先建立一致的資料採樣與事件標記，否則後續熱模型與預警門檻會缺乏可信基礎。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. BMS 為什麼是電池系統的大腦</h3>
+        <p class="lead">同一組電芯，安全與失控的分界，往往不是材料本身，而是控制策略的品質。</p>
+        <p>很多人談電池時，焦點只放在容量、續航與充電速度。但在工程現場，真正先被問的問題常是「這組系統能不能穩定地知道自己正在發生什麼」。BMS 的第一個任務，就是把電壓、電流、溫度、絕緣狀態與接觸器狀態轉成可決策的資訊。沒有這個層，所有安全機制都會像閉眼開車。</p>
+        <p>這裡最容易被低估的是時間尺度。電池異常不一定在秒級就變事故，有些偏差是幾小時、幾天逐步累積。BMS 如果只能抓住瞬間尖峰，卻看不到長期偏移，就會在看似平穩的運轉中慢慢把風險推高。反過來說，一套好的 BMS 不是只有保護觸發邏輯，還要有能支撐趨勢分析的資料一致性。</p>
+        <p>你可以把 BMS 想成一個不斷做判斷的值班工程師：哪些訊號還在合理範圍，哪些異常只是噪音，哪些趨勢代表該降額運轉，哪些條件已經必須隔離。只要這位值班工程師看不清現場，後面任何安全宣稱都會很脆弱。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Battery Monitoring Basics</h4>
+            <p>頻道：Texas Instruments｜用途：建立 BMS 感測與監控的基本架構，理解「量測品質」對安全控制的根本影響。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="1SeH0f8nigc" title="Battery Monitoring Basics" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看片時請特別看「哪些變數被持續量測、哪些只在保護觸發才被關注」。這能幫你判斷一套 BMS 是只求不炸，還是具備長期可維運能力。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. 量測與均衡決定壽命與風險邊界</h3>
+        <p class="lead">均衡不是為了好看，而是為了不讓最弱那顆電芯拖著整包系統走向危險。</p>
+        <p>電池包從來不是完美一致的個體集合。即使同批次電芯，內阻、容量、老化速度也會逐步分化。當電芯不一致擴大，充放電時就容易出現「有人先到上限、有人先掉到底限」的情況。這時若策略不夠精細，系統要嘛被迫提早降額，要嘛冒著過充過放風險繼續運轉。</p>
+        <p>均衡策略的核心不只在主動或被動，而在你是否知道「何時」均衡、「對誰」均衡、以及「均衡完是否真的改善」。很多實作只把均衡當成固定流程，忽略了負載狀態、溫度條件與 SOC 區間。結果是耗掉能量與時間，卻沒有真正降低偏差。</p>
+        <p>工程上更現實的一點是，均衡與熱管理是綁在一起的。均衡過程本身會產生熱，熱又會反過來加速老化不一致。如果 BMS 只在電氣面算得漂亮，卻沒把熱效應納入控制，等於把問題從一個模組挪到另一個模組，最後還是會回到安全壓力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Electric vehicles | Episode 4 - Battery Management Systems</h4>
+            <p>頻道：WMG, University of Warwick｜用途：從電動車系統視角理解 BMS 任務分工，建立均衡與壽命管理脈絡。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="k1N2LyXtK-k" title="Electric vehicles Episode 4 Battery Management Systems" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>影片中最值得抓的是「BMS 不只是保護器件，而是資源調度器」。均衡、限制功率與估算健康狀態，其實都在回答同一題：如何把風險留在可控區間。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. 熱失控不是突然爆炸，而是失控鏈條</h3>
+        <p class="lead">熱失控常被描述成一個瞬間事件，但工程上它更像一條逐步縮短的反應時間鏈。</p>
+        <p>從局部過熱、SEI 破壞、氣體釋放、壓力升高到自加速反應，熱失控通常有明確機理。問題在於，這條鏈在不同化學體系、不同機械結構與不同散熱條件下，推進速度差很多。若團隊只背結論，不理解機理，就很難設定有效的預警門檻。</p>
+        <p>BMS 在這一段的作用，是把看似分散的訊號湊成「風險故事」。單一溫度點升高可能只是局部負載，單一電壓波動可能只是量測誤差；但當溫度梯度異常、壓差變化、內阻上升與電流行為偏離同時出現，這就是應該提早介入的時刻。好的系統不等到保護跳脫才行動，而是在證據開始聚攏時就進行降額或隔離。</p>
+        <p>這也是為什麼熱失控防護不能只靠消防末端。真正的安全設計應該把「阻止發生」、「延緩傳播」與「可控失效」一起規劃。只要其中一段缺席，事故就會把剩下兩段壓到來不及反應。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜What Is Thermal Runaway?</h4>
+            <p>頻道：UL Research Institutes｜用途：把熱失控機理講清楚，建立從材料到系統反應的基礎語言。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="kHTlVmBbnPA" title="What Is Thermal Runaway" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請把重點放在「反應鏈條」而不是「單點溫度」。只盯絕對溫度常常太晚，觀察變化速率與相鄰單體的耦合才更接近實戰。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 從單顆到模組，熱傳播怎麼被看見</h3>
+        <p class="lead">一顆電芯失效不一定是系統災難，真正決定後果的是熱能能不能被限制在局部。</p>
+        <p>工程測試裡最殘酷的一課是：你以為已經控制住的事件，常常在相鄰單體被加熱後重新擴大。電芯間距、導熱路徑、結構材料、洩壓方向、匯流排設計，都會影響熱傳播的速度與形態。當模組設計只考慮正常工況效率，沒給異常工況留空間，事故就會放大得很快。</p>
+        <p>因此，熱傳播測試不是展示影片用，而是用來校準「你對風險擴散的想像」。如果實測看到火焰噴射方向、碎片飛散或高溫維持時間超出預估，就表示 BMS 的應對窗口可能比你原本設定更短。這會直接影響保護門檻、斷電策略與系統級隔離設計。</p>
+        <p>更實務的做法，是把熱測試結果反餵到控制策略。哪些情境該立即切斷，哪些情境可進入受限模式，哪些情境要通知上層系統做區域隔離。當材料、機構、控制三者開始閉環，安全設計才算真正落地。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜High speed Lithium Ion Battery Fire</h4>
+            <p>頻道：Department of Fire Protection Engineering, University of Maryland｜用途：用高速影像觀察熱事件演化，理解傳播行為與時間窗口。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="TNEfZqFOoGY" title="High speed Lithium Ion Battery Fire" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請留意事件推進速度與噴射方向。這些細節會直接改寫你對機構防護與維修安全距離的設定，不是單純視覺衝擊而已。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. 故障預警與壓力監測如何提早止損</h3>
+        <p class="lead">想在事故前介入，關鍵不是把感測器堆滿，而是讓感測資訊能形成可執行判斷。</p>
+        <p>在高能量密度系統裡，單靠電壓與溫度有時不足以捕捉早期異常。壓力、氣體、絕緣狀態與局部熱梯度，往往能提供更早的跡象。問題是，這些訊號如果沒有被整合進 BMS 或上層控制決策，最後只會變成「看得到但用不起來」的監測圖。</p>
+        <p>工程團隊常遇到一個兩難：門檻設太敏感，誤報會干擾營運；門檻設太寬鬆，真正異常又會滑過去。這裡沒有萬能數值，只有基於測試與運轉資料反覆校準。你需要知道哪些訊號組合代表可觀察偏差，哪些代表必須立刻降額，哪些已經該進入隔離程序。</p>
+        <p>當系統開始導入更多預警訊號時，紀律比演算法更重要。每一次觸發是否有被追蹤、每一次閾值調整是否有版本管理、每一次誤報是否有回顧機制，這些流程決定你是在累積安全能力，還是在累積未來難以排查的複雜度。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜Battery Flattery: Amy Marconnet Tests the Heat of Lithium-Ion Cells</h4>
+            <p>頻道：Purdue University Mechanical Engineering｜用途：連結熱行為研究與工程判讀，理解實驗如何支撐預警與防護策略。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="qCTMA8sxZO0" title="Battery Flattery Amy Marconnet Tests the Heat of Lithium-Ion Cells" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>影片重點在於「研究如何變成設計輸入」。不是只有實驗做得漂亮，而是要把量到的熱行為轉成可執行的控制與結構決策。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 系統級防護：設計、測試、營運一體化</h3>
+        <p class="lead">電池安全最怕「分段最佳化」：每個零件都看起來合格，但整體流程仍然脆弱。</p>
+        <p>成熟的電池安全工程，不會把責任壓在單一元件。它會同時設計感測架構、控制策略、熱與機構隔離、電氣保護、故障通報、維修流程與復原策略。換句話說，安全不是一個功能，而是一個跨部門的運行系統。只要其中一段沒被納入，真正事件來時就會暴露斷點。</p>
+        <p>從導入角度看，很多團隊在試產與初期部署最容易鬆動紀律。測試資料蒐集不足、版本追溯不完整、異常處理靠口頭經驗，這些都會讓後期風險累積。你需要的是一套可持續運作的節奏：定期驗證保護策略、演練隔離流程、檢查資料品質、回顧誤報與漏報，並把結果回寫到設計與韌體更新。</p>
+        <p>最後請記住，BMS 與熱失控防護的終點不是「從未觸發保護」，而是「即使觸發了，也能把事故限制在可控範圍，且讓系統有秩序地恢復」。這種能力看似保守，實際上才是大規模電動化與儲能部署能否長期被信任的關鍵。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜How pressure monitoring protects EV batteries from thermal runaway</h4>
+            <p>頻道：STMicroelectronics｜用途：從感測整合角度看熱失控早期預警，理解系統級安全要怎麼落到可量測實作。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="5O8J6OkFV4c" title="How pressure monitoring protects EV batteries from thermal runaway" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>把這支影片當作前面五章的收束。你會看到感測、判斷、控制與系統整合如何形成閉環，這正是工程上可維持的安全能力。</div>
+
+        <p class="closing">如果你要把今天內容轉成實際行動，建議從三個檢查點開始：第一，確認你是否真的看得見關鍵風險訊號，而不是只看得到平均值；第二，確認你的保護策略是否經過事件回放與跨條件測試，而不只是單一工況驗證；第三，確認你的組織是否有能力在故障時快速隔離、清楚通報並穩定復原。這三點做實，BMS 才會從規格表上的功能，變成系統可信度的核心。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const sense = document.getElementById('sense');
+    const thermal = document.getElementById('thermal');
+    const response = document.getElementById('response');
+    const plannerOutput = document.getElementById('plannerOutput');
+
+    const updatePlanner = () => {
+      const s = Number(sense.value);
+      const t = Number(thermal.value);
+      const r = Number(response.value);
+      const score = s * 1.2 + t * 1.1 + r * 1.2;
+
+      if (score < 9) {
+        plannerOutput.innerHTML = '目前判定：<b>先補量測與故障可視性</b>。建議優先建立一致的資料採樣與事件標記，否則後續熱模型與預警門檻會缺乏可信基礎。';
+      } else if (score < 13) {
+        plannerOutput.innerHTML = '目前判定：<b>已具備基礎防護，但需強化熱傳播阻斷</b>。下一步建議把模組級隔熱設計與異常降額策略一起驗證。';
+      } else {
+        plannerOutput.innerHTML = '目前判定：<b>安全閉環接近成熟</b>。建議固定化桌上演練與事件回放，持續校準門檻與復原流程。';
+      }
+    };
+
+    [sense, thermal, response].forEach((el) => el.addEventListener('input', updatePlanner));
+    updatePlanner();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      progressBar.style.width = `${total > 0 ? (top / total) * 100 : 0}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+      });
+    }, { rootMargin: '-35% 0px -50% 0px', threshold: 0 });
+    sections.forEach((section) => navObserver.observe(section));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (card && !card.querySelector('.open-youtube')) {
+        const link = document.createElement('a');
+        link.className = 'open-youtube';
+        link.href = watchUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = '直接在 YouTube 開啟影片';
+        card.appendChild(link);
+      }
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
