@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="工業控制系統資安與關鍵基礎設施防護學習指南：從 ICS/SCADA 架構、Stuxnet、資產盤點到 ISA/IEC 62443 與 OT 韌性治理。">
+  <title>學習指南：工業控制系統資安與關鍵基礎設施防護</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #111311;
+      --panel: #1b2420;
+      --panel-2: #23322c;
+      --panel-3: #30473d;
+      --line: #556c61;
+      --text: #f2f0e6;
+      --muted: #d0d5cb;
+      --accent: #d6b36b;
+      --accent-2: #98d6c0;
+      --warning: #f0c977;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at 16% 0%, rgba(214,179,107,.18), transparent 30%),
+        radial-gradient(circle at 85% 10%, rgba(152,214,192,.16), transparent 26%),
+        linear-gradient(180deg, #151814 0%, #111311 100%);
+    }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Noto Sans TC", sans-serif;
+      line-height: 1.85;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,.08);
+      z-index: 80;
+    }
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width .08s linear;
+    }
+
+    .hero {
+      padding: 5rem 1.15rem 2rem;
+      border-bottom: 1px solid rgba(214,179,107,.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -90px -90px auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(214,179,107,.22), rgba(214,179,107,0));
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr .9fr;
+      gap: 1.2rem;
+      align-items: end;
+    }
+    .eyebrow {
+      display: inline-block;
+      border: 1px solid rgba(214,179,107,.55);
+      color: #f4dfb2;
+      border-radius: 999px;
+      padding: .24rem .8rem;
+      font-size: .8rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: .9rem;
+    }
+    h1 {
+      margin: 0;
+      font-family: "Newsreader", serif;
+      font-size: clamp(2.3rem, 4.7vw, 4rem);
+      line-height: 1.04;
+      letter-spacing: -.02em;
+      max-width: 840px;
+    }
+    .hero p {
+      margin: 1rem 0 0;
+      color: var(--muted);
+      max-width: 820px;
+      font-size: 1rem;
+    }
+    .hero-panel {
+      border: 1px solid rgba(152,214,192,.34);
+      border-radius: 18px;
+      background: linear-gradient(160deg, rgba(25,36,31,.96), rgba(41,57,50,.9));
+      padding: 1rem;
+      box-shadow: 0 18px 38px rgba(0,0,0,.22);
+    }
+    .hero-panel h2 {
+      margin: 0 0 .55rem;
+      font-size: .95rem;
+      color: #e8f8f1;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .hero-panel ul {
+      margin: 0;
+      padding-left: 1rem;
+      color: #d9ebe2;
+      font-size: .95rem;
+    }
+    .hero-panel li + li { margin-top: .45rem; }
+
+    .layout {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1rem 1.15rem 2.4rem;
+      display: grid;
+      grid-template-columns: 265px 1fr;
+      gap: 1rem;
+    }
+    .toc {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      border: 1px solid rgba(214,179,107,.26);
+      border-radius: 16px;
+      background: rgba(25,31,28,.88);
+      backdrop-filter: blur(10px);
+      padding: .85rem;
+    }
+    .toc h2 {
+      margin: 0 0 .55rem;
+      color: #f2dfb5;
+      font-size: .84rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .toc a {
+      display: block;
+      padding: .42rem .5rem;
+      border-radius: 10px;
+      text-decoration: none;
+      color: #eff3ec;
+      font-size: .92rem;
+    }
+    .toc a:hover,
+    .toc a.active {
+      background: rgba(214,179,107,.14);
+      color: #fff6e0;
+    }
+
+    .radar {
+      border: 1px solid rgba(152,214,192,.34);
+      border-radius: 18px;
+      background: linear-gradient(155deg, rgba(37,53,45,.98), rgba(26,35,31,.96));
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 16px 36px rgba(0,0,0,.22);
+    }
+    .radar h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #f4f6f0;
+    }
+    .radar p {
+      margin: .45rem 0 .85rem;
+      color: #d1ded6;
+      font-size: .94rem;
+    }
+    .radar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .7rem;
+    }
+    .radar-item {
+      border: 1px solid rgba(214,179,107,.18);
+      border-radius: 12px;
+      background: rgba(11,14,13,.26);
+      padding: .75rem;
+    }
+    .radar-item label {
+      display: block;
+      color: #ebf2ed;
+      font-size: .84rem;
+      margin-bottom: .35rem;
+    }
+    .radar-item input { width: 100%; accent-color: var(--accent); }
+    .radar-output {
+      margin-top: .75rem;
+      border: 1px solid rgba(214,179,107,.3);
+      border-radius: 12px;
+      background: rgba(7,10,9,.36);
+      padding: .78rem .82rem;
+      color: #eef2ea;
+      font-size: .93rem;
+    }
+    .radar-output b { color: #fff0c8; }
+
+    .section {
+      border: 1px solid rgba(214,179,107,.22);
+      border-radius: 20px;
+      background: linear-gradient(165deg, rgba(31,40,35,.96), rgba(41,58,49,.95));
+      padding: 1.25rem 1.1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 18px 36px rgba(0,0,0,.18);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section h3 {
+      margin: 0;
+      font-family: "Newsreader", serif;
+      font-size: clamp(1.5rem, 2.3vw, 2rem);
+      line-height: 1.16;
+      letter-spacing: -.01em;
+    }
+    .lead {
+      margin: .55rem 0 .78rem;
+      color: #ffe5ab;
+      border-left: 3px solid var(--accent);
+      padding-left: .6rem;
+      font-size: .96rem;
+    }
+    .section p {
+      margin: .68rem 0;
+      color: #eef1ea;
+      font-size: .99rem;
+    }
+
+    .video-card {
+      margin-top: 1rem;
+      border: 1px solid rgba(152,214,192,.35);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #18231f;
+    }
+    .video-meta {
+      padding: .82rem .92rem;
+      border-bottom: 1px solid rgba(152,214,192,.24);
+      background: linear-gradient(180deg, rgba(52,73,63,.88), rgba(34,49,42,.88));
+    }
+    .video-meta h4 {
+      margin: 0;
+      font-size: 1rem;
+      color: #f9fbf8;
+    }
+    .video-meta p {
+      margin: .32rem 0 0;
+      color: #d8e5de;
+      font-size: .9rem;
+    }
+    .frame {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: #0d1311;
+    }
+    .frame iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .debrief {
+      margin-top: .78rem;
+      border: 1px solid rgba(214,179,107,.28);
+      border-radius: 12px;
+      background: rgba(69,57,33,.18);
+      padding: .74rem .82rem;
+      color: #f4eee0;
+      font-size: .93rem;
+    }
+    .debrief strong { color: #ffe6a6; }
+    .open-youtube {
+      display: inline-block;
+      margin: .72rem .92rem .92rem;
+      color: #e8f2eb;
+      font-size: .9rem;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(232,242,235,.78);
+    }
+    .open-youtube:hover {
+      color: #fff;
+      border-bottom-color: #fff;
+    }
+
+    .closing {
+      border-top: 1px solid rgba(214,179,107,.18);
+      padding-top: 1rem;
+      color: #d7ddd5;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner,
+      .layout,
+      .radar-grid {
+        grid-template-columns: 1fr;
+      }
+      .toc { position: static; }
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding-top: 4.4rem; }
+      h1 { font-size: 2.2rem; }
+      .section,
+      .radar,
+      .toc { padding-left: .9rem; padding-right: .9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress"><span id="progressBar"></span></div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <span class="eyebrow">Lesson 031 • Learning Guide</span>
+        <h1>工業控制系統資安與關鍵基礎設施防護</h1>
+        <p>一座城市最脆弱的時刻，常常不是天災降臨，而是看不見的控制訊號突然不再可信。水廠的加藥程序、變電站的保護邏輯、輸油管的壓力控制、工廠的安全儀表系統，平常安靜得像背景噪音；一旦被誤設、被入侵、被勒索，它們就會從技術名詞變成現實世界的停水、停電、停產與公共恐慌。這份指南不是把 OT 資安講成一份抽象清單，而是帶你走進真正的控制現場，理解 ICS、SCADA、PLC 與關鍵基礎設施防護為何跟一般 IT 安全有本質差異。</p>
+      </div>
+      <aside class="hero-panel">
+        <h2>學習焦點</h2>
+        <ul>
+          <li>主領域：Information｜次領域：Engineering</li>
+          <li>6 個教學章節，各自搭配真實 YouTube 影片與老師解讀</li>
+          <li>互動元件：OT 防護成熟度分級器</li>
+        </ul>
+      </aside>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc">
+      <h2>章節導覽</h2>
+      <a href="#s1">1. 為什麼 OT 被打到，世界會真的停下來</a>
+      <a href="#s2">2. ICS、SCADA、PLC 到底怎麼連成一張網</a>
+      <a href="#s3">3. Stuxnet 讓世界第一次看見控制邏輯被改寫</a>
+      <a href="#s4">4. 資產盤點與分區隔離是 OT 防護起點</a>
+      <a href="#s5">5. ISA/IEC 62443 為何是治理骨架</a>
+      <a href="#s6">6. 從偵測到復原，關鍵基礎設施要怎麼撐住</a>
+    </aside>
+
+    <main>
+      <section class="radar" aria-label="OT 防護成熟度分級器">
+        <h2>OT 防護成熟度分級器</h2>
+        <p>拖動三個滑桿，看一個關鍵基礎設施營運單位目前比較像是在救火、補洞，還是已經具備可持續的 OT 防護節奏。</p>
+        <div class="radar-grid">
+          <div class="radar-item">
+            <label for="visibility">資產可視性：你知道現場到底有哪些 PLC、HMI、工程站嗎？</label>
+            <input id="visibility" type="range" min="1" max="5" value="2">
+          </div>
+          <div class="radar-item">
+            <label for="segmentation">網路區隔：IT、OT、遠端維護與第三方連線有沒有明確邊界？</label>
+            <input id="segmentation" type="range" min="1" max="5" value="2">
+          </div>
+          <div class="radar-item">
+            <label for="recovery">復原演練：備援、離線備份與手動操作切換有沒有實際演練過？</label>
+            <input id="recovery" type="range" min="1" max="5" value="3">
+          </div>
+        </div>
+        <div class="radar-output" id="radarOutput">目前判定：<b>基礎盤點不足，先做看得見</b>。優先動作是建立 OT 資產清冊、整理遠端存取路徑，並確認哪些系統一旦停機會直接影響供水、供電、產線或安全。</div>
+      </section>
+
+      <section class="section" id="s1">
+        <h3>1. 為什麼 OT 被打到，世界會真的停下來</h3>
+        <p class="lead">在辦公室網路裡出錯，最常見的結果是檔案打不開；在控制網路裡出錯，可能是壓力閥打不開。</p>
+        <p>很多人第一次接觸工業控制系統資安，會直覺把它當成「比較舊的 IT」。這個想像很危險。IT 的核心資產通常是資料與服務可用性，OT 的核心資產則是連續運轉、物理安全與人身安全。控制網路裡每一個指令都可能牽動泵浦、馬達、閥門、斷路器與安全保護機制，所以 OT 的失敗不是只有資訊洩漏，而是設備真的會偏離設計條件。</p>
+        <p>這也是為什麼關鍵基礎設施防護永遠不能只談防火牆品牌。供水、能源、交通、化工與製造系統，都有長生命週期設備、停機代價高、補丁窗口少、現場商維人員複雜等特性。你很難像處理辦公室筆電一樣，說重開機就重開機，說升級就升級。許多設備還背著十年甚至二十年的歷史包袱，協定老、驗證弱、紀錄少，但它們仍然是城市與產線每天依賴的骨架。</p>
+        <p>真正成熟的 OT 安全思維，起點不是問「我們裝了哪些工具」，而是問「哪些流程一旦失效，會對現場造成什麼物理後果」。只要這個順序搞反，團隊就很容易把預算花在看起來很先進的監控圖表，卻忽略了最樸素、也最重要的安全邊界。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 1｜Cybersecurity for Industrial Control Systems: Why It Matters and How To Stay Protected</h4>
+            <p>頻道：RealPars｜用途：用控制現場的語言切入，先建立 OT 風險與 IT 風險的本質差異。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="5Wpu6dsWEb8" title="Cybersecurity for Industrial Control Systems: Why It Matters and How To Stay Protected" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>注意影片裡一直反覆出現的不是「機密性」，而是「操作連續性」與「安全」。這正是 OT 思維的轉折點。只要你抓住這一點，後面談分區、白名單、資產盤點，就不會覺得那些要求只是官僚流程，而會知道它們是在替物理世界保留緩衝空間。</div>
+      </section>
+
+      <section class="section" id="s2">
+        <h3>2. ICS、SCADA、PLC 到底怎麼連成一張網</h3>
+        <p class="lead">OT 架構之所以難守，不是因為名詞很多，而是因為每個名詞背後都有一種不同的失敗模式。</p>
+        <p>工業控制系統不是一台機器，而是一整串角色分工。PLC 負責即時控制，HMI 給操作員看狀態與下指令，SCADA 把分散站點集中監看，工程站用來下載程式與修改邏輯，Historian 記錄資料供分析與報表使用，還有各種通訊閘道把現場協定與企業系統接起來。當這些元件分別由不同供應商、不同年代、不同維護商組成時，資安問題很快就會從單點漏洞變成系統性複雜度。</p>
+        <p>很多入侵不是直接從 PLC 開始，而是沿著比較方便的路徑前進。遠端維護 VPN、共享工程筆電、跳板主機、Windows 工程站、歷史資料伺服器，往往比控制器本身更容易被利用。對攻擊者來說，真正重要的不是哪台設備最老，而是哪條路最能讓他接近能改寫程序邏輯的人與機器。</p>
+        <p>因此，理解 ICS 架構不是為了背圖，而是為了看懂信任關係。哪裡是命令下發點，哪裡只應單向傳資料，哪裡可以接受維修商遠端連線，哪裡一旦被橫向移動成功就足以造成製程偏移。你如果不知道系統如何連起來，就不可能知道應該把偵測器、白名單、帳號控管與分區閘道放在哪裡。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 2｜Industrial Control Systems - Understanding ICS Architectures</h4>
+            <p>頻道：Mandiant &amp; Google Cloud Security｜用途：從攻防視角拆解 ICS 組件與信任邊界，適合建立架構全貌。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="tHZNkXadh5U" title="Industrial Control Systems - Understanding ICS Architectures" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>看片時別只記設備名稱，請特別留意哪些節點同時扮演了「資料整合點」與「控制入口」。那種位置最容易在日常營運上看起來方便，卻在事件發生時成為風險放大的樞紐。</div>
+      </section>
+
+      <section class="section" id="s3">
+        <h3>3. Stuxnet 讓世界第一次看見控制邏輯被改寫</h3>
+        <p class="lead">Stuxnet 最驚人的地方，不是它是一支惡意程式，而是它懂得工業流程、懂得控制器，也懂得怎麼騙過人。</p>
+        <p>在很長一段時間裡，人們以為網路攻擊的結果大多停留在資料面。Stuxnet 改變了這個直覺。它不是單純加密檔案、竊取帳密，而是精準尋找特定控制環境，修改 PLC 邏輯，並同時回送看似正常的監看資訊。這種攻擊把「入侵」從資訊系統問題，提升成對物理製程的操控問題。</p>
+        <p>這件事之所以值得反覆學，是因為它讓全世界第一次清楚看到：控制系統安全不能只靠傳統周界防護。如果工程站能被利用、程式下載沒有嚴格驗證、操作員畫面可以被假資料欺騙，那麼就算現場設備本身很堅固，整體流程仍然可能在不知不覺中被推離安全區間。</p>
+        <p>從 Stuxnet 後的十多年來，OT 事件不只出現在高度機密設施，也出現在油氣、製造、物流與公共設施。它提醒我們，關鍵基礎設施最怕的不是單一漏洞，而是組織誤以為「沒出事就表示很安全」。很多控制環境真正缺的，不是更多設備，而是能看見異常行為的眼睛，以及在異常出現時有紀律地停損的能力。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 3｜Stuxnet Worm: One of the World's First Cyber Attacks</h4>
+            <p>頻道：CFR Education｜用途：把歷史事件講清楚，理解控制邏輯被動手腳時，風險如何從網路世界滲進物理世界。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="djUHvCyPYhY" title="Stuxnet Worm: One of the World's First Cyber Attacks" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請把焦點放在「偽裝正常」這件事。真正可怕的 OT 攻擊不一定是設備立刻停機，而是它可以讓現場一邊偏離，一邊看起來還像在正常運轉。這正是為什麼程序變更控管、獨立驗證與跨來源比對會那麼重要。</div>
+      </section>
+
+      <section class="section" id="s4">
+        <h3>4. 資產盤點與分區隔離是 OT 防護起點</h3>
+        <p class="lead">很多 OT 防護失敗，不是因為缺少高階技術，而是因為連「我們到底在保護什麼」都沒有說清楚。</p>
+        <p>資產盤點在 IT 世界可能像例行行政工作，在 OT 世界卻是戰略問題。你必須知道哪些 PLC 控制關鍵製程，哪些 HMI 位於關鍵站房，哪些工程站平常連得到控制器，哪些供應商透過什麼方式遠端登入。沒有這些基本資料，任何風險排序都只是猜測，任何事件調查都會像在黑暗中摸牆。</p>
+        <p>接著是分區與隔離。控制網路不應與企業辦公網形成毫無阻隔的平面網段，第三方維修也不應直接打到核心控制區。成熟做法通常會把業務系統、監看區、工程維護區、安全系統與外部連線拆成不同信任區，再用清楚的規則管住資料流向與管理連線。這種設計的目的不是追求零連通，而是讓單一失守不至於變成整體潰散。</p>
+        <p>你會發現，很多單位一開始最有效的改善並不是買新的 OT 平台，而是把遠端帳號收斂、整理跳板路徑、停用不必要服務、替關鍵工程站建立強驗證與變更紀錄。這些動作看起來不華麗，卻最能快速降低暴露面，因為它們直接針對攻擊者最愛走的路。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 4｜CISA’s OT Cybersecurity Webinar: Foundational Steps for Building an OT Asset Inventory</h4>
+            <p>頻道：CISA｜用途：從官方實務出發，說明為什麼 OT 可視性與資產清冊是所有後續控管的起跑線。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="liRig_LXQRQ" title="CISA’s OT Cybersecurity Webinar: Foundational Steps for Building an OT Asset Inventory" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>影片的價值不只在盤點方法，而在它提醒你盤點本身就是治理。當團隊能說清楚哪些資產最關鍵、哪些連線最危險、哪些站點最難停機，後面的補丁策略、偵測規則與演練優先順序才有依據。</div>
+      </section>
+
+      <section class="section" id="s5">
+        <h3>5. ISA/IEC 62443 為何是治理骨架</h3>
+        <p class="lead">標準的價值，不在於讓你把控制清單背熟，而在於它幫你建立一套跨部門都能說得通的共同語言。</p>
+        <p>OT 環境很容易陷入一種拉扯：資安團隊想更嚴，營運團隊怕停機，設備商有自己的維護習慣，管理層又希望結果可量化。ISA/IEC 62443 之所以重要，就是因為它把這些角色拉進同一個框架，從資產擁有者、系統整合商到產品供應商，各自對應不同責任，避免所有人都以為安全是別人的工作。</p>
+        <p>其中最關鍵的觀念，是把系統畫成 zones and conduits，也就是清楚區分信任區與它們之間的受控通道。這個概念看似抽象，實際上非常貼近控制現場。你不需要奢望每一台老設備都支援最新安全功能，但你至少要知道哪些設備可以被包在同一個風險邊界內，哪些跨區連線一定要被嚴格監督。</p>
+        <p>62443 也逼迫組織正視一件常被忽略的事：OT 安全不是只靠買產品，而是要靠生命週期管理。從設計、部署、變更、維護到淘汰，都應該有清楚的安全要求與補償措施。否則今天補上一個弱點，明天新的遠端維修需求又會在別處挖出洞來。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 5｜A Closer Look at the ISA/IEC 62443 Series of Standards</h4>
+            <p>頻道：International Society of Automation - ISA｜用途：建立 62443 的整體地圖，理解它如何把架構、流程與責任連起來。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="nC-_iObgZCc" title="A Closer Look at the ISA/IEC 62443 Series of Standards" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>你不需要一次吃下整套標準，但要記住它給你的不是更多複雜度，而是更清楚的責任切面。當 OT 安全討論可以從「誰該做什麼、做到什麼程度」開始，治理就不再只是口號。</div>
+      </section>
+
+      <section class="section" id="s6">
+        <h3>6. 從偵測到復原，關鍵基礎設施要怎麼撐住</h3>
+        <p class="lead">真正可靠的 OT 防護，不是保證永遠不出事，而是在出事時仍然能控制傷害、維持核心服務，並有辦法安全回復。</p>
+        <p>關鍵基礎設施的資安成熟度，最後一定會走到韌性。你不可能假設所有弱點都會被提前補好，也不能假設供應鏈永遠不出錯。更務實的做法是把偵測、應變、手動接管與復原流程當成系統設計的一部分。哪些異常必須在分鐘級反應，哪些程序可切到手動模式，哪些備份必須完全離線，哪些站點要先恢復，這些都需要在平時講清楚、演練過、寫進操作節奏。</p>
+        <p>許多組織把 OT 監測當成多一套儀表板，但好的 OT 偵測應該服務決策，而不是增加噪音。它要能告訴你：是誰在什麼時間點改了控制邏輯，哪一條跨區通訊突然出現不應存在的流量，哪個遠端連線在不該工作的時段上線。當偵測訊號跟現場程序知識結合，SOC 才不會只看到封包，卻看不懂風險。</p>
+        <p>最後別忘了，關鍵基礎設施的事件管理永遠同時是技術問題與信任問題。公眾不會先問你是 Modbus 還是 DNP3，他們只會問：水還會不會來？電什麼時候恢復？所以防護的終點不是技術漂亮，而是營運單位在壓力最大時，仍能誠實、穩定地守住最重要的服務承諾。</p>
+
+        <div class="video-card">
+          <div class="video-meta">
+            <h4>影片 6｜The Importance of OT Cybersecurity in Protecting Critical Infrastructure</h4>
+            <p>頻道：Dragos: OT Cybersecurity｜用途：把 OT 安全拉回到關鍵基礎設施韌性，理解偵測、應變與營運連續性的連動。</p>
+          </div>
+          <div class="frame"><iframe data-video-id="PlYNsrdj-DE" title="The Importance of OT Cybersecurity in Protecting Critical Infrastructure" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        </div>
+        <div class="debrief"><strong>老師解讀：</strong>請特別注意影片把「保護基礎設施」和「保護業務連續性」放在同一個句子裡。這不是修辭，而是 OT 防護最核心的現實。安全做得再細，如果不能支撐穩定供應，那就沒有真的完成任務。</div>
+
+        <p class="closing">走到這裡，你應該已經能用比較成熟的方式看 OT 資安：它不是把 IT 控制生硬搬進工廠，而是從物理流程、控制邏輯、營運節奏與公共後果出發，重新排列防護優先順序。下一次當你聽到某座工廠、某家公用事業或某條能源設施遭遇事件時，可以先問四件事：它控制的是什麼物理流程、攻擊者靠哪條路接近核心、現場是否有獨立驗證與手動接管能力、組織是否已經把復原當作平時訓練而不是事後祈禱。這四個問題，往往比任何行銷式口號都更接近真相。</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.getElementById('progressBar');
+    const sections = Array.from(document.querySelectorAll('.section'));
+    const navLinks = Array.from(document.querySelectorAll('.toc a'));
+    const iframes = Array.from(document.querySelectorAll('.frame iframe'));
+
+    const visibility = document.getElementById('visibility');
+    const segmentation = document.getElementById('segmentation');
+    const recovery = document.getElementById('recovery');
+    const radarOutput = document.getElementById('radarOutput');
+
+    const updateRadar = () => {
+      const v = Number(visibility.value);
+      const s = Number(segmentation.value);
+      const r = Number(recovery.value);
+      const score = v * 1.1 + s * 1.2 + r * 1.1;
+
+      if (score < 9) {
+        radarOutput.innerHTML = '目前判定：<b>基礎盤點不足，先做看得見</b>。優先動作是建立 OT 資產清冊、整理遠端存取路徑，並確認哪些系統一旦停機會直接影響供水、供電、產線或安全。';
+      } else if (score < 13) {
+        radarOutput.innerHTML = '目前判定：<b>邊界開始成形，但仍容易被橫向移動穿透</b>。下一步應優先強化 IT/OT 分區、第三方維護跳板與工程站帳號治理。';
+      } else {
+        radarOutput.innerHTML = '目前判定：<b>已具備韌性雛形，重點轉向偵測與復原節奏</b>。建議把邏輯變更監測、離線備份驗證與跨部門桌上演練納入固定週期。';
+      }
+    };
+
+    [visibility, segmentation, recovery].forEach((el) => el.addEventListener('input', updateRadar));
+    updateRadar();
+
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const top = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      progressBar.style.width = `${total > 0 ? (top / total) * 100 : 0}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.14 });
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        navLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+      });
+    }, { rootMargin: '-35% 0px -50% 0px', threshold: 0 });
+    sections.forEach((section) => navObserver.observe(section));
+
+    iframes.forEach((frame) => {
+      const id = frame.getAttribute('data-video-id');
+      if (!id) return;
+      const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+      embedUrl.searchParams.set('rel', '0');
+      embedUrl.searchParams.set('playsinline', '1');
+      embedUrl.searchParams.set('enablejsapi', '1');
+      if (window.location.origin && window.location.origin !== 'null') {
+        embedUrl.searchParams.set('origin', window.location.origin);
+      }
+      embedUrl.searchParams.set('widget_referrer', window.location.href);
+      frame.src = embedUrl.toString();
+
+      const watchUrl = `https://www.youtube.com/watch?v=${id}`;
+      const card = frame.closest('.video-card');
+      if (card && !card.querySelector('.open-youtube')) {
+        const link = document.createElement('a');
+        link.className = 'open-youtube';
+        link.href = watchUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = '直接在 YouTube 開啟影片';
+        card.appendChild(link);
+      }
+    });
+
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  </script>
+</body>
+</html>
